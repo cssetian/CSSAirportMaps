@@ -1,0 +1,21 @@
+
+.input-label {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.input-search {
+
+}
+
+th {
+  text-align: left;
+}
+
+.first-column {
+  min-width: 300px;
+}
+
+.second-column {
+  min-width: 300px;
+}

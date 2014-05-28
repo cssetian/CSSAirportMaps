@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Let's Make Some Maps!</title>
+  <link rel="stylesheet" href="styles/map-it.css" />
+</head>
+<body>
+  <div id="app-container">
+    <div id="input-container">
+      <h2>Input</h2>
+      <table id="airport-search-container">
+        <thead>
+          <tr>
+            <!--
+            <th for="selectedDepartureAirport" class="input-label first-column">Select Departure Airport:</th>
+            <th for="arrivalAirport" class="input-label second-column">Select Arrival Airport:</th>
+          -->
+            <th class="input-label first-column">Departure Airport:</th>
+            <th class="input-label second-column">Arrival Airport:</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input  type="text" =
+                        list="departure-airports-list" 
+                        name="departureAirport" 
+                        id="departureAirport" 
+                        class="input-search first-column required" 
+                        data-bind=" value: departureAirportInput, 
+                                    valueUpdate: 'input'" />
+            </td>
+            <td><input  type="text"
+                        list="arrival-airports-list"
+                        name="arrivalAirport"
+                        id="arrivalAirport"
+                        class="input-search second-column required"
+                        data-bind=" value: arrivalAirportInput, 
+                                    valueUpdate: 'input'" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="map-container">
+      <h2>Airport Data</h2>
+      <table id="airport-info-container">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Departure Airport</th>
+            <th>Arrival Airport</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Airport Name:</td>
+            <td><span data-bind="text: selectedDepartureAirport().name"></span></td>
+            <td><span data-bind="text: selectedArrivalAirport().name"></span></td>
+          </tr>
+          <tr>
+            <td>Airport Code:</td>
+            <td><span data-bind="text: selectedDepartureAirport().code"></span></td>
+            <td><span data-bind="text: selectedArrivalAirport().code"></span></td>
+          </tr>
+          <tr>
+            <td>City:</td>
+            <td><span data-bind="text: selectedDepartureAirport().city"></span></td>
+            <td><span data-bind="text: selectedArrivalAirport().city"></span></td>
+          </tr>
+          <tr>
+            <td>State:</td>
+            <td><span data-bind="text: selectedDepartureAirport().state"></span></td>
+            <td><span data-bind="text: selectedArrivalAirport().state"></span></td>
+          </tr>
+          <tr>
+            <td>Country:</td>
+            <td><span data-bind="text: selectedDepartureAirport().country"></span></td>
+            <td><span data-bind="text: selectedArrivalAirport().country"></span></td>
+          </tr>
+          <tr>
+            <td>Latitude:</td>
+            <td><span data-bind="text: selectedDepartureAirport().lat"></span></td>
+            <td><span data-bind="text: selectedArrivalAirport().lat"></span></td>
+          </tr>
+          <tr>
+            <td>Longitude:</td>
+            <td><span data-bind="text: selectedDepartureAirport().lon"></span></td>
+            <td><span data-bind="text: selectedArrivalAirport().lon"></span></td>
+          </tr>
+        </tbody>
+      </table>
+        
+      <h2>Results</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Units</th>
+            <th>Distance</th>
+          </tr>
+        </th>
+        <tr>
+          <td>Kilometers</td>
+          <td>
+            <!-- ko if: selectedDepartureAirport() && selectedArrivalAirport() -->
+            <span data-bind="text: distBtwnAirports('Km')"></span>
+            <!-- /ko -->
+          </td>
+        </tr>
+        <tr>
+          <td>Miles</td>
+          <td>
+            <!-- ko if: selectedDepartureAirport() && selectedArrivalAirport() -->
+            <div data-bind="text: distBtwnAirports('M')"></div>
+            <!-- /ko -->
+          </td>
+        </tr>
+        <tr>
+          <td>Nautical Miles</td>
+          <td>
+            <!-- ko if: selectedDepartureAirport() && selectedArrivalAirport() -->
+            <div data-bind="text: distBtwnAirports('NM')"></div>
+            <!-- /ko -->
+          </td>
+        </tr>
+      </table>
+
+      <div id="map-canvas" style="float:left;width:70%; height:400px"></div>
+
+    </div>
+  </div>
+
+</body>
+
+<div visibility="hidden">
+  <datalist id="departure-airports-list">
+  </datalist>
+
+  <datalist id="arrival-airports-list">
+  </datalist>
+
+
+  <script type="text/javascript" src="scripts/lib/jquery-2.1.0.js"></script>
+  <script type="text/javascript" src="scripts/lib/underscore-1.6.0.js"></script>
+  <script type="text/javascript" src="scripts/lib/knockout-3.1.0.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+  <script type="text/javascript" src="scripts/lib/latlong.js"></script>
+  <script type="text/javascript" src="content/airports.js"></script>
+  <script type="text/javascript" src="scripts/MapIt_App.js"></script>
+  <script type="text/javascript" src="scripts/MapModel.js"></script>
+  <script type="text/javascript" src="scripts/ViewModel.js"></script>
+</div>
+
+<script type="text/javascript">
+  (function ($) {
+
+    $( document ).ready(function() {
+
+        MapIt.App.init({
+          domEls: {
+            appContainer: $("#app-container"),
+            appTitle: $("#app-title"),
+            departureAirportsList: $("#departure-airports-list"),
+            arrivalAirportsList: $("#arrival-airports-list")
+          },
+          Urls: {
+            allAirportsUrl_XML: "http://airports.pidgets.com/v1/airports",
+            allAirportsUrl_JSON: "http://airports.pidgets.com/v1/airports?format=json"
+          },
+          airportsJSON: airportsJSON
+        });
+
+    });
+
+  })(jQuery);
+</script>
+
+</html>
