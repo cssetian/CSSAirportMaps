@@ -21,7 +21,7 @@ MapIt.App = MapIt.App || (function($, ko, google){
     viewModel = new MapIt.ViewModel(map);
 
 
-    initAirports(options);
+    initAirportRefData(options);
 
 
     ko.applyBindings(viewModel);
@@ -31,7 +31,7 @@ MapIt.App = MapIt.App || (function($, ko, google){
 
   };
 
-  var initAirports = function(options) {
+  var initAirportRefData = function(options) {
     console.log('Initializing airport datalist and appending elements to dropdown selects');
 
     _.each(options.airportsJSON, function(airport) {

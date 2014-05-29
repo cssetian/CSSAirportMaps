@@ -27,7 +27,7 @@
                         name="departureAirport" 
                         id="departureAirport" 
                         class="input-search first-column required" 
-                        data-bind=" value: departureAirportInput, 
+                        data-bind=" value: departureAirport().airportSearchInput, 
                                     valueUpdate: 'input'" />
             </td>
             <td><input  type="text"
@@ -35,7 +35,7 @@
                         name="arrivalAirport"
                         id="arrivalAirport"
                         class="input-search second-column required"
-                        data-bind=" value: arrivalAirportInput, 
+                        data-bind=" value: arrivalAirport().airportSearchInput, 
                                     valueUpdate: 'input'" />
             </td>
           </tr>
@@ -56,38 +56,38 @@
         <tbody>
           <tr>
             <td>Airport Name:</td>
-            <td><span data-bind="text: selectedDepartureAirport().name"></span></td>
-            <td><span data-bind="text: selectedArrivalAirport().name"></span></td>
+            <td><span data-bind="text: departureAirport().airportData().name"></span></td>
+            <td><span data-bind="text: arrivalAirport().airportData().name"></span></td>
           </tr>
           <tr>
             <td>Airport Code:</td>
-            <td><span data-bind="text: selectedDepartureAirport().code"></span></td>
-            <td><span data-bind="text: selectedArrivalAirport().code"></span></td>
+            <td><span data-bind="text: departureAirport().airportData().code"></span></td>
+            <td><span data-bind="text: arrivalAirport().airportData().code"></span></td>
           </tr>
           <tr>
             <td>City:</td>
-            <td><span data-bind="text: selectedDepartureAirport().city"></span></td>
-            <td><span data-bind="text: selectedArrivalAirport().city"></span></td>
+            <td><span data-bind="text: departureAirport().airportData().city"></span></td>
+            <td><span data-bind="text: arrivalAirport().airportData().city"></span></td>
           </tr>
           <tr>
             <td>State:</td>
-            <td><span data-bind="text: selectedDepartureAirport().state"></span></td>
-            <td><span data-bind="text: selectedArrivalAirport().state"></span></td>
+            <td><span data-bind="text: departureAirport().airportData().state"></span></td>
+            <td><span data-bind="text: arrivalAirport().airportData().state"></span></td>
           </tr>
           <tr>
             <td>Country:</td>
-            <td><span data-bind="text: selectedDepartureAirport().country"></span></td>
-            <td><span data-bind="text: selectedArrivalAirport().country"></span></td>
+            <td><span data-bind="text: departureAirport().airportData().country"></span></td>
+            <td><span data-bind="text: arrivalAirport().airportData().country"></span></td>
           </tr>
           <tr>
             <td>Latitude:</td>
-            <td><span data-bind="text: selectedDepartureAirport().lat"></span></td>
-            <td><span data-bind="text: selectedArrivalAirport().lat"></span></td>
+            <td><span data-bind="text: departureAirport().airportData().lat"></span></td>
+            <td><span data-bind="text: arrivalAirport().airportData().lat"></span></td>
           </tr>
           <tr>
             <td>Longitude:</td>
-            <td><span data-bind="text: selectedDepartureAirport().lon"></span></td>
-            <td><span data-bind="text: selectedArrivalAirport().lon"></span></td>
+            <td><span data-bind="text: departureAirport().airportData().lon"></span></td>
+            <td><span data-bind="text: arrivalAirport().airportData().lon"></span></td>
           </tr>
         </tbody>
       </table>
@@ -103,7 +103,7 @@
         <tr>
           <td>Kilometers</td>
           <td>
-            <!-- ko if: selectedDepartureAirport() && selectedArrivalAirport() -->
+            <!-- ko if: departureAirport().airportData() && arrivalAirport().airportData() -->
             <span data-bind="text: distBtwnAirports('Km')"></span>
             <!-- /ko -->
           </td>
@@ -111,7 +111,7 @@
         <tr>
           <td>Miles</td>
           <td>
-            <!-- ko if: selectedDepartureAirport() && selectedArrivalAirport() -->
+            <!-- ko if: departureAirport().airportData() && arrivalAirport().airportData() -->
             <div data-bind="text: distBtwnAirports('M')"></div>
             <!-- /ko -->
           </td>
@@ -119,7 +119,7 @@
         <tr>
           <td>Nautical Miles</td>
           <td>
-            <!-- ko if: selectedDepartureAirport() && selectedArrivalAirport() -->
+            <!-- ko if: departureAirport().airportData() && arrivalAirport().airportData() -->
             <div data-bind="text: distBtwnAirports('NM')"></div>
             <!-- /ko -->
           </td>
@@ -150,6 +150,7 @@
   <script type="text/javascript" src="scripts/MapIt_App.js"></script>
   <script type="text/javascript" src="scripts/MapModel.js"></script>
   <script type="text/javascript" src="scripts/ViewModel.js"></script>
+  <script type="text/javascript" src="scripts/Airport.js"></script>
 </div>
 
 <script type="text/javascript">

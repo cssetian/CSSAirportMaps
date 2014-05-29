@@ -2,6 +2,8 @@
   'use strict';
   var _map;
 
+  console.log('Got to the Airport.js file!');
+
   MapIt.Airport = function(map) {
     var self = this;
     _map = map;
@@ -14,7 +16,7 @@
     self.airportSearchSuffix = '?format=json&callback=alert';
 
     self.airportSearchUrl = ko.computed(function () {
-      var output = self.airportSearchBaseUrl + self.departureAirportInput() + self.airportSearchSuffix;
+      var output = self.airportSearchBaseUrl + self.airportSearchInput() + self.airportSearchSuffix;
       console.log('Airport Search Url: ' + output);
       return output;
     });
@@ -35,14 +37,14 @@
 
     self.airportData = ko.computed({
       read: function() {
-        console.log('Reading input for airport, value is: "' + self.departureAirportInput() + '"');
+        console.log('Reading input for airport, value is: "' + self.airportSearchInput() + '"');
 
-        if(typeof airportsJSON === undefined || (self.departureAirportInput() !== undefined && self.departureAirportInput().length === 0)) {
+        if(typeof airportsJSON === undefined || (self.airportSearchInput() !== undefined && self.airportSearchInput().length === 0)) {
           return self.emptyData;
         }
 
         var filteredAirports = _.filter(airportsJSON,function(airport) {
-          return self.departureAirportInput() === airport.name;
+          return self.airportSearchInput() === airport.name;
         });
 
         var resultAirport = '';
@@ -50,14 +52,14 @@
           resultAirport = filteredAirports[0];
 
           // If an airport is found, update the coordinates of the corresponding point on the map
-          self.departureAirportCoords(new google.maps.LatLng(parseInt(resultAirport.lat), parseInt(resultAirport.lon)));
-          self.departureAirportMarker(new google.maps.Marker({
-            position: self.departureAirportCoords(),
-            title: 'Departure Airport'
+          self.airportCoords(new google.maps.LatLng(parseInt(resultAirport.lat), parseInt(resultAirport.lon)));
+          self.airportMarker(new google.maps.Marker({
+            position: self.airportCoords(),
+            title: 'Airport Marker'
           }));
 
           // Set the new coordinates on the map
-          self.departureAirportMarker().setMap(_map);
+          self.airportMarker().setMap(_map);
 
           console.log('Found matching airport: ' + resultAirport.name);
         } else {
