@@ -118,7 +118,7 @@ MapIt.ViewModel = function() {
 
   self.twoAirportsSelected.subscribe(function(newVal){
     if(newVal === true) {
-      console.log('ViewModel.twoAirportsSelectedSusbscriber: Two airports are selected! Calculate route!');
+      console.log('ViewModel.twoAirportsSelectedSusbscriber: Two airports are selected! Add flight path to map!');
 
       self.flightPath(new google.maps.Polyline({
         path: [self.departureAirport().airportCoords(), self.arrivalAirport().airportCoords()],
@@ -128,20 +128,28 @@ MapIt.ViewModel = function() {
         strokeWeight: 2
       }));
       self.flightPath().setMap(self.map());
+
+      console.log('ViewModel.twoAirportsSelectedSubscriber: Setting view bounds on map');
       var bounds = new google.maps.LatLngBounds();
       bounds.extend(self.departureAirport().airportCoords());
       bounds.extend(self.arrivalAirport().airportCoords());
+      
       self.map().fitBounds(bounds);
     } else {
       self.flightPath().setMap(null);
+
       if(self.departureAirportSelected()) {
         console.log('ViewModel.twoAirportsSelectedSubscriber: Arrival airport has been deselected. Panning to departureAirport!');
+
         self.map().setZoom(10);
         self.map().panTo(self.mapMarkers()[1].marker.position);
+
       } else if(self.arrivalAirportSelected()) {
         console.log('ViewModel.twoAirportsSelectedSubscriber: Departure airport has been deselected. Panning to arrivalAirport!');
+
         self.map().setZoom(10);
         self.map().panTo(self.mapMarkers()[2].marker.position);
+
       }
       console.log('ViewModel.twoAirportsSelectedSubscriber: Two airports are not selected. Deal with any data updates needed.');
     }
@@ -172,11 +180,11 @@ MapIt.ViewModel = function() {
         } else {
           console.log('ViewModel.distBtwnAirports: No unit of length supplied, providing distance in Kilometers.');
         }
-        var distanceToReturnTrimmed =  parseFloat(distanceToReturn).toFixed(0);
         
         // This is getting repeated multiple times because whenever departureAirport or arrivalAirport are updated/touched at all, this recomputes
         // That incldues the tests in the HTML where it checks to see if they exist before displaying the computed distances
         //console.log('ViewModel.distBtwnAirports: Distance between ' + self.departureAirport().airportData().name + ' and ' + self.arrivalAirport().airportData().name + ' is approximately: ' + distanceToReturnTrimmed + ' ' + unit);
+        var distanceToReturnTrimmed =  parseFloat(distanceToReturn).toFixed(2);
         return distanceToReturnTrimmed;
       },
 

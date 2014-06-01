@@ -1,4 +1,6 @@
 
+// MapModel no longer needed currently - all updates are handled in viewmodel
+/*
 MapIt.MapModel = function() {
   var self = this;
 
@@ -85,3 +87,4 @@ MapIt.MapModel = function() {
 
   return { init: _init};
 };
+*/
