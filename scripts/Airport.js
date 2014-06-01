@@ -81,7 +81,7 @@ MapIt.Airport = function(map, options) {
         return null;
       } else {
         var _LatLng = new google.maps.LatLng(parseFloat(self.airportData().lat, 10), parseFloat(self.airportData().lon, 10));
-        console.log('Airport.airportCoords: New airportCoords for ' + self.name + ': ' + _LatLng);
+        console.log('Airport.airportCoords: New airportCoords for ' + self.name + ': (' + _LatLng.lat().toFixed(2) + ', ' + _LatLng.lng().toFixed(2) + ')');
         return _LatLng;
       }
     },
@@ -96,7 +96,7 @@ MapIt.Airport = function(map, options) {
         return null;
       } else {
         var _Marker = new google.maps.Marker({ position: self.airportCoords(), title: self.name});
-        console.log('Airport.airportMarker: New airport Marker for ' + self.name + ': ' + _Marker.getPosition().lat() + ', ' + _Marker.getPosition().lng());
+        console.log('Airport.airportMarker: New airport Marker for ' + self.name + ': ' + _Marker.getPosition().lat().toFixed(2) + ', ' + _Marker.getPosition().lng().toFixed(2));
         return _Marker;
       }
     },
