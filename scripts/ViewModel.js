@@ -135,8 +135,12 @@ MapIt.ViewModel = function() {
     } else {
       self.flightPath().setMap(null);
       if(self.departureAirportSelected()) {
+        console.log('ViewModel.twoAirportsSelectedSubscriber: Arrival airport has been deselected. Panning to departureAirport!');
+        self.map().setZoom(10);
         self.map().panTo(self.mapMarkers()[1].marker.position);
       } else if(self.arrivalAirportSelected()) {
+        console.log('ViewModel.twoAirportsSelectedSubscriber: Departure airport has been deselected. Panning to arrivalAirport!');
+        self.map().setZoom(10);
         self.map().panTo(self.mapMarkers()[2].marker.position);
       }
       console.log('ViewModel.twoAirportsSelectedSubscriber: Two airports are not selected. Deal with any data updates needed.');
