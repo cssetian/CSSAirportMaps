@@ -36,6 +36,14 @@
 
     self.name = options.name;
 
+    self.isAirportSelected = ko.computed({
+      read: function() {
+        return !(typeof self.airportData() === 'undefined' || typeof self.airportData().code === 'undefined' || self.airportData().code === '');
+      },
+      owner: self,
+      deferEvaluation: true
+    });
+
     self.airportSearchInput = ko.observable();
     self.airportSearchBaseUrl = 'http://airports.pidgets.com/v1/airports/';
     self.airportSearchSuffix = '?format=json&callback=alert';

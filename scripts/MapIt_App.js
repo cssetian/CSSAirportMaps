@@ -24,8 +24,6 @@ MapIt.App = (function($, _, ko) {
   var _init = function (options) {
     _initAirportRefData(options);
 
-    //var map = new MapIt.MapModel().init();
-    //var viewModel = new MapIt.ViewModel(map);
     viewModel = new MapIt.ViewModel();
 
     // If geolocation is available in this browser, set the initial marker to that person's location
@@ -40,14 +38,12 @@ MapIt.App = (function($, _, ko) {
     console.log('Creating initial position for map');
     var _initialLatLong = new google.maps.LatLng(40.7056308,-73.9780035);
     viewModel.initialPosition(_initialLatLong);
+    viewModel.mapMarkers()[0].marker.setPosition(viewModel.initialPosition());
 
     console.log('Initializing map!');
-    var mapOptions = {
-      zoom: 10,
-      center: viewModel.initialPosition()
-    };
-    viewModel.map(new google.maps.Map(document.getElementById('map-canvas'), mapOptions));
-    console.log('Initialized map with default position in Manhattan: ' + viewModel.initialPosition());
+    viewModel.map().setZoom(10);
+    viewModel.map().setCenter(viewModel.initialPosition());
+    console.log('Initialized map with default position in Manhattan: ' + viewModel.mapMarkers()[0].marker.position);//+ viewModel.initialPosition());
 
     ko.applyBindings(viewModel);
     options.domEls.appContainer.fadeIn(50);
@@ -56,13 +52,14 @@ MapIt.App = (function($, _, ko) {
 
   var _geoLocationCallback = function(position) {
     console.log('MapModel.GeoLocationCallback: Retrieved initial position via geolocation');
+    var _geoLocatedPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+    viewModel.mapMarkers()[0].marker.setPosition(_geoLocatedPosition);
 
-    viewModel.initialMarker().setMap(null);
-    viewModel.initialPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+    viewModel.initialPosition(_geoLocatedPosition);
     console.log('MapModel.GeoLocationCallback: Your current location is: ' + viewModel.initialPosition() + '!');
 
-    console.log('MapModel.GeoLocationCallback: Moving center of map');
-    viewModel.map().setCenter(viewModel.initialPosition());
+    console.log('MapModel.GeoLocationCallback: Moving center of map to: ' + viewModel.initialPosition());
+    viewModel.map().panTo(viewModel.initialPosition());
   };
 
   return { init: _init };
