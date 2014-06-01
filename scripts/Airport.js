@@ -1,6 +1,5 @@
 //(function(ko, google, LatLon, MapIt) {
 //  'use strict';
-  var _map;
 
 //  var MapIt = MapIt || {};
 //  MapIt.Airport = MapIt.Airport || {};
@@ -10,7 +9,6 @@
 
     /******* Initialize Airport *******/
     var self = this;
-    _map = map;
 
     // This is JSON so the quotes should stay as double quotes
     var emptyJSON = '{' +
@@ -82,7 +80,7 @@
           console.log('Airport.airportCoords: No airport supplied to airportCoords for ' + self.name + '!');
           return null;
         } else {
-          var _LatLng = new google.maps.LatLng(parseInt(self.airportData().lat, 10), parseInt(self.airportData().lon, 10));
+          var _LatLng = new google.maps.LatLng(parseFloat(self.airportData().lat, 10), parseFloat(self.airportData().lon, 10));
           console.log('Airport.airportCoords: New airportCoords for ' + self.name + ': ' + _LatLng);
           return _LatLng;
         }
@@ -108,9 +106,6 @@
     self.airportMarker.subscribe(function(newVal) {
           // Set the new coordinates on the map
       console.log('hHAWIUEFHUALEWHALFEHWAI LUFEHW ELIWA HEFILWA FEAW');
-      if(_map) {
-        self.airportMarker()['map'] = _map;
-      }
     });
 
   };

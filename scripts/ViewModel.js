@@ -20,15 +20,18 @@ MapIt.ViewModel = function() {
   });
 
   // EXCEPTION BEING THROWN HERE BECAUSE POSITION SHOULD NO LONGER BE CONTAINED IN VIEWMODEL
-  self.departureAirportUpdateHandler = function (newAirportData) {
+  self.departureAirportUpdateHandler = function (newAirportMarker) {
     console.log('ViewModel.DepartureAirportUpdateHandler: Updated Departure Airport!');
-    if(typeof newAirportData === 'undefined' || typeof newAirportData.name === 'undefined') {
+    if(typeof newAirportMarker === 'undefined' || newAirportMarker === null || typeof newAirportMarker.title === 'undefined') {
       console.log('ViewModel.DeptUpdateHandler: No Departure Airport to plot!');
-      self.departurePosition();
+      //self.departureAirport().airportMarker().setMap(self.map());
     } else {
-      console.log('ViewModel.DeptUpdateHandler: Plotting new Departure Airport ' + newAirportData.name + ' at: (' + newAirportData.lat + ', ' + newAirportData.lon + ')');
-      var _newDeparturePosition = new google.maps.LatLng(newAirportData.lat, newAirportData.lon);
-      self.departurePosition(_newDeparturePosition);
+      console.log('ViewModel.DeptUpdateHandler: Plotting new Departure Airport ' + newAirportMarker.title + ' at: (k: ' + newAirportMarker.position.k + ', A: ' + newAirportMarker.position.A + ')');
+      var _newDeparturePosition = new google.maps.LatLng(newAirportMarker.position.A, newAirportMarker.position.k);
+      //self.departurePosition(_newDeparturePosition);
+      //self.departureAirport().airportMarker().setMap(self.map());
+      newAirportMarker.setMap(self.map());
+      self.map().setCenter(newAirportMarker.position);
     }
   };
 
@@ -65,11 +68,25 @@ MapIt.ViewModel = function() {
 */
   console.log('ViewModel: Map-updating callback function for departureAirport bound to departureAirport.airportData');
 
+  self.arrivalAirportUpdateHandler = function (newAirportMarker) {
+    console.log('ViewModel.ArrivalAirportUpdateHandler: Updated Arrival Airport!');
+    if(typeof newAirportMarker === 'undefined' || newAirportMarker === null || typeof newAirportMarker.title === 'undefined') {
+      console.log('ViewModel.ArrUpdateHandler: No Arrival Airport to plot!');
+      //self.departureAirport().airportMarker().setMap(self.map());
+    } else {
+      console.log('ViewModel.ArrUpdateHandler: Plotting new Arrival Airport ' + newAirportMarker.title + ' at: (k: ' + newAirportMarker.position.k + ', A: ' + newAirportMarker.position.A + ')');
+      var _newArrivalPosition = new google.maps.LatLng(newAirportMarker.position.A, newAirportMarker.position.k);
+      //self.departurePosition(_newDeparturePosition);
+      //self.departureAirport().airportMarker().setMap(self.map());
+      newAirportMarker.setMap(self.map());
+      self.map().setCenter(newAirportMarker.position);
+    }
+  };
+
   self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'}));
   self.arrivalAirport.subscribe(self.arrivalAirportUpdateHandler);
-  self.arrivalPosition = ko.observable();
   console.log('ViewModel: Map-updating callback function for arrialAirport bound to arrivalAirport.airportData');
-
+/*
   self.arrivalAirportUpdateHandler = function (newAirportData) {
     if(typeof newAirportData === 'undefined' || typeof newAirportData.name === 'undefined') {
       console.log('ViewModel.ArrUpdateHandler: No Arrival Airport to plot!');
@@ -80,7 +97,7 @@ MapIt.ViewModel = function() {
       self.arrivalPosition(_newArrivalPosition);
     }
   };
-
+*/
 /*
   self.arrivalMarker = ko.computed({
     read: function() {
