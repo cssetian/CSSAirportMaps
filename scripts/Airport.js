@@ -23,7 +23,7 @@ MapIt.Airport = function(map, options) {
     '"direct_flights":"",' +
     '"carriers":""' +
   '}';
-      
+
   self.emptyData = JSON.parse(emptyJSON);
   self.name = options.name;
 
@@ -63,6 +63,7 @@ MapIt.Airport = function(map, options) {
 
         console.log('Airport.airportData: Found matching airport: ' + resultAirport.name);
       } else {
+        resultAirport = self.emptyData;
         console.log('Airport.airportData: No matching airport found.');
       }
 
