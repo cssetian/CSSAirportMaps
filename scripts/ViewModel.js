@@ -1,67 +1,99 @@
 
-MapIt.ViewModel = function(map) {
+MapIt.ViewModel = function() {
   var self = this;
-  var _map;
 
-  self.map = ko.observable(map);
-
-  self.departureAirport = ko.observable(new MapIt.Airport(self._map, {name: 'Departure Airport'}));
-  self.arrivalAirport = ko.observable(new MapIt.Airport(self._map, {name: 'Arrival Airport'}));
+  self.map = ko.observable(new google.maps.Map(document.getElementById('map-canvas'), {}));
 
   self.airportSearchInput = ko.observable('');
   self.airportList = ko.observableArray([]);
 
+  self.initialPosition = ko.observable();
+  self.initialMarker = ko.computed({
+    read: function() {
+      console.log('MapModel.initialMarker: Recomputing initialMarker to: ' + self.initialPosition());
+      var _initialMarker = new google.maps.Marker({
+        position: self.initialPosition(),
+        map: self.map()
+      });
+      return _initialMarker;
+    }
+  });
+
+  // EXCEPTION BEING THROWN HERE BECAUSE POSITION SHOULD NO LONGER BE CONTAINED IN VIEWMODEL
   self.departureAirportUpdateHandler = function (newAirportData) {
-    console.log('MapIt_App.init: Plotting new Departure Airport ' + newAirportData.name + ' at: (' + newAirportData.lat + ', ' + newAirportData.lon + ')');
-    
-    self.map.departurePosition(newAirportData());
+    console.log('ViewModel.DepartureAirportUpdateHandler: Updated Departure Airport!');
+    if(typeof newAirportData === 'undefined' || typeof newAirportData.name === 'undefined') {
+      console.log('ViewModel.DeptUpdateHandler: No Departure Airport to plot!');
+      self.departurePosition();
+    } else {
+      console.log('ViewModel.DeptUpdateHandler: Plotting new Departure Airport ' + newAirportData.name + ' at: (' + newAirportData.lat + ', ' + newAirportData.lon + ')');
+      var _newDeparturePosition = new google.maps.LatLng(newAirportData.lat, newAirportData.lon);
+      self.departurePosition(_newDeparturePosition);
+    }
   };
+
+  self.departureAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Departure Airport'}));
+  self.departureAirport().airportMarker.subscribe(self.departureAirportUpdateHandler);
+  /*
+  self.departurePosition = ko.computed({
+    read: function() {
+      console.log('ViewModel.departurePosition: Recomputing departurePosition');
+      if(typeof self.departureAirport() === 'undefined' ||
+         typeof self.departureAirport().airportData === 'undefined' ||
+         typeof self.departureAirport().airportData.name === 'undefined') {
+        console.log('ViewModel.departurePosition: No Departure Airport to plot!');
+        return '';
+      } else {
+        console.log('ViewModel.departurePosition: Computing new departure position for ' + self.departureAirport().airportData.name + ' at: (' + self.departureAirport().airportData.lat + ', ' + self.departureAirport().airportData.lon + ')');
+        var _newDeparturePosition = new google.maps.LatLng(self.departureAirport().airportData.lat, self.departureAirport().airportData.lon);
+        return _newDeparturePosition;
+      }
+    },
+    owner: self
+  });
+  self.departureMarker = ko.computed({
+    read: function() {
+      console.log('ViewModel.departureMarker: Recomputing departureMarker to: ' + self.departurePosition());
+      var _departureMarker =  new google.maps.Marker({
+        position: self.departurePosition(),
+        map: self.map()
+      });
+      return _departureMarker;
+    },
+    owner: self
+  });
+*/
+  console.log('ViewModel: Map-updating callback function for departureAirport bound to departureAirport.airportData');
+
+  self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'}));
+  self.arrivalAirport.subscribe(self.arrivalAirportUpdateHandler);
+  self.arrivalPosition = ko.observable();
+  console.log('ViewModel: Map-updating callback function for arrialAirport bound to arrivalAirport.airportData');
 
   self.arrivalAirportUpdateHandler = function (newAirportData) {
     if(typeof newAirportData === 'undefined' || typeof newAirportData.name === 'undefined') {
-      console.log('MapIt_App.init: Plotting new Arrival Airport ' + newAirportData.name + ' at: (' + newAirportData.lat + ', ' + newAirportData.lon + ')');
-      self.map.arrivalPosition(newAirportData);
+      console.log('ViewModel.ArrUpdateHandler: No Arrival Airport to plot!');
+      self.arrivalPosition();
     } else {
-      console.log('MapIt_App.init: No Arrival Airport to plot!');
-      self.map.arrivalPosition();
+      console.log('ViewModel.ArrUpdateHandler: Plotting new Arrival Airport ' + newAirportData.name + ' at: (' + newAirportData.lat + ', ' + newAirportData.lon + ')');
+      var _newArrivalPosition = new google.maps.LatLng(newAirportData.lat, newAirportData.lon);
+      self.arrivalPosition(_newArrivalPosition);
     }
   };
 
-  self.departureAirport().airportData.subscribe(self.departureAirportUpdateHandler);
-  console.log('MapIt_App.init: Map-updating callback function for departureAirport bound to departureAirport.airportData');
-
-  self.arrivalAirport().airportData.subscribe(self.arrivalAirportUpdateHandler);
-  console.log('MapIt_App.init: Map-updating callback function for arrialAirport bound to arrivalAirport.airportData');
-
-
-  /*
-  self.areTwoAirportsSelected = ko.computed(function() {
-    if(typeof self.departureAirport() === 'undefined'                     || typeof self.arrivalAirport() === 'undefined' ||
-       typeof self.departureAirport().airportData() === 'undefined'       || typeof self.arrivalAirport().airportData() === 'undefined' ||
-       typeof self.departureAirport().airportData().lat === 'undefined'   || typeof self.arrivalAirort().airportData().lat === 'undefined'
-      ) {
-      return false;
-    }
-    return self.departureAirport().airportData().name !== '' && self.arrivalAirport().airportData().name !== '';
+/*
+  self.arrivalMarker = ko.computed({
+    read: function() {
+      console.log('MapModel.arrivalMarker: Recomputing arrivalMarker to: ' + self.arrivalPosition());
+      var _arrivalMarker =  new google.maps.Marker({
+        position: self.arrivalPosition(),
+        map: self.map()
+      });
+      return _arrivalMarker;
+    },
+    owner: self
   });
-  
-  self.areTwoAirportsSelected.subscribe(function(twoPortsSelected) {
-    var bounds = new google.maps.LatLngBounds ();
-    if(twoPortsSelected() === true) {
-      console.log('ViewModel.areTwoAirportsSelectedSubscribe: Two airports selected!');
-    }
-    else if(typeof self.departureAirport().airportCoords() !== undefined && self.departureAirport().airportCoords().length > 0) {
-      _map.setCenter(self.departureAirport().airportCoords());
-      console.log('Adding departure airport to map bounds');
-    }
-    if(typeof self.arrivalAirport().airportCoords() !== undefined && self.arrivalAirport().airportCoords().length > 0) {
-      _map.setCenter(self.arrivalAirport().airportCoords());
-      console.log('Adding arrival airport to map bounds');
-    }
-
-    map.fitBounds(bounds);
-  });
-  */
+*/
 
   self.distBtwnAirports = function(unit) {
     return ko.computed({
@@ -93,29 +125,14 @@ MapIt.ViewModel = function(map) {
         // This is getting repeated multiple times because whenever departureAirport or arrivalAirport are updated/touched at all, this recomputes
         // That incldues the tests in the HTML where it checks to see if they exist before displaying the computed distances
         console.log('ViewModel.distBtwnAirports: Distance between ' + self.departureAirport().airportData().name + ' and ' + self.arrivalAirport().airportData().name + ' is approximately: ' + distanceToReturnTrimmed + ' ' + unit);
-        
         return distanceToReturnTrimmed;
-
-        // Sample usage of LatLon from an API example
-        //   var p1 = new LatLon(51.5136, -0.0983);                                                      
-        //   var p2 = new LatLon(51.4778, -0.0015);                                                      
-        //   var dist = p1.distanceTo(p2);          // in km                                             
-        //   var brng = p1.bearingTo(p2);           // in degrees clockwise from north   
       },
 
       deferEvaluation: true
     }, this);
   };
 
-  // private helpers
-  var _resetDepartureSearch = function () {
-    self.executingDepartureSearch(false);
-    self.departureAirportInput('');
-  };
-  var _resetArrivalSearch = function () {
-    self.executingArrivalSearch(false);
-    self.arrivalAirportInput('');
-  };
+/**********************************************************************************************************/
 
-  //return { init: _init };
+
 };

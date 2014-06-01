@@ -49,9 +49,10 @@
 
     self.airportData = ko.computed({
       read: function() {
-        console.log('Reading input for airport, value is: "' + self.airportSearchInput() + '"');
+        console.log('Airport.airportData: Reading input for airport ' + self.name + ', value is: "' + self.airportSearchInput() + '"');
 
         if(typeof airportsJSON === 'undefined' || typeof self.airportSearchInput() === 'undefined' || self.airportSearchInput().length === 0) {
+          console.log('Airport.airportData: No airport search input supplied, or no JSON data for airports. Returning default data.');
           return self.emptyData;
         }
 
@@ -63,9 +64,9 @@
         if(filteredAirports.length > 0) {
           resultAirport = filteredAirports[0];
 
-          console.log('Found matching airport: ' + resultAirport.name);
+          console.log('Airport.airportData: Found matching airport: ' + resultAirport.name);
         } else {
-          console.log('No matching airport found.');
+          console.log('Airport.airportData: No matching airport found.');
         }
 
         return resultAirport;
@@ -76,10 +77,14 @@
     
     self.airportCoords = ko.computed({
       read: function() {
-        if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().length === 'undefined') {
+        console.log('Airport.airportCoords: Recomputing airportCoords for ' + self.name);
+        if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().code === 'undefined' || self.airportData().code === '') {
+          console.log('Airport.airportCoords: No airport supplied to airportCoords for ' + self.name + '!');
           return null;
         } else {
-          return new google.maps.LatLng(parseInt(self.airportData().lat), parseInt(self.airportData().lon));
+          var _LatLng = new google.maps.LatLng(parseInt(self.airportData().lat, 10), parseInt(self.airportData().lon, 10));
+          console.log('Airport.airportCoords: New airportCoords for ' + self.name + ': ' + _LatLng);
+          return _LatLng;
         }
       },
       owner: self
@@ -87,10 +92,14 @@
 
     self.airportMarker = ko.computed({
       read: function() {
-        if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().length === 'undefined') {
+        console.log('Airport.airportMarker: Recomputing airportMarker for ' + self.name);
+        if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().code === 'undefined' || self.airportData().code === '') {
+          console.log('Airport.airportMarker: No airport supplied to airportMarker for ' + self.name + '!');
           return null;
         } else {
-          return new google.maps.Marker({ position: self.airportCoords(), title: self.name});
+          var _Marker = new google.maps.Marker({ position: self.airportCoords(), title: self.name});
+          console.log('Airport.airportMarker: New airport Marker for ' + self.name + ': ' + _Marker.getPosition().lat() + ', ' + _Marker.getPosition().lng());
+          return _Marker;
         }
       },
       owner: self
@@ -98,6 +107,7 @@
 
     self.airportMarker.subscribe(function(newVal) {
           // Set the new coordinates on the map
+      console.log('hHAWIUEFHUALEWHALFEHWAI LUFEHW ELIWA HEFILWA FEAW');
       if(_map) {
         self.airportMarker()['map'] = _map;
       }
