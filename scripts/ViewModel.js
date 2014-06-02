@@ -63,6 +63,23 @@ MapIt.ViewModel = function() {
   self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'}));
   self.arrivalAirport().airportMarker.subscribe(self.arrivalAirportUpdateHandler);
   console.log('ViewModel: Map-updating callback function for arrialAirport bound to arrivalAirport.airportData');
+  /*
+  self.departureAirport().airportSearchInput.subscribe(function(newVal){
+    if(typeof newVal.length === 'undefined' || newVal.length === 0) {
+      console.log('No input supplied, turning off datalist doubleclick')
+      $('#departureAirport').off('ondblclick');
+    } else {
+      $('#departureAirport').on('ondblclick');
+    }
+  });
+  self.arrivalAirport().airportSearchInput.subscribe(function(newVal){
+    if(typeof newVal.length === 'undefined' || newVal.length === 0) {
+      $('#arrivalAirport').off('ondblclick');
+    } else {
+      $('#arrivalAirport').on('ondblclick');
+    }
+  });
+  */
   /**************************************************************************************/
 
   /********************** Airport Existance Conditions and Helpers **********************/

@@ -51,6 +51,10 @@ table {
   }
 }
 
+input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
 .module {
   width:90%;
   margin: 10px auto;

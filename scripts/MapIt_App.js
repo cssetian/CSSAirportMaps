@@ -22,6 +22,10 @@ MapIt.App = (function($, _, ko) {
       minLength: 2
     });
     */
+   /*
+    $('#departureAirport').off('ondblclick');
+    $('#arrivalAirport').off('ondblclick');
+    */
 
     // If geolocation is available in this browser, set the initial marker to that person's location
     // Otherwise, set location to Manhattan
