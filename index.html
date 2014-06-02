@@ -2,35 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Let's Make Some Maps!</title>
+  <link rel="stylesheet" href="styles/bootstrap.css" />
+  <link rel="stylesheet" href="styles/bootstrap-theme.css" />
   <link rel="stylesheet" href="styles/map-it.css" />
 </head>
 <body>
-  <div id="app-container">
-    <div id="input-container">
+  <div class="container">
+    <h1>Let's Plot Some Maps</h1>
+    <hr />
+    <div id="input-container" class="module">
       <h2>Input</h2>
-      <table id="airport-search-container">
+      <table id="airport-search-container" class="table input-table">
         <thead>
           <tr>
-            <th class="input-label first-column">Departure Airport:</th>
-            <th class="input-label second-column">Arrival Airport:</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td><input  type="text" =
-                        list="departure-airports-list" 
+          <tr> <!-- list="departure-airports-list" -->
+            <th class="input-label first-input-column">Departure Airport:</th>
+            <td><input  type="text"
+                        list="departure-airports-list"
                         name="departureAirport" 
                         id="departureAirport" 
-                        class="input-search first-column required" 
+                        class="second-input-column required" 
                         data-bind=" value: departureAirport().airportSearchInput, 
                                     valueUpdate: 'input'" />
-            </td>
+            </td> 
+          </tr><tr><!--list="arrival-airports-list"-->
+            <th class="input-label first-input-column">Arrival Airport:</th>
             <td><input  type="text"
                         list="arrival-airports-list"
                         name="arrivalAirport"
                         id="arrivalAirport"
-                        class="input-search second-column required"
+                        class="second-input-column required"
                         data-bind=" value: arrivalAirport().airportSearchInput, 
                                     valueUpdate: 'input'" />
             </td>
@@ -39,65 +45,103 @@
       </table>
     </div>
 
-    <div id="map-container">
-      <h2>Airport Data</h2>
-      <table id="airport-info-container">
+    <div id="results-container" class="module">
+      <h2>Results</h2>
+      <table id="departure-airport-data-container" class="table results-data">
         <thead>
           <tr>
-            <th></th>
-            <th>Departure Airport</th>
-            <th>Arrival Airport</th>
+            <th class='first-column'></th>
+            <th class='second-column'>Departure Airport</th>
+            <th class='third-column hidden-700'>Arrival Airport</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>Airport Name:</td>
             <td><span data-bind="text: departureAirport().airportData().name"></span></td>
-            <td><span data-bind="text: arrivalAirport().airportData().name"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().name" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>Airport Code:</td>
             <td><span data-bind="text: departureAirport().airportData().code"></span></td>
-            <td><span data-bind="text: arrivalAirport().airportData().code"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().code" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>City:</td>
             <td><span data-bind="text: departureAirport().airportData().city"></span></td>
-            <td><span data-bind="text: arrivalAirport().airportData().city"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().city" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>State:</td>
             <td><span data-bind="text: departureAirport().airportData().state"></span></td>
-            <td><span data-bind="text: arrivalAirport().airportData().state"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().state" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>Country:</td>
             <td><span data-bind="text: departureAirport().airportData().country"></span></td>
-            <td><span data-bind="text: arrivalAirport().airportData().country"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().country" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>Latitude:</td>
             <td><span data-bind="text: departureAirport().airportData().lat"></span></td>
-            <td><span data-bind="text: arrivalAirport().airportData().lat"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().lat" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>Longitude:</td>
             <td><span data-bind="text: departureAirport().airportData().lon"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().lon"></span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table id="arrival-airport-data-container" class="table display-700 results-data">
+        <thead>
+          <tr>
+            <th class='first-column'></th>
+            <th class='third-column'>Arrival Airport</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Airport Name:</td>
+            <td><span data-bind="text: arrivalAirport().airportData().name"></span></td>
+          </tr>
+          <tr>
+            <td>Airport Code:</td>
+            <td><span data-bind="text: arrivalAirport().airportData().code"></span></td>
+          </tr>
+          <tr>
+            <td>City:</td>
+            <td><span data-bind="text: arrivalAirport().airportData().city"></span></td>
+          </tr>
+          <tr>
+            <td>State:</td>
+            <td><span data-bind="text: arrivalAirport().airportData().state"></span></td>
+          </tr>
+          <tr>
+            <td>Country:</td>
+            <td><span data-bind="text: arrivalAirport().airportData().country"></span></td>
+          </tr>
+          <tr>
+            <td>Latitude:</td>
+            <td><span data-bind="text: arrivalAirport().airportData().lat"></span></td>
+          </tr>
+          <tr>
+            <td>Longitude:</td>
             <td><span data-bind="text: arrivalAirport().airportData().lon"></span></td>
           </tr>
         </tbody>
       </table>
         
-      <h2>Results</h2>
-      <table>
+      <table id="airport-computed-results-data" class="table results-data">
         <thead>
           <tr>
-            <th>Units</th>
-            <th>Distance</th>
+            <th class="first-column">Units</th>
+            <th class="second-column">Distance</th>
           </tr>
         </th>
         <tr>
-          <td>Kilometers</td>
+          <td>Kilometers:</td>
           <td>
             <!-- ko if: departureAirport().airportData() && arrivalAirport().airportData() -->
             <span data-bind="text: distBtwnAirports('Km')"></span>
@@ -105,7 +149,7 @@
           </td>
         </tr>
         <tr>
-          <td>Miles</td>
+          <td>Miles:</td>
           <td>
             <!-- ko if: departureAirport().airportData() && arrivalAirport().airportData() -->
             <div data-bind="text: distBtwnAirports('M')"></div>
@@ -113,7 +157,7 @@
           </td>
         </tr>
         <tr>
-          <td>Nautical Miles</td>
+          <td>Nautical Miles:</td>
           <td>
             <!-- ko if: departureAirport().airportData() && arrivalAirport().airportData() -->
             <div data-bind="text: distBtwnAirports('NM')"></div>
@@ -121,13 +165,23 @@
           </td>
         </tr>
       </table>
-
-      <div id="map-canvas" style="float:left;width:70%; height:400px"></div>
-
     </div>
+    
+    <div id="map-container" class="module">
+      <div id="map-canvas" style="height:400px"></div>
+    </div>
+
   </div>
 
 </body>
+<footer class="footer">
+<div>Chris Setian</div>
+<div>Last Updated: 
+  <script>
+  document.write(document.lastModified);
+  </script>
+</div>
+</footer>
 
 <div visibility="hidden">
   <datalist id="departure-airports-list">
@@ -135,7 +189,6 @@
 
   <datalist id="arrival-airports-list">
   </datalist>
-
 
   <script type="text/javascript" src="scripts/lib/jquery-2.1.0.js"></script>
   <script type="text/javascript" src="scripts/lib/underscore-1.6.0.js"></script>
@@ -155,7 +208,7 @@
 
         MapIt.App.init({
           domEls: {
-            appContainer: $("#app-container"),
+            appContainer: $("#container"),
             appTitle: $("#app-title"),
             departureAirportsList: $("#departure-airports-list"),
             arrivalAirportsList: $("#arrival-airports-list")

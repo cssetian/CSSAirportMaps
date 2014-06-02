@@ -16,6 +16,13 @@ MapIt.App = (function($, _, ko) {
 
     viewModel = new MapIt.ViewModel();
 
+    /*
+    $('#departureAirport').autocomplete({
+      source: viewModel.makeRequest,
+      minLength: 2
+    });
+    */
+
     // If geolocation is available in this browser, set the initial marker to that person's location
     // Otherwise, set location to Manhattan
     if ('geolocation' in navigator) {
