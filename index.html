@@ -23,7 +23,9 @@
           <tr> <!-- list="departure-airports-list" -->
             <th class="input-label first-input-column">Departure Airport:</th>
             <td><input  type="text"
+                        placeholder="Type to search for a departure airport..."
                         list="departure-airports-list"
+                        autocomplete="off"
                         name="departureAirport" 
                         id="departureAirport" 
                         class="second-input-column required" 
@@ -33,6 +35,7 @@
           </tr><tr><!--list="arrival-airports-list"-->
             <th class="input-label first-input-column">Arrival Airport:</th>
             <td><input  type="text"
+                        placeholder="Type to search for an arrival airport..."
                         list="arrival-airports-list"
                         name="arrivalAirport"
                         id="arrivalAirport"
@@ -184,15 +187,16 @@
 </footer>
 
 <div visibility="hidden">
-  <datalist id="departure-airports-list">
+  <datalist autocomplete="off" id="departure-airports-list">
   </datalist>
 
-  <datalist id="arrival-airports-list">
+  <datalist autocomplete="off" id="arrival-airports-list">
   </datalist>
 
   <script type="text/javascript" src="scripts/lib/jquery-2.1.0.js"></script>
   <script type="text/javascript" src="scripts/lib/underscore-1.6.0.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout-3.1.0.js"></script>
+  <script type="text/javascript" src="scripts/lib/typeahead.bundle.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
   <script type="text/javascript" src="scripts/lib/latlong.js"></script>
   <script type="text/javascript" src="scripts/MapIt_App.js"></script>

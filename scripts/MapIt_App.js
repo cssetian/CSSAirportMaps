@@ -15,7 +15,40 @@ MapIt.App = (function($, _, ko) {
     _initAirportRefData(options);
 
     viewModel = new MapIt.ViewModel();
+    /*
+    $('#departureAirport').live('focus',function(){
+      $(this).attr('autocomplete', 'off');
+    });
+  */
+    options.domEls.departureAirportsList.unbind('dblclick');
+    options.domEls.departureAirportsList.dblclick(function(e){
+      console.log('DISABLING DEPARTUREAIRPORTLIST DOUBLECLICK');
+      e.stopPropagation();
+      e.preventDefault();
+      return false;
+    });
+    options.domEls.departureAirportsList.unbind('click');
+    options.domEls.departureAirportsList.dblclick(function(e){
+      console.log('DISABLING DEPARTUREAIRPORTLIST CLICK');
+      e.stopPropagation();
+      e.preventDefault();
+      return false;
+    });
 
+    $('#departureAirport').unbind('dblclick');
+    $('#departureAirport').dblclick(function(e){
+      console.log('DISABLING DEPARTUREAIRPORT DOUBLECLICK');
+      e.stopPropagation();
+      e.preventDefault();
+      return false;
+    });
+    $('#departureAirport').unbind('click');
+    $('#departureAirport').click(function(e){
+      console.log('DISABLING DEPARTUREAIRPORT CLICK');
+      e.stopPropagation();
+      e.preventDefault();
+      return false;
+    });
     /*
     $('#departureAirport').autocomplete({
       source: viewModel.makeRequest,

@@ -64,6 +64,13 @@ MapIt.ViewModel = function() {
   self.arrivalAirport().airportMarker.subscribe(self.arrivalAirportUpdateHandler);
   console.log('ViewModel: Map-updating callback function for arrialAirport bound to arrivalAirport.airportData');
   /*
+  var currentPosDisplay = $('#departureAirport');
+  currentPosDisplay.on('ondblclick', function(e) {
+    console.log('ViewModel: Hit the doubleclick event!!');
+    e.stopPropagation();
+  });
+  */
+  /*
   self.departureAirport().airportSearchInput.subscribe(function(newVal){
     if(typeof newVal.length === 'undefined' || newVal.length === 0) {
       console.log('No input supplied, turning off datalist doubleclick')
