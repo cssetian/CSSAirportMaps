@@ -1,7 +1,7 @@
 MapIt.Airport = function(map, options) {
   console.log('MapIt.Airport: Initializing Airport ViewModel');
   var self = this;
-
+  var service;
   // This is JSON so the quotes should stay as double quotes
   var emptyJSON = '{' +
     '"code":"",' +
@@ -21,7 +21,8 @@ MapIt.Airport = function(map, options) {
     '"elev":"",' +
     '"icao":"",' +
     '"direct_flights":"",' +
-    '"carriers":""' +
+    '"carriers":"",' +
+    '"geometry":{"location":{"lat":"","lng":""}}' +
   '}';
 
   self.emptyData = JSON.parse(emptyJSON);
@@ -35,26 +36,98 @@ MapIt.Airport = function(map, options) {
     deferEvaluation: true
   });
 
+  self.airportTextSearchBaseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?&name=airport&types=airport&sensor=false&key=AIzaSyC_i9CE-MZrDZDLY9MdrfukhcEBkatg3Jc&query=';
   self.airportSearchInput = ko.observable();
-  self.airportSearchBaseUrl = 'http://airports.pidgets.com/v1/airports/?name=';
-  self.airportSearchSuffix = '&format=json';
+  self.airportSearchInputThrottled = ko.computed(self.airportSearchInput)
+                                        .extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 } });
   self.airportSearchUrl = ko.computed(function () {
-    var output = self.airportSearchBaseUrl + self.airportSearchInput() + self.airportSearchSuffix;
+    var output = self.airportTextSearchBaseUrl + encodeURI(self.airportSearchInputThrottled()); //self.airportSearchInput(); + self.airportSearchSuffix;
+    console.log('Airport Search Url: ' + output);
+    return output;
+  }).extend({ rateLimit: 0 });
+  /*
+  self.airportSearchBaseUrl = 'https://maps.googleapis.com/maps/api/place/search/json?sensor=false&rankby=prominence&keyword=airport&types=airport';
+  self.googlePlacesAPIKey = '&key=' + 'AIzaSyDC0_jxucNVmD3mA40DOUB8463jhdQ0yPE';
+  self.airportSearchInput = ko.observable();
+  self.computedAirportSearchInput = ko.computed(function() {
+    return '&name=' + encodeURI(self.airportSearchInput());
+  });
+  //self.airportSearchBaseUrl = 'http://airports.pidgets.com/v1/airports/?name=';
+  //self.airportSearchSuffix = '&format=json';
+  self.airportSearchUrl = ko.computed(function () {
+    var output = self.airportSearchBaseUrl + self.googlePlacesAPIKey + self.computedAirportSearchInput(); //self.airportSearchInput(); + self.airportSearchSuffix;
     console.log('Airport Search Url: ' + output);
     return output;
   });
+*/
   self.airportSearchResults = ko.observableArray([]);
+  self.airportSearchResultsNameList = ko.computed(function() {
+    var plucked_results = _.pluck(self.airportSearchResults(), "name");
+    console.log('plucked results!');
+    console.log(plucked_results);
+    return plucked_results;
+  });
 
   var AJAXCallback = {
-    success: function(data) {
+    success: function(results, status) {
       console.log('Airport.AJAXCallback: Found AJAX Results!');
-      console.log(data);
-      self.airportSearchResults(JSON.parse(data));
+      
+      console.log(results);
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        console.log(results);
+      }
+      
+      self.airportSearchResults(results.results);
+      console.log('Airport.AJAXCallback: Extracted Airport Results');
+      console.log(self.airportSearchResults());
     },
     failure: function(pbj, error, exception) {
       console.log('Airport.AJAXCallback: Error fetching airports!');
     }
   };
+
+  self.airportSearchInputThrottled.subscribe(function(newSearchInput){
+    var sanitizedInput = encodeURI(newSearchInput);
+    /*
+    $.ajax({
+      type: 'GET',
+      dataType: 'json',
+      //url: '/airportsearch?airportSearchQuery=' + newSearchInput,
+      url: 'airportsearch',
+      data: {'search_query': sanitizedInput},
+      success: AJAXCallback.success,
+      failure: AJAXCallback.failure
+    });*/
+    AJAXCallback.success(sampleAirports);
+
+
+    //$.getJSON('newSearchUrl', function(json_data){
+    //  alert(JSON.stringify(json_data));
+    //});
+
+    /* google maps service try, not using own app server
+    var pyrmont = new google.maps.LatLng(-33.8665433,151.1956316);
+
+    var request = {
+      query: self.airportSearchInput(),
+      type: 'airport'
+    };
+
+    var service = new google.maps.places.PlacesService(document.getElementById('map-canvas'));
+    service.textSearch(request, AJAXCallback);
+    */
+   
+    /*
+    var sanitizedSearchUrl = escape(newSearchUrl);
+    $.ajax({
+      url: sanitizedSearchUrl,
+      type: 'POST',
+      success: AJAXCallback.success,
+      error: AJAXCallback.failure,
+      timeout: 3000
+    });
+    */
+  });//.extend({ rateLimit: 0 });
 
   /*
   self.airportSearchInput.subscribe(function(searchInput){
@@ -105,7 +178,7 @@ MapIt.Airport = function(map, options) {
   */
   self.airportData = ko.computed({
     read: function() {
-      console.log('Airport.airportData: Reading input for airport ' + self.name + ', value is: "' + self.airportSearchInput() + '"');
+      console.log('Airport.airportData: Computing results for airport ' + self.name + ', search term is: "' + self.airportSearchInput() + '"');
 
       if(typeof self.airportSearchResults() === 'undefined' || typeof self.airportSearchInput() === 'undefined' || self.airportSearchInput().length === 0) {
         console.log('Airport.airportData: No airport search input supplied, or no JSON data for airports. Returning default data.');
@@ -113,12 +186,13 @@ MapIt.Airport = function(map, options) {
       }
 
       //var filteredAirports = _.filter(self.airportSearchResults(), function(airport) {
-      var filteredAirports = _.filter(airportsJSON, function(airport) {
+      /*var filteredAirports = _.filter(self.airportSearchResults(), function(airport) {
         return self.airportSearchInput() === airport.name;
-      });
+      });*/
+      var filteredAirports = self.airportSearchResults();
 
       var resultAirport = '';
-      if(filteredAirports.length > 0) {
+      if(filteredAirports.length > 0 && filteredAirports[0].name === self.airportSearchInput()) {
         resultAirport = filteredAirports[0];
 
         console.log('Airport.airportData: Found matching airport: ' + resultAirport.name);
@@ -136,11 +210,11 @@ MapIt.Airport = function(map, options) {
   self.airportCoords = ko.computed({
     read: function() {
       console.log('Airport.airportCoords: Recomputing airportCoords for ' + self.name);
-      if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().code === 'undefined' || self.airportData().code === '') {
+      if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().name === 'undefined' || self.airportData().name === '') {
         console.log('Airport.airportCoords: No airport supplied to airportCoords for ' + self.name + '!');
         return null;
       } else {
-        var _LatLng = new google.maps.LatLng(parseFloat(self.airportData().lat, 10), parseFloat(self.airportData().lon, 10));
+        var _LatLng = new google.maps.LatLng(parseFloat(self.airportData().geometry.location.lat, 10), parseFloat(self.airportData().geometry.location.lng, 10));
         console.log('Airport.airportCoords: New airportCoords for ' + self.name + ': (' + _LatLng.lat().toFixed(2) + ', ' + _LatLng.lng().toFixed(2) + ')');
         return _LatLng;
       }
@@ -151,12 +225,12 @@ MapIt.Airport = function(map, options) {
   self.airportMarker = ko.computed({
     read: function() {
       console.log('Airport.airportMarker: Recomputing airportMarker for ' + self.name);
-      if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().code === 'undefined' || self.airportData().code === '') {
+      if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().name === 'undefined' || self.airportData().name === '') {
         console.log('Airport.airportMarker: No airport supplied to airportMarker for ' + self.name + '!');
         return null;
       } else {
         var _Marker = new google.maps.Marker({ position: self.airportCoords(), title: self.name});
-        console.log('Airport.airportMarker: New airport Marker for ' + self.name + ': ' + _Marker.getPosition().lat().toFixed(2) + ', ' + _Marker.getPosition().lng().toFixed(2));
+        console.log('Airport.airportMarker: New airport Marker for ' + self.name + ': ' + _Marker.getPosition() .lat().toFixed(2) + ', ' + _Marker.getPosition().lng().toFixed(2));
         return _Marker;
       }
     },

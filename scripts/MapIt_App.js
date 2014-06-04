@@ -10,16 +10,192 @@ var MapIt = MapIt || {};
 MapIt.App = (function($, _, ko) {
 
   var viewModel;
+  var departureTimer = 0;
+  var arrivalTimer = 0;
 
   var _init = function (options) {
     _initAirportRefData(options);
 
     viewModel = new MapIt.ViewModel();
+
     /*
-    $('#departureAirport').live('focus',function(){
+    ko.bindingHandlers.typeahead = {
+        init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+            var typeaheadSource; // <-- this is where our typeahead options will be stored in
+            //this is the parameter that you pass from you data-bind expression in the mark-up
+            if (typeof valueAccessor() === undefined) {
+              return;
+            }
+            var passedValueFromMarkup = ko.utils.unwrapObservable(valueAccessor());
+            if (passedValueFromMarkup instanceof Array) typeaheadSource = passedValueFromMarkup;
+            else {
+                // if the name contains '.', then we expect it to be a property in an object such as myLists.listOfCards
+                var splitedName = passedValueFromMarkup.split('.');
+                var result = window[splitedName[0]];
+                $.each($(splitedName).slice(1, splitedName.length), function(iteration, name) {
+                    result = result[name];
+                });
+
+                // if we find any array in the JsVariable, then use that as source, otherwise init without any specific source and hope that it is defined from attributes
+                if (result != null && result.length > 0) {
+                    typeaheadSource = result;
+                }
+
+            }
+            if (typeaheadSource == null) $(element).typeahead();
+            else {
+                $(element).typeahead({
+                    source: typeaheadSource
+                });
+            }
+
+        },
+    };
+    console.log('initialized binding handler!');
+  */
+    // Bind twitter typeahead
+    ko.bindingHandlers.typeahead = {
+      init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+        var $element = $(element);
+        var allBindings = allBindingsAccessor();
+        var typeaheadArr = ko.utils.unwrapObservable(valueAccessor());
+
+        console.log('element: ');
+        console.log($element);
+        console.log('valueAccessor: ');
+        console.log(valueAccessor());
+        console.log('allBindingsAccessor: ');
+        console.log(allBindings);
+        console.log(allBindings);
+        console.log('viewModel: ');
+        console.log(viewModel);
+        console.log('bindingContext: ');
+        console.log(viewModel);
+        
+        console.log('bindings handler for autocomplete init!');
+        console.log('source array!:');
+        console.log(typeaheadArr);
+        $element.attr('autocomplete', 'off')
+        .typeahead({
+          'source': valueAccessor(),//typeaheadArr,
+          'minLength': 2,
+          'items': allBindings.typeahead,
+          'displayKey': 'value',
+          'updater': function(item) {
+            alert(item);
+            allBindings.typeaheadValue(item);
+            return item;
+          }
+        });
+      }/*,
+      update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+        var $element = $(element);
+        var allBindings = allBindingsAccessor();
+        console.log('valueAccessor: ' + valueAccessor());
+        var typeaheadArr = ko.utils.unwrapObservable(valueAccessor());
+        
+        console.log('bindings handler for autocomplete update!');
+        console.log('source array!:');
+        console.log(typeaheadArr);
+        $element//.attr('autocomplete', 'off')
+        .typeahead({
+          'source': typeaheadArr,
+          'minLength': 2,
+          'items': allBindings.typeahead,
+          'updater': function(item) {
+            allBindings.typeaheadValue(item);
+            return item;
+          }
+        });
+
+      }*/
+    };
+
+    /*
+    $('#departure-airport-selector').typeahead({
+        hint: true,
+        displayKey: 'value',
+        name: 'Departure Airports',
+        limit: 10,
+        templates: {
+          empty: [
+            '<div class="empty-message">',
+            'unable to find any Best Picture winners that match the current query',
+            '</div>'
+          ].join('\n'),
+          suggestion: Handlebars.compile('<span><strong>{{name}}</strong></span><span>{{formatted_address}}</span>')
+        },
+        source: function(query, process) {
+          console.log('processing source!!');
+          var resultObject = viewModel.departureAirport().airportSearchResults();
+
+          var results = _.map(resultObject, function(airport) {
+            return airport.name;
+          });
+
+          console.log('airport search results - typeahead source: ' + results);
+          process(results);
+          console.log('source method of typeahead - finished!');
+        },
+
+        matcher: function(item) {
+          console.log('processing matcher!');
+          if(item.name.toLowerCase().indexOf(this.query.trim().toLowerCase()) !== -1) {
+            return true;
+          }
+        },
+
+        highlighter: function(item) {
+          console.log('processing highlighter!');
+          var regex = new RegExp( '(' + this.query + ')', 'gi' );
+          return item.replace( regex, '<strong>$1</strong>' );
+        },
+
+        updater: function(item) {
+          console.log('updater method of typeahead');
+          console.log('"' + item + '" selected.');
+          return item;
+        }
+
+      });*/
+    console.log('initialized typeahead!');
+
+    /*
+    viewModel.departureAirport().airportSearchResults.subscribe(function(newSearchResults) {
+      var autocomplete = $('#departure-airport-selector').typeahead();
+      autocomplete.data('typeahead').source = newSearchResults;
+    });
+    viewModel.arrivalAirport().airportSearchResults.subscribe(function(newSearchResults) {
+      var autocomplete = $('#arrival-airport-selector').typeahead();
+      autocomplete.data('typeahead').source = newSearchResults;
+    });
+    */
+
+    console.log('initialized typeahead results subscribe!');
+    /*
+    var bestPictures = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      prefetch: '../data/films/post_1960.json',
+      remote: '../data/films/queries/%QUERY.json'
+    });
+    
+    bestPictures.initialize();
+    */
+     /*
+    $('#departure-airport-selector-container .typeahead').typeahead(null, {
+      name: 'best-pictures',
+      displayKey: 'value',
+      source: bestPictures.ttAdapter()
+    });
+    */
+
+    /*
+    $('#departure-airport-selector').live('focus',function(){
       $(this).attr('autocomplete', 'off');
     });
-  */
+    */
+    /*
     options.domEls.departureAirportsList.unbind('dblclick');
     options.domEls.departureAirportsList.dblclick(function(e){
       console.log('DISABLING DEPARTUREAIRPORTLIST DOUBLECLICK');
@@ -35,29 +211,30 @@ MapIt.App = (function($, _, ko) {
       return false;
     });
 
-    $('#departureAirport').unbind('dblclick');
-    $('#departureAirport').dblclick(function(e){
+    $('#departure-airport-selector').unbind('dblclick');
+    $('#departure-airport-selector').dblclick(function(e){
       console.log('DISABLING DEPARTUREAIRPORT DOUBLECLICK');
       e.stopPropagation();
       e.preventDefault();
       return false;
     });
-    $('#departureAirport').unbind('click');
-    $('#departureAirport').click(function(e){
+    $('#departure-airport-selector').unbind('click');
+    $('#departure-airport-selector').click(function(e){
       console.log('DISABLING DEPARTUREAIRPORT CLICK');
       e.stopPropagation();
       e.preventDefault();
       return false;
     });
+    */
     /*
-    $('#departureAirport').autocomplete({
+    $('#departure-airport-selector').autocomplete({
       source: viewModel.makeRequest,
       minLength: 2
     });
     */
    /*
-    $('#departureAirport').off('ondblclick');
-    $('#arrivalAirport').off('ondblclick');
+    $('#departure-airport-selector').off('ondblclick');
+    $('#arrival-airport-selector').off('ondblclick');
     */
 
     // If geolocation is available in this browser, set the initial marker to that person's location

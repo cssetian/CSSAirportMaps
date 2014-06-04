@@ -22,7 +22,19 @@
         <tbody>
           <tr> <!-- list="departure-airports-list" -->
             <th class="input-label first-input-column">Departure Airport:</th>
-            <td><input  type="text"
+            <td>
+              <div id="departure-airport-selector-container">
+                <input  id="departure-airport-selector"
+                        class="typeahead second-input-column required"
+                        type="text"
+                        placeholder="Type to search for a departure airport..."
+                        data-bind=" value: departureAirport().airportSearchInput,
+                                    valueUpdate: 'input',
+                                    typeahead: departureAirport().airportSearchResultsNameList(), 
+                                    updater: function(item) { return item.name; }" />
+              </div>
+              <!-- <input  type="text"
+                        data-bind=" typeaheadValue: departureAirport().airportSearchInput,
                         placeholder="Type to search for a departure airport..."
                         list="departure-airports-list"
                         autocomplete="off"
@@ -30,19 +42,29 @@
                         id="departureAirport" 
                         class="second-input-column required" 
                         data-bind=" value: departureAirport().airportSearchInput, 
-                                    valueUpdate: 'input'" />
-            </td> 
-          </tr><tr><!--list="arrival-airports-list"-->
+                                    valueUpdate: 'input'" /> -->
+              </td>  <!-- data-list input to go with local json or pidgits data -->
+          </tr>
+          <tr><!--list="arrival-airports-list"-->
             <th class="input-label first-input-column">Arrival Airport:</th>
-            <td><input  type="text"
+            <td>
+              <div id="arrival-airport-selector-container">
+                <input  id="arrival-airport-selector"
+                        class="typeahead second-input-column required" 
+                        type="text" 
+                        placeholder="Type to search for an arrival airport..." 
+                        data-bind=" value: arrivalAirport().airportSearchInput, 
+                                    valueUpdate: 'input'" />
+              </div>
+            <!--<input  type="text"
                         placeholder="Type to search for an arrival airport..."
                         list="arrival-airports-list"
                         name="arrivalAirport"
                         id="arrivalAirport"
                         class="second-input-column required"
                         data-bind=" value: arrivalAirport().airportSearchInput, 
-                                    valueUpdate: 'input'" />
-            </td>
+                                    valueUpdate: 'input'" />-->
+            </td> <!-- data-list input to go with local json or pidgits data -->
           </tr>
         </tbody>
       </table>
@@ -63,7 +85,7 @@
             <td>Airport Name:</td>
             <td><span data-bind="text: departureAirport().airportData().name"></span></td>
             <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().name" class="hidden-600"></span></td>
-          </tr>
+          </tr><!--
           <tr>
             <td>Airport Code:</td>
             <td><span data-bind="text: departureAirport().airportData().code"></span></td>
@@ -83,16 +105,32 @@
             <td>Country:</td>
             <td><span data-bind="text: departureAirport().airportData().country"></span></td>
             <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().country" class="hidden-600"></span></td>
-          </tr>
+          </tr>-->
           <tr>
             <td>Latitude:</td>
-            <td><span data-bind="text: departureAirport().airportData().lat"></span></td>
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().lat" class="hidden-600"></span></td>
+            <td>
+              <!-- ko if: typeof departureAirport().airportData().geometry !== undefined -->
+                <span data-bind="text: departureAirport().airportData().geometry.location.lat"></span>
+              <!-- /ko -->
+            </td>
+            <td class="hidden-700">
+              <!-- ko if: typeof arrivalAirport().airportData().geometry !== undefined -->
+                <span data-bind="text: arrivalAirport().airportData().geometry.location.lat" class="hidden-600"></span>
+              <!-- /ko -->
+            </td>
           </tr>
           <tr>
             <td>Longitude:</td>
-            <td><span data-bind="text: departureAirport().airportData().lon"></span></td>
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().lon"></span></td>
+            <td>
+              <!-- ko if: typeof departureAirport().airportData().geometry !== undefined -->
+                <span data-bind="text: departureAirport().airportData().geometry.location.lng"></span>
+              <!-- /ko -->
+            </td>
+            <td class="hidden-700">
+              <!-- ko if: typeof arrivalAirport().airportData().geometry !== undefined -->
+                <span data-bind="text: arrivalAirport().airportData().geometry.location.lng"></span>
+              <!-- /ko -->
+            </td>
           </tr>
         </tbody>
       </table>
@@ -108,7 +146,7 @@
           <tr>
             <td>Airport Name:</td>
             <td><span data-bind="text: arrivalAirport().airportData().name"></span></td>
-          </tr>
+          </tr><!--
           <tr>
             <td>Airport Code:</td>
             <td><span data-bind="text: arrivalAirport().airportData().code"></span></td>
@@ -124,14 +162,22 @@
           <tr>
             <td>Country:</td>
             <td><span data-bind="text: arrivalAirport().airportData().country"></span></td>
-          </tr>
+          </tr>-->
           <tr>
             <td>Latitude:</td>
-            <td><span data-bind="text: arrivalAirport().airportData().lat"></span></td>
+            <td>
+              <!-- ko if: typeof arrivalAirport().airportData().geometry !== undefined -->
+                <span data-bind="text: arrivalAirport().airportData().geometry.location.lat"></span>
+              <!-- /ko -->
+            </td>
           </tr>
           <tr>
             <td>Longitude:</td>
-            <td><span data-bind="text: arrivalAirport().airportData().lon"></span></td>
+            <td>
+              <!-- ko if: typeof arrivalAirport().airportData().geometry !== undefined -->
+                <span data-bind="text: arrivalAirport().airportData().geometry.location.lng"></span>
+              <!-- /ko -->
+            </td>
           </tr>
         </tbody>
       </table>
@@ -146,7 +192,7 @@
         <tr>
           <td>Kilometers:</td>
           <td>
-            <!-- ko if: departureAirport().airportData() && arrivalAirport().airportData() -->
+            <!-- ko if: typeof departureAirport().airportData().geometry !== undefined && arrivalAirport().airportData().geometry !== undefined-->
             <span data-bind="text: distBtwnAirports('Km')"></span>
             <!-- /ko -->
           </td>
@@ -154,7 +200,7 @@
         <tr>
           <td>Miles:</td>
           <td>
-            <!-- ko if: departureAirport().airportData() && arrivalAirport().airportData() -->
+            <!-- ko if: typeof departureAirport().airportData() !== undefined && arrivalAirport().airportData().geometry !== undefined -->
             <div data-bind="text: distBtwnAirports('M')"></div>
             <!-- /ko -->
           </td>
@@ -162,7 +208,7 @@
         <tr>
           <td>Nautical Miles:</td>
           <td>
-            <!-- ko if: departureAirport().airportData() && arrivalAirport().airportData() -->
+            <!-- ko if: typeof departureAirport().airportData().geometry !== undefined && arrivalAirport().airportData().geometry !== undefined -->
             <div data-bind="text: distBtwnAirports('NM')"></div>
             <!-- /ko -->
           </td>
@@ -196,13 +242,18 @@
   <script type="text/javascript" src="scripts/lib/jquery-2.1.0.js"></script>
   <script type="text/javascript" src="scripts/lib/underscore-1.6.0.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout-3.1.0.js"></script>
+  <script type="text/javascript" src="scripts/lib/knockout-bootstrap.min.js"></script>
+  <script type="text/javascript" src="scripts/lib/bootstrap.js"></script>
   <script type="text/javascript" src="scripts/lib/typeahead.bundle.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+  <script type="text/javascript" src="scripts/lib/handlebars-v1.3.0.js"></script>
+  <script type="text/javascritp" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
   <script type="text/javascript" src="scripts/lib/latlong.js"></script>
   <script type="text/javascript" src="scripts/MapIt_App.js"></script>
   <script type="text/javascript" src="content/airports.js"></script>
   <script type="text/javascript" src="scripts/ViewModel.js"></script>
   <script type="text/javascript" src="scripts/Airport.js"></script>
+  <script type="text/javascript" src="content/dummy-google-places.json"></script>
 </div>
 
 <script type="text/javascript">

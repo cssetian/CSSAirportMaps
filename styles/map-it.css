@@ -12,6 +12,10 @@ th {
   text-align: left;
 }
 
+.input-append,.input-prepend{
+  font-size: 16px;
+}
+
 .input-table th, .input-table td { 
   border-top: none !important; 
 }

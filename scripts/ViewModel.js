@@ -56,15 +56,15 @@ MapIt.ViewModel = function() {
     }
   };
 
-  self.departureAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Departure Airport'}));
+  self.departureAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Departure Airport'})).extend({ rateLimit: 0 });
   self.departureAirport().airportMarker.subscribe(self.departureAirportUpdateHandler);
   console.log('ViewModel: Map-updating callback function for departureAirport bound to departureAirport.airportData');
   
-  self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'}));
+  self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'})).extend({ rateLimit: 0 });
   self.arrivalAirport().airportMarker.subscribe(self.arrivalAirportUpdateHandler);
   console.log('ViewModel: Map-updating callback function for arrialAirport bound to arrivalAirport.airportData');
   /*
-  var currentPosDisplay = $('#departureAirport');
+  var currentPosDisplay = $('#departure-airport-selector');
   currentPosDisplay.on('ondblclick', function(e) {
     console.log('ViewModel: Hit the doubleclick event!!');
     e.stopPropagation();
@@ -74,16 +74,16 @@ MapIt.ViewModel = function() {
   self.departureAirport().airportSearchInput.subscribe(function(newVal){
     if(typeof newVal.length === 'undefined' || newVal.length === 0) {
       console.log('No input supplied, turning off datalist doubleclick')
-      $('#departureAirport').off('ondblclick');
+      $('#departure-airport-selector').off('ondblclick');
     } else {
-      $('#departureAirport').on('ondblclick');
+      $('#departure-airport-selector').on('ondblclick');
     }
   });
   self.arrivalAirport().airportSearchInput.subscribe(function(newVal){
     if(typeof newVal.length === 'undefined' || newVal.length === 0) {
-      $('#arrivalAirport').off('ondblclick');
+      $('#arrival-airport-selector').off('ondblclick');
     } else {
-      $('#arrivalAirport').on('ondblclick');
+      $('#arrival-airport-selector').on('ondblclick');
     }
   });
   */
@@ -97,7 +97,7 @@ MapIt.ViewModel = function() {
       return _departureAirportSelected;
     },
     owner: self
-  });
+  }).extend({ rateLimit: 0 });
   self.arrivalAirportSelected = ko.computed({
     read: function() {
       var _arrivalAirportSelected = (self.arrivalAirport().airportData() !== self.arrivalAirport().emptyData);
@@ -105,7 +105,7 @@ MapIt.ViewModel = function() {
       return _arrivalAirportSelected;
     },
     owner: self
-  });
+  }).extend({ rateLimit: 0 });
   self.anyAirportSelected = ko.computed({
     read: function() {
       var _anyAirportSelected = (self.departureAirportSelected() || self.arrivalAirportSelected());
@@ -113,7 +113,7 @@ MapIt.ViewModel = function() {
       return _anyAirportSelected;
     },
     owner: self
-  });
+  }).extend({ rateLimit: 0 });
   self.twoAirportsSelected = ko.computed({
     read: function() {
       var _bothAirportsSelected = (self.arrivalAirportSelected() && self.departureAirportSelected());
@@ -121,7 +121,7 @@ MapIt.ViewModel = function() {
       return _bothAirportsSelected;
     },
     owner: self
-  });
+  }).extend({ rateLimit: 0 });
   /****************************************************************************************/
 
   /*************************** Airport Existance Event Handlers ***************************/
@@ -190,8 +190,8 @@ MapIt.ViewModel = function() {
           return '';
         }
 
-        var p1 = new LatLon(self.departureAirport().airportData().lat, self.departureAirport().airportData().lon);
-        var p2 = new LatLon(self.arrivalAirport().airportData().lat, self.arrivalAirport().airportData().lon);
+        var p1 = new LatLon(self.departureAirport().airportData().lat, self.departureAirport().airportData().lng);
+        var p2 = new LatLon(self.arrivalAirport().airportData().lat, self.arrivalAirport().airportData().lng);
         var dist = p1.distanceTo(p2);
 
         var distanceToReturn = dist;
