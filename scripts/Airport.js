@@ -61,11 +61,15 @@ MapIt.Airport = function(map, options) {
   });
 */
   self.airportSearchResults = ko.observableArray([]);
-  self.airportSearchResultsNameList = ko.computed(function() {
-    var plucked_results = _.pluck(self.airportSearchResults(), "name");
-    console.log('plucked results!');
-    console.log(plucked_results);
-    return plucked_results;
+  self.airportData = ko.observable(self.emptyData);
+  self.airportSearchResultsNameList = ko.computed({
+    read: function() {
+      var plucked_results = _.pluck(self.airportSearchResults(), "name");
+      console.log('plucked results!');
+      console.log(plucked_results);
+      return plucked_results;
+    },
+    owner: self
   });
 
   var AJAXCallback = {
@@ -176,6 +180,24 @@ MapIt.Airport = function(map, options) {
     });
   };
   */
+  self.airportSearchResults.subscribe(function(newSearchResults){
+    if(typeof newSearchResults === 'undefined' || typeof newSearchResults[0] === 'undefined') {
+      console.log('Airport.airportData: No airport search input exists, or no JSON data for airports. Returning default data.');
+      return self.emptyData;
+    }
+
+    var resultAirport = '';
+    if(newSearchResults.length > 0 && newSearchResults[0].name === self.airportSearchInput()) {
+      self.airportData(newSearchResults[0]);
+
+      console.log('Airport.airportData: Found matching airport: ' + resultAirport.name);
+    } else if(self.airportData() !== self.emptyData) {
+      self.airportData(self.emptyData);
+      console.log('Airport.airportData: No matching airport found.');
+    }
+  });
+
+  /*
   self.airportData = ko.computed({
     read: function() {
       console.log('Airport.airportData: Computing results for airport ' + self.name + ', search term is: "' + self.airportSearchInput() + '"');
@@ -186,9 +208,9 @@ MapIt.Airport = function(map, options) {
       }
 
       //var filteredAirports = _.filter(self.airportSearchResults(), function(airport) {
-      /*var filteredAirports = _.filter(self.airportSearchResults(), function(airport) {
-        return self.airportSearchInput() === airport.name;
-      });*/
+      //var filteredAirports = _.filter(self.airportSearchResults(), function(airport) {
+      //  return self.airportSearchInput() === airport.name;
+      //});
       var filteredAirports = self.airportSearchResults();
 
       var resultAirport = '';
@@ -206,7 +228,8 @@ MapIt.Airport = function(map, options) {
     owner: self,
     deferEvaluation: true
   });
-  
+  */
+ 
   self.airportCoords = ko.computed({
     read: function() {
       console.log('Airport.airportCoords: Recomputing airportCoords for ' + self.name);

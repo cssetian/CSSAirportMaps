@@ -53,41 +53,90 @@ MapIt.App = (function($, _, ko) {
     };
     console.log('initialized binding handler!');
   */
+    var substringMatcher = function(strs) {
+      return function findMatches(q, cb) {
+        var matches, substrRegex;
+     
+        // an array that will be populated with substring matches
+        matches = [];
+     
+        // regex used to determine if a string contains the substring `q`
+        substrRegex = new RegExp(q, 'i');
+     
+        // iterate through the pool of strings and for any string that
+        // contains the substring `q`, add it to the `matches` array
+        $.each(strs, function(i, str) {
+          if (substrRegex.test(str)) {
+            // the typeahead jQuery plugin expects suggestions to a
+            // JavaScript object, refer to typeahead docs for more info
+            matches.push({ value: str });
+          }
+        });
+     
+        cb(matches);
+      };
+    };
+
+    viewModel.SearchText = ko.computed(function () {
+      var searchableTerms = [];
+      ko.utils.arrayForEach(viewModel.departureAirport().airportSearchResults(), function (item) {
+        searchableTerms.push(item.name);
+      });
+      return searchableTerms;
+    });
+
     // Bind twitter typeahead
     ko.bindingHandlers.typeahead = {
-      init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-        var $element = $(element);
-        var allBindings = allBindingsAccessor();
-        var typeaheadArr = ko.utils.unwrapObservable(valueAccessor());
+      init: function (element, valueAccessor) {//, allBindingsAccessor, viewModel, bindingContext) {
+        var binding = this;
 
         console.log('element: ');
-        console.log($element);
+        console.log($(element));
         console.log('valueAccessor: ');
         console.log(valueAccessor());
-        console.log('allBindingsAccessor: ');
-        console.log(allBindings);
-        console.log(allBindings);
-        console.log('viewModel: ');
-        console.log(viewModel);
-        console.log('bindingContext: ');
-        console.log(viewModel);
-        
-        console.log('bindings handler for autocomplete init!');
-        console.log('source array!:');
-        console.log(typeaheadArr);
-        $element.attr('autocomplete', 'off')
+
+        var elem = $(element);
+        var value = valueAccessor();
+
+        elem.typeahead({
+          source: function () {
+            return ko.utils.unwrapObservable(value.source);
+          },
+          onselect: function (val) {
+            value.target(val);
+          }
+        });
+
+        elem.blur(function () {
+          value.target(elem.val());
+        });
+      },
+      update: function (element, valueAccessor) {
+        var elem = $(element);
+        var value = valueAccessor();
+        elem.val(value.target());
+      }
+    };
+
+        /*
+        $element//.attr('autocomplete', 'off')
         .typeahead({
-          'source': valueAccessor(),//typeaheadArr,
+          //'source': function (query, process) {
+          //            console.log('accessing source of typeahead! Query is ' + query);
+          //            return substringMatcher(query);
+          //         },//typeaheadArr,
+          'remote': '/airportsearch?search_query=%QUERY',
           'minLength': 2,
           'items': allBindings.typeahead,
           'displayKey': 'value',
           'updater': function(item) {
-            alert(item);
+            console.log('updating typeahead!');
             allBindings.typeaheadValue(item);
             return item;
           }
         });
-      }/*,
+      }*/
+      /*,
       update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
         var $element = $(element);
         var allBindings = allBindingsAccessor();
@@ -109,7 +158,7 @@ MapIt.App = (function($, _, ko) {
         });
 
       }*/
-    };
+    //};
 
     /*
     $('#departure-airport-selector').typeahead({

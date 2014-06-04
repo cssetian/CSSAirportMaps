@@ -30,8 +30,7 @@
                         placeholder="Type to search for a departure airport..."
                         data-bind=" value: departureAirport().airportSearchInput,
                                     valueUpdate: 'input',
-                                    typeahead: departureAirport().airportSearchResultsNameList(), 
-                                    updater: function(item) { return item.name; }" />
+                                    typeahead: { target: departureAirport().airportSearchResultsNameList, source: SearchText }" />
               </div>
               <!-- <input  type="text"
                         data-bind=" typeaheadValue: departureAirport().airportSearchInput,
