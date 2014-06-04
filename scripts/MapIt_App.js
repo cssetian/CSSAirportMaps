@@ -77,11 +77,16 @@ MapIt.App = (function($, _, ko) {
       };
     };
 
+    viewModel.clientSearchResults = ko.mapping.fromJS([]);
+    ko.mapping.fromJS(viewModel.departureAirport().airportSearchResults(), viewModel.clientSearchResults);
+
     viewModel.SearchText = ko.computed(function () {
       var searchableTerms = [];
       ko.utils.arrayForEach(viewModel.departureAirport().airportSearchResults(), function (item) {
         searchableTerms.push(item.name);
       });
+      console.log('SearchableTerms:');
+      console.log(searchableTerms);
       return searchableTerms;
     });
 

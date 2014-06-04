@@ -60,18 +60,22 @@ MapIt.Airport = function(map, options) {
     return output;
   });
 */
-  self.airportSearchResults = ko.observableArray([]);
+  self.airportSearchResults = ko.mapping.fromJS([]);
   self.airportData = ko.observable(self.emptyData);
+
+  /*
   self.airportSearchResultsNameList = ko.computed({
     read: function() {
       var plucked_results = _.pluck(self.airportSearchResults(), "name");
-      console.log('plucked results!');
+      console.log('plucked results! Original: ');
+      console.log(self.airportSearchResults());
+      console.log('plucked results! Plucked: ');
       console.log(plucked_results);
       return plucked_results;
     },
     owner: self
   });
-
+  */
   var AJAXCallback = {
     success: function(results, status) {
       console.log('Airport.AJAXCallback: Found AJAX Results!');
@@ -89,7 +93,7 @@ MapIt.Airport = function(map, options) {
       console.log('Airport.AJAXCallback: Error fetching airports!');
     }
   };
-
+  
   self.airportSearchInputThrottled.subscribe(function(newSearchInput){
     var sanitizedInput = encodeURI(newSearchInput);
     /*
