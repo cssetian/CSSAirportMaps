@@ -2,13 +2,26 @@
 MapIt.ViewModel = function() {
   var self = this;
 
+  self.initialPosition = ko.observable();
   self.map = ko.observable(new google.maps.Map(document.getElementById('map-canvas'), {}));
 
-  self.airportSearchInput = ko.observable('');
-
   self.airportList = ko.observableArray([]);
-  self.initialPosition = ko.observable();
   self.flightPath = ko.observable();
+
+
+  self.clientSearchResults = ko.mapping.fromJS([]);
+  ko.mapping.fromJS(self.departureAirport().airportSearchResults(), self.clientSearchResults);
+
+  // Parses strings returned from the query results into searchable terms to store for later keyword searching
+  self.searchableTermsRepository = ko.computed(function () {
+    var searchableTerms = [];
+    ko.utils.arrayForEach(self.departureAirport().airportSearchResults(), function (item) {
+      searchableTerms.push(item.name);
+    });
+    console.log('SearchableTerms:');
+    console.log(searchableTerms);
+    return searchableTerms;
+  });
 
   // Initialize an array of map markers to keep track of all 3 markers on the map.
   // Google Maps API does not automatically keep track of and clean up markers on a map.
@@ -19,6 +32,7 @@ MapIt.ViewModel = function() {
     {id: 2, marker: new google.maps.Marker({map: self.map()})}
   ]);
 
+  // Subscribe to changes in the array to show/hide default position when relevant
   self.mapMarkerArray.subscribe(function(){
     if(self.anyAirportSelected()) {
       console.log('REMOVED INITIAL MAP MARKER');
@@ -77,51 +91,6 @@ MapIt.ViewModel = function() {
     new Option(3, 'This is a defualt option')
   ]);
 
-  /*
-  self.departureAirport().typeaheadOptions = {
-    name: 'Departure Airport Search Box',
-    minLength: 0,
-    remote: {
-      url: self.departureAirport().airportSearchUrl(),
-      filter: function(parsedResponse) {
-        var dataset = [];
-        for (var key in parsedResponse) {
-          dataset.push({
-            value: parsedResponse[key].firstName + ' ' + parsedResponse[key].surname,
-            tokens: [parsedResponse[key].firstName, parsedResponse[key].surname]
-          });
-        }
-        return dataset;
-      }
-    }
-  };
-  */
-
-  /*
-  var currentPosDisplay = $('#departure-airport-selector');
-  currentPosDisplay.on('ondblclick', function(e) {
-    console.log('ViewModel: Hit the doubleclick event!!');
-    e.stopPropagation();
-  });
-  */
-  /*
-  self.departureAirport().airportSearchInput.subscribe(function(newVal){
-    if(typeof newVal.length === 'undefined' || newVal.length === 0) {
-      console.log('No input supplied, turning off datalist doubleclick')
-      $('#departure-airport-selector').off('ondblclick');
-    } else {
-      $('#departure-airport-selector').on('ondblclick');
-    }
-  });
-  self.arrivalAirport().airportSearchInput.subscribe(function(newVal){
-    if(typeof newVal.length === 'undefined' || newVal.length === 0) {
-      $('#arrival-airport-selector').off('ondblclick');
-    } else {
-      $('#arrival-airport-selector').on('ondblclick');
-    }
-  });
-  */
- 
 
   /**************************************************************************************/
 

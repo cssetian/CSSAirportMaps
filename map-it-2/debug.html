@@ -1,0 +1,52 @@
+<html>
+<head>
+</head>
+<body>
+<input type="text" css="veritcal-align: top" id="airport-input" /> <!--autocomplete="off" />-->
+<input type="hidden" css="display: none, veritcal-align: top" name="airportId" id="airportId" value="" />
+<input  id="departure-airport-selector"
+        autocomplete="off"
+        css="veritcal-align: top"
+        class="typeahead second-input-column required"
+        type="text"
+        placeholder="Type to search for a departure airport..."
+        data-bind=" value: departureAirport().airportSearchInput,
+                    valueUpdate: 'input'" />  
+
+<hr>
+<div id="results"></div>
+
+</body>
+
+<div visibility="hidden">
+  <script type="text/javascript" src="scripts/lib/jquery-2.1.0.js"></script>
+  <script type="text/javascript" src="scripts/lib/underscore-1.6.0.js"></script>
+  <script type="text/javascript" src="scripts/lib/knockout-3.1.0.js"></script>
+  <script type="text/javascript" src="scripts/lib/knockout.mapping-latest.debug.js"></script>
+  <script type="text/javascript" src="scripts/lib/knockout-bootstrap.min.js"></script>
+  <script type="text/javascript" src="scripts/lib/bootstrap.js"></script>
+  <script type="text/javascript" src="scripts/lib/typeahead.bundle.js"></script>
+  <script type="text/javascript" src="scripts/lib/knockout.bindings.typeahead.js"></script>
+  <script type="text/javascript" src="scripts/lib/handlebars-v1.3.0.js"></script>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+  <script type="text/javascript" src="scripts/lib/latlong.js"></script>
+  <script type="text/javascript" src="scripts/MapIt_App.js"></script>
+  <script type="text/javascript" src="content/airports.js"></script>
+  <script type="text/javascript" src="scripts/ViewModel.js"></script>
+  <script type="text/javascript" src="scripts/Airport.js"></script>
+  <script type="text/javascript" src="content/dummy-google-places.json"></script>
+  <script type="text/javascript" src="scripts/TypeaheadDebugging.js"></script>
+</div>
+
+<script>
+
+  (function ($) {
+
+    $( document ).ready(function() {
+        Debug().init();
+      });
+
+    })(jQuery);
+</script>
+</html>
