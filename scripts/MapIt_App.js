@@ -18,316 +18,22 @@ MapIt.App = (function($, _, ko) {
 
     viewModel = new MapIt.ViewModel();
 
-    /*
-    ko.bindingHandlers.typeahead = {
-        init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            var typeaheadSource; // <-- this is where our typeahead options will be stored in
-            //this is the parameter that you pass from you data-bind expression in the mark-up
-            if (typeof valueAccessor() === undefined) {
-              return;
-            }
-            var passedValueFromMarkup = ko.utils.unwrapObservable(valueAccessor());
-            if (passedValueFromMarkup instanceof Array) typeaheadSource = passedValueFromMarkup;
-            else {
-                // if the name contains '.', then we expect it to be a property in an object such as myLists.listOfCards
-                var splitedName = passedValueFromMarkup.split('.');
-                var result = window[splitedName[0]];
-                $.each($(splitedName).slice(1, splitedName.length), function(iteration, name) {
-                    result = result[name];
-                });
-
-                // if we find any array in the JsVariable, then use that as source, otherwise init without any specific source and hope that it is defined from attributes
-                if (result != null && result.length > 0) {
-                    typeaheadSource = result;
-                }
-
-            }
-            if (typeaheadSource == null) $(element).typeahead();
-            else {
-                $(element).typeahead({
-                    source: typeaheadSource
-                });
-            }
-
-        },
-    };
-    console.log('initialized binding handler!');
-  */
-    var substringMatcher = function(strs) {
-      return function findMatches(q, cb) {
-        var matches, substrRegex;
-     
-        // an array that will be populated with substring matches
-        matches = [];
-     
-        // regex used to determine if a string contains the substring `q`
-        substrRegex = new RegExp(q, 'i');
-     
-        // iterate through the pool of strings and for any string that
-        // contains the substring `q`, add it to the `matches` array
-        $.each(strs, function(i, str) {
-          if (substrRegex.test(str)) {
-            // the typeahead jQuery plugin expects suggestions to a
-            // JavaScript object, refer to typeahead docs for more info
-            matches.push({ value: str });
-          }
-        });
-     
-        cb(matches);
-      };
-    };
-
-    viewModel.clientSearchResults = ko.mapping.fromJS([]);
     ko.mapping.fromJS(viewModel.departureAirport().airportSearchResults(), viewModel.clientSearchResults);
 
-    viewModel.SearchText = ko.computed(function () {
-      var searchableTerms = [];
-      ko.utils.arrayForEach(viewModel.departureAirport().airportSearchResults(), function (item) {
-        searchableTerms.push(item.name);
-      });
-      console.log('SearchableTerms:');
-      console.log(searchableTerms);
-      return searchableTerms;
-    });
-
-    /*
-    // Bind twitter typeahead
-    ko.bindingHandlers.typeahead = {
-      init: function (element, valueAccessor) {//, allBindingsAccessor, viewModel, bindingContext) {
-        var binding = this;
-
-        console.log('element: ');
-        console.log($(element));
-        console.log('valueAccessor: ');
-        console.log(valueAccessor());
-
-        var elem = $(element);
-        var value = valueAccessor();
-
-        elem.typeahead({
-          source: function () {
-            return ko.utils.unwrapObservable(value.source);
-          },
-          onselect: function (val) {
-            value.target(val);
-          }
-        });
-
-        elem.blur(function () {
-          value.target(elem.val());
-        });
-      },
-      update: function (element, valueAccessor) {
-        var elem = $(element);
-        var value = valueAccessor();
-        elem.val(value.target());
-      }
-    };
-    */
-   
-    MapIt.Option = function Option(id, name) {
-      var self = this;
-      self.Id = ko.observable(id);
-      self.Name = ko.observable(name);
-    };
-
-
-   ko.bindingHandlers.typeahead = {
-    init: function (element, valueAccessor) {
-        var options = ko.unwrap(valueAccessor()) || {},
-            $el = $(element),
-            triggerChange = function () {
-                $el.change();
-            };
-            
-        var displayKey = options.displayKey;
-        options.displayKey = function(item) {
-            return item[displayKey]();
-        };
-        options.dupDetector = function(remoteMatch, localMatch) {
-            return false;
-        };
-        options.source = options.taOptions.ttAdapter();
-
-        console.log('options local set - ', options.taOptions.ttAdapter);
-        var thisTypeAhead = $el.typeahead(null, options)
-          .on("typeahead:selected", triggerChange)
-          .on("typeahead:autocompleted", triggerChange);
-        
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-          $el.typeahead("destroy");
-          $el = null;
-        });
-      }
-    };
-
-        /*
-        $element//.attr('autocomplete', 'off')
-        .typeahead({
-          //'source': function (query, process) {
-          //            console.log('accessing source of typeahead! Query is ' + query);
-          //            return substringMatcher(query);
-          //         },//typeaheadArr,
-          'remote': '/airportsearch?search_query=%QUERY',
-          'minLength': 2,
-          'items': allBindings.typeahead,
-          'displayKey': 'value',
-          'updater': function(item) {
-            console.log('updating typeahead!');
-            allBindings.typeaheadValue(item);
-            return item;
-          }
-        });
-      }*/
-      /*,
-      update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-        var $element = $(element);
-        var allBindings = allBindingsAccessor();
-        console.log('valueAccessor: ' + valueAccessor());
-        var typeaheadArr = ko.utils.unwrapObservable(valueAccessor());
-        
-        console.log('bindings handler for autocomplete update!');
-        console.log('source array!:');
-        console.log(typeaheadArr);
-        $element//.attr('autocomplete', 'off')
-        .typeahead({
-          'source': typeaheadArr,
-          'minLength': 2,
-          'items': allBindings.typeahead,
-          'updater': function(item) {
-            allBindings.typeaheadValue(item);
-            return item;
-          }
-        });
-
-      }*/
-    //};
-
-    /*
-    $('#departure-airport-selector').typeahead({
-        hint: true,
-        displayKey: 'value',
-        name: 'Departure Airports',
-        limit: 10,
-        templates: {
-          empty: [
-            '<div class="empty-message">',
-            'unable to find any Best Picture winners that match the current query',
-            '</div>'
-          ].join('\n'),
-          suggestion: Handlebars.compile('<span><strong>{{name}}</strong></span><span>{{formatted_address}}</span>')
-        },
-        source: function(query, process) {
-          console.log('processing source!!');
-          var resultObject = viewModel.departureAirport().airportSearchResults();
-
-          var results = _.map(resultObject, function(airport) {
-            return airport.name;
-          });
-
-          console.log('airport search results - typeahead source: ' + results);
-          process(results);
-          console.log('source method of typeahead - finished!');
-        },
-
-        matcher: function(item) {
-          console.log('processing matcher!');
-          if(item.name.toLowerCase().indexOf(this.query.trim().toLowerCase()) !== -1) {
-            return true;
-          }
-        },
-
-        highlighter: function(item) {
-          console.log('processing highlighter!');
-          var regex = new RegExp( '(' + this.query + ')', 'gi' );
-          return item.replace( regex, '<strong>$1</strong>' );
-        },
-
-        updater: function(item) {
-          console.log('updater method of typeahead');
-          console.log('"' + item + '" selected.');
-          return item;
-        }
-
-      });*/
-    console.log('initialized typeahead!');
-
-    /*
-    viewModel.departureAirport().airportSearchResults.subscribe(function(newSearchResults) {
-      var autocomplete = $('#departure-airport-selector').typeahead();
-      autocomplete.data('typeahead').source = newSearchResults;
-    });
-    viewModel.arrivalAirport().airportSearchResults.subscribe(function(newSearchResults) {
-      var autocomplete = $('#arrival-airport-selector').typeahead();
-      autocomplete.data('typeahead').source = newSearchResults;
-    });
-    */
-
-    console.log('initialized typeahead results subscribe!');
-    /*
-    var bestPictures = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      prefetch: '../data/films/post_1960.json',
-      remote: '../data/films/queries/%QUERY.json'
-    });
-    
-    bestPictures.initialize();
-    */
      /*
-    $('#departure-airport-selector-container .typeahead').typeahead(null, {
+    airportSearchManager.initialize();
+     
+    $('#remote .typeahead').typeahead(null, {
       name: 'best-pictures',
       displayKey: 'value',
       source: bestPictures.ttAdapter()
     });
     */
-
-    /*
-    $('#departure-airport-selector').live('focus',function(){
-      $(this).attr('autocomplete', 'off');
-    });
-    */
-    /*
-    options.domEls.departureAirportsList.unbind('dblclick');
-    options.domEls.departureAirportsList.dblclick(function(e){
-      console.log('DISABLING DEPARTUREAIRPORTLIST DOUBLECLICK');
-      e.stopPropagation();
-      e.preventDefault();
-      return false;
-    });
-    options.domEls.departureAirportsList.unbind('click');
-    options.domEls.departureAirportsList.dblclick(function(e){
-      console.log('DISABLING DEPARTUREAIRPORTLIST CLICK');
-      e.stopPropagation();
-      e.preventDefault();
-      return false;
-    });
-
-    $('#departure-airport-selector').unbind('dblclick');
-    $('#departure-airport-selector').dblclick(function(e){
-      console.log('DISABLING DEPARTUREAIRPORT DOUBLECLICK');
-      e.stopPropagation();
-      e.preventDefault();
-      return false;
-    });
-    $('#departure-airport-selector').unbind('click');
-    $('#departure-airport-selector').click(function(e){
-      console.log('DISABLING DEPARTUREAIRPORT CLICK');
-      e.stopPropagation();
-      e.preventDefault();
-      return false;
-    });
-    */
-    /*
-    $('#departure-airport-selector').autocomplete({
-      source: viewModel.makeRequest,
-      minLength: 2
-    });
-    */
-   /*
-    $('#departure-airport-selector').off('ondblclick');
-    $('#arrival-airport-selector').off('ondblclick');
-    */
+    MapIt.Option = function Option(id, name) {
+      var self = this;
+      self.Id = ko.observable(id);
+      self.Name = ko.observable(name);
+    };
 
     // If geolocation is available in this browser, set the initial marker to that person's location
     // Otherwise, set location to Manhattan
@@ -350,6 +56,30 @@ MapIt.App = (function($, _, ko) {
 
     ko.applyBindings(viewModel);
     options.domEls.appContainer.fadeIn(50);
+  };
+
+  var _substringMatcher = function(strs) {
+    return function findMatches(q, cb) {
+      var matches, substrRegex;
+   
+      // an array that will be populated with substring matches
+      matches = [];
+   
+      // regex used to determine if a string contains the substring `q`
+      substrRegex = new RegExp(q, 'i');
+   
+      // iterate through the pool of strings and for any string that
+      // contains the substring `q`, add it to the `matches` array
+      $.each(strs, function(i, str) {
+        if (substrRegex.test(str)) {
+          // the typeahead jQuery plugin expects suggestions to a
+          // JavaScript object, refer to typeahead docs for more info
+          matches.push({ value: str });
+        }
+      });
+   
+      cb(matches);
+    };
   };
 
   var _initAirportRefData = function(options) {

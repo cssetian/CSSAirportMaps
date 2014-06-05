@@ -31,7 +31,7 @@
                         placeholder="Type to search for a departure airport..."
                         data-bind=" value: departureAirport().airportSearchInput,
                                     valueUpdate: 'input',
-                                    typeahead: { name: 'Departure Airport Selector', taOptions: theseOptions, displayKey: 'Name' }" />
+                                    typeahead: { name: 'Departure Airport Selector', displayKey: 'name' }" />
               </div>
               <!-- <input  type="text"
                         data-bind=" typeaheadValue: departureAirport().airportSearchInput,
@@ -109,12 +109,12 @@
           <tr>
             <td>Latitude:</td>
             <td>
-              <!-- ko if: typeof departureAirport().airportData().geometry !== undefined -->
+              <!-- ko if: typeof departureAirport().airportData().geometry !== 'undefined' -->
                 <span data-bind="text: departureAirport().airportData().geometry.location.lat"></span>
               <!-- /ko -->
             </td>
             <td class="hidden-700">
-              <!-- ko if: typeof arrivalAirport().airportData().geometry !== undefined -->
+              <!-- ko if: typeof arrivalAirport().airportData().geometry !== 'undefined' -->
                 <span data-bind="text: arrivalAirport().airportData().geometry.location.lat" class="hidden-600"></span>
               <!-- /ko -->
             </td>
@@ -122,12 +122,12 @@
           <tr>
             <td>Longitude:</td>
             <td>
-              <!-- ko if: typeof departureAirport().airportData().geometry !== undefined -->
+              <!-- ko if: typeof departureAirport().airportData().geometry !== 'undefined' -->
                 <span data-bind="text: departureAirport().airportData().geometry.location.lng"></span>
               <!-- /ko -->
             </td>
             <td class="hidden-700">
-              <!-- ko if: typeof arrivalAirport().airportData().geometry !== undefined -->
+              <!-- ko if: typeof arrivalAirport().airportData().geometry !== 'undefined' -->
                 <span data-bind="text: arrivalAirport().airportData().geometry.location.lng"></span>
               <!-- /ko -->
             </td>

@@ -23,7 +23,21 @@ MapIt.ViewModel = function() {
   self.airportList = ko.observableArray([]);
   self.initialPosition = ko.observable();
   self.flightPath = ko.observable();
+  self.clientSearchResults = ko.mapping.fromJS([]);
 
+  self.SearchText = ko.computed({
+    read: function () {
+      var searchableTerms = [];
+      ko.utils.arrayForEach(self.departureAirport().airportSearchResults(), function (item) {
+        searchableTerms.push(item.name);
+      });
+      console.log('SearchableTerms:');
+      console.log(searchableTerms);
+      return searchableTerms;
+    },
+    owner: self,
+    deferEvaluation: true
+  });
   // Initialize an array of map markers to keep track of all 3 markers on the map.
   // Google Maps API does not automatically keep track of and clean up markers on a map.
   // That must be done manually by either updating existing markers' positions or remove/readding them.
@@ -110,35 +124,6 @@ MapIt.ViewModel = function() {
     }
   };
 
-
-  /*
-  var currentPosDisplay = $('#departure-airport-selector');
-  currentPosDisplay.on('ondblclick', function(e) {
-    console.log('ViewModel: Hit the doubleclick event!!');
-    e.stopPropagation();
-  });
-  */
-  /*
-  self.departureAirport().airportSearchInput.subscribe(function(newVal){
-    if(typeof newVal.length === 'undefined' || newVal.length === 0) {
-      console.log('No input supplied, turning off datalist doubleclick')
-      $('#departure-airport-selector').off('ondblclick');
-    } else {
-      $('#departure-airport-selector').on('ondblclick');
-    }
-  });
-  self.arrivalAirport().airportSearchInput.subscribe(function(newVal){
-    if(typeof newVal.length === 'undefined' || newVal.length === 0) {
-      $('#arrival-airport-selector').off('ondblclick');
-    } else {
-      $('#arrival-airport-selector').on('ondblclick');
-    }
-  });
-  */
- 
-
-  /**************************************************************************************/
-
   /********************** Airport Existance Conditions and Helpers **********************/
   self.departureAirportSelected = ko.computed({
     read: function() {
@@ -195,7 +180,7 @@ MapIt.ViewModel = function() {
       console.log('ViewModel.twoAirportsSelectedSusbscriber: Two airports are selected! Add flight path to map!');
 
       self.flightPath(new google.maps.Polyline({
-        path: [self.departureAirport().airportCoords(), self.arrivalAirport().airportCoords()],
+        path: [self.departureAirport().toAirportCoords(), self.arrivalAirport().toAirportCoords()],
         geodesic: true,
         strokeColor: '#FF0000',
         strokeOpacity: 1.0,
@@ -205,8 +190,8 @@ MapIt.ViewModel = function() {
 
       console.log('ViewModel.twoAirportsSelectedSubscriber: Setting view bounds on map');
       var bounds = new google.maps.LatLngBounds();
-      bounds.extend(self.departureAirport().airportCoords());
-      bounds.extend(self.arrivalAirport().airportCoords());
+      bounds.extend(self.departureAirport().toAirportCoords());
+      bounds.extend(self.arrivalAirport().toAirportCoords());
 
       self.map().fitBounds(bounds);
     } else {
