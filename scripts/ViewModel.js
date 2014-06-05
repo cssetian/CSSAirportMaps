@@ -2,9 +2,23 @@
 MapIt.ViewModel = function() {
   var self = this;
 
-  self.map = ko.observable(new google.maps.Map(document.getElementById('map-canvas'), {}));
+  self.dummyAirportSearches =  ko.observableArray([
+        'Angular',
+        'Canjs',
+        'Batman',
+        'Meteor',
+        'Ember',
+        'Backbone',
+        'Knockout',
+        'Knockback',
+        'Spine',
+        'Sammy',
+        'YUI',
+        'Closure',
+        'jQuery']);
 
-  self.airportSearchInput = ko.observable('');
+
+  self.map = ko.observable(new google.maps.Map(document.getElementById('map-canvas'), {}));
 
   self.airportList = ko.observableArray([]);
   self.initialPosition = ko.observable();
@@ -75,7 +89,7 @@ MapIt.ViewModel = function() {
       new Option(1, 'John'),
       new Option(2, 'Johnny'),
       new Option(3, 'This is a defualt option')
-  ]);]
+  ]);
 
 
   self.departureAirport().typeaheadOptions = {

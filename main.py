@@ -31,6 +31,10 @@ from google.appengine.ext.webapp import util
 def handleError(e):
   logging.info('Need to handle the error!')
 
+class DebugHandler(webapp2.RequestHandler):
+    def get(self):
+        self.response.out.write(template.render('debug.html', {}))
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.out.write(template.render('index.html', {}))
@@ -102,5 +106,6 @@ class AirportSearchHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     #webapp2.Route('/airportsearch<search_query:((\?)([^/\?\.])+)*>', handler=AirportSearchHandler),
     webapp2.Route('/airportsearch', handler=AirportSearchHandler),
+    ('/debug', DebugHandler),
     ('/', MainHandler)
 ], debug=True)

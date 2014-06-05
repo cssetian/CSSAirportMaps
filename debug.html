@@ -1,0 +1,67 @@
+<html>
+<head>
+  <link rel="stylesheet" href="styles/bootstrap.css" />
+  <link rel="stylesheet" href="styles/bootstrap-theme.css" />
+  <link rel="stylesheet" href="styles/typeaheadjs.css">
+  <link rel="stylesheet" href="styles/map-it.css" />
+</head>
+<body>
+  <div class="container">
+      <div class="row">
+          <div class="col-md-12">
+              <section id="typeahead">
+                  <div class="page-header">
+                       <h1>Typeahead</h1>
+
+                  </div>
+                   <h2>Examples</h2>
+
+                  <p>Typeahead input with a data source as an observable array. Pass a reference to the <code>data-bind="typeahead:"</code> binding and the items from that observable array will be shown as suggestions in the input box. To show the binding nature of this feature the example allows you to add and remove items from the array.
+                      <div class="bs-docs-example">
+                          <div class="row">
+                              <div class="col-md-4">
+                                  <form>
+                                      <label>Javascript Frameworks</label>
+                                      <input name="jsFrameworks" id="jsFrameworks" type="text" data-bind="typeahead: { source: jsFrameworks }" />
+                                  </form>
+                                  <form data-bind="submit: addFramework">
+                                      <label>Add a framework</label>
+                                      <input type="text" data-bind="value: frameworkToAdd, valueUpdate:'afterkeydown'" />
+                                      <div class="form-actions">
+                                          <button class="btn" type="submit" data-bind="enable: frameworkToAdd().length > 0">Add</button>
+                                      </div>
+                                  </form>
+                              </div>
+                              <div class="well col-md-4">
+                                  <ul class="nav nav-list" data-bind="foreach: jsFrameworks">
+                                      <li> <span data-bind="text: $data"></span>
+   <i class="fa fa-minus-square" data-bind="click: $root.removeFramework"></i>
+
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+              </section>
+          </div>
+      </div>
+  </div>
+</body>
+
+<div visibility="hidden">
+  <script type="text/javascript" src="scripts/lib/jquery-2.1.0.js"></script>
+  <script type="text/javascript" src="scripts/lib/underscore-1.6.0.js"></script>
+  <script type="text/javascript" src="scripts/lib/knockout-3.1.0.js"></script>
+  <script type="text/javascript" src="scripts/lib/knockout.mapping-latest.debug.js"></script>
+  <script type="text/javascript" src="scripts/lib/knockout-bootstrap.min.js"></script>
+  <script type="text/javascript" src="scripts/lib/bootstrap.js"></script>
+  <script type="text/javascript" src="scripts/lib/typeahead.bundle.js"></script>
+  <script type="text/javascript" src="scripts/lib/knockout.bindings.typeahead.js"></script>
+  <script type="text/javascript" src="scripts/lib/handlebars-v1.3.0.js"></script>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+  <script type="text/javascript" src="scripts/lib/latlong.js"></script>
+  <script type="text/javascript" src="content/dummy-google-places.json"></script>
+</div>
+
+</html>
