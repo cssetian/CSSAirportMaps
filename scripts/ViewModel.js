@@ -5,6 +5,7 @@ MapIt.ViewModel = function() {
   self.map = ko.observable(new google.maps.Map(document.getElementById('map-canvas'), {}));
 
   self.airportSearchInput = ko.observable('');
+
   self.airportList = ko.observableArray([]);
   self.initialPosition = ko.observable();
   self.flightPath = ko.observable();
@@ -63,6 +64,39 @@ MapIt.ViewModel = function() {
   self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'})).extend({ rateLimit: 0 });
   self.arrivalAirport().airportMarker.subscribe(self.arrivalAirportUpdateHandler);
   console.log('ViewModel: Map-updating callback function for arrialAirport bound to arrivalAirport.airportData');
+
+
+  function Option(id, name) {
+    var self = this;
+    self.Id = ko.observable(id);
+    self.Name = ko.observable(name);
+  };
+  self.someOptions = ko.observableArray([
+      new Option(1, 'John'),
+      new Option(2, 'Johnny'),
+      new Option(3, 'This is a defualt option')
+  ]);]
+
+
+  self.departureAirport().typeaheadOptions = {
+    name: 'Departure Airport Search Box',
+    minLength: 0,
+    remote: {
+      url: self.departureAirport().airportSearchUrl(),
+      filter: function(parsedResponse) {
+        var dataset = [];
+        for (var key in parsedResponse) {
+          dataset.push({
+            value: parsedResponse[key].firstName + ' ' + parsedResponse[key].surname,
+            tokens: [parsedResponse[key].firstName, parsedResponse[key].surname]
+          });
+        }
+        return dataset;
+      }
+    }
+  };
+
+
   /*
   var currentPosDisplay = $('#departure-airport-selector');
   currentPosDisplay.on('ondblclick', function(e) {

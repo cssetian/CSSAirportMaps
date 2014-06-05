@@ -90,6 +90,7 @@ MapIt.App = (function($, _, ko) {
       return searchableTerms;
     });
 
+    /*
     // Bind twitter typeahead
     ko.bindingHandlers.typeahead = {
       init: function (element, valueAccessor) {//, allBindingsAccessor, viewModel, bindingContext) {
@@ -120,6 +121,43 @@ MapIt.App = (function($, _, ko) {
         var elem = $(element);
         var value = valueAccessor();
         elem.val(value.target());
+      }
+    };
+    */
+   
+    MapIt.Option = function Option(id, name) {
+      var self = this;
+      self.Id = ko.observable(id);
+      self.Name = ko.observable(name);
+    };
+
+
+   ko.bindingHandlers.typeahead = {
+    init: function (element, valueAccessor) {
+        var options = ko.unwrap(valueAccessor()) || {},
+            $el = $(element),
+            triggerChange = function () {
+                $el.change();
+            };
+            
+        var displayKey = options.displayKey;
+        options.displayKey = function(item) {
+            return item[displayKey]();
+        };
+        options.dupDetector = function(remoteMatch, localMatch) {
+            return false;
+        };
+        options.source = options.taOptions.ttAdapter();
+
+        console.log('options local set - ', options.taOptions.ttAdapter);
+        var thisTypeAhead = $el.typeahead(null, options)
+          .on("typeahead:selected", triggerChange)
+          .on("typeahead:autocompleted", triggerChange);
+        
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+          $el.typeahead("destroy");
+          $el = null;
+        });
       }
     };
 
