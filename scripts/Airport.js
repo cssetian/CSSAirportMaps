@@ -1,5 +1,5 @@
 MapIt.Airport = function(map, options) {
-  console.log('MapIt.Airport: Initializing Airport ViewModel');
+  console.log('MapIt.Airport: Initializing Airport ViewModel for ' + options.name);
   var self = this;
   var service;
   // This is JSON so the quotes should stay as double quotes
@@ -28,6 +28,7 @@ MapIt.Airport = function(map, options) {
   self.emptyData = JSON.parse(emptyJSON);
   self.name = options.name;
 
+
   self.airportSearchTerm = ko.observable();
   self.airportSearchResults = ko.mapping.fromJS([]);
   self.airportData = ko.computed({
@@ -38,13 +39,16 @@ MapIt.Airport = function(map, options) {
   });
 
   self.remoteSearchBaseURI = 'https://maps.googleapis.com/maps/api/place/textsearch/json?&name=airport&types=airport&sensor=false&key=AIzaSyC_i9CE-MZrDZDLY9MdrfukhcEBkatg3Jc&query=';
-  self.localSearchBaseURI = '/airportsearch/';
+  self.localSearchBaseURI = '/airportsearch';
 
   self.encodedAirportSearchTerm = ko.computed({
     read: function() {
+      console.log('------------------------BEGINNING AIRPORT SEARCH-------------------------------');
       if(typeof self.airportSearchTerm() !== 'undefined' && self.airportSearchTerm() !== null && self.airportSearchTerm() !== '') {
-        return encodeURI(self.airportSearchTerm());
+        console.log('Airport.encodedAirportSearchTerm: Encoded Airport Search Term is: ' + self.airportSearchTerm())
+        return encodeURI(self.airportSearchTerm.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 } })());
       } else {
+        console.log('Airport.encodedAirportSearchTerm: Airport is undefined or null or empty');
         return undefined;
       }
     },
@@ -54,8 +58,10 @@ MapIt.Airport = function(map, options) {
   self.throttledAirportSearchTerm = ko.computed({
     read: function() {
       if(typeof self.encodedAirportSearchTerm() !== 'undefined' && self.encodedAirportSearchTerm() !== null && self.encodedAirportSearchTerm() !== '') {
-        return self.encodedAirportSearchTerm().extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 } });
+        console.log('Airport.throttledAirportSearchTerm: Throttled Airport Search Term: ' + self.encodedAirportSearchTerm());
+        return self.encodedAirportSearchTerm();
       } else {
+        console.log('Airport.throttledAirportSearchTerm: Throttled Airport is undefined or null or empty');
         return undefined;
       }
     },
@@ -63,13 +69,14 @@ MapIt.Airport = function(map, options) {
     deferEvaluation: true
   });
 
-  self.airportSearchUrl = ko.computed({
+  self.airportRemoteSearchUrl = ko.computed({
     read: function () {
-      if(typeof self.encodedAirportSearchTerm() !== 'undefined' && self.encodedAirportSearchTerm() !== null && self.encodedAirportSearchTerm() !== '') {
-        var output = self.mapItAirportLocalBaseURI + encodeURI(self.airportThrottledSearchTerm()); //self.airportSearchInput(); + self.airportSearchSuffix;
-        console.log('Airport Search Url: ' + output);
+      if(typeof self.airportSearchTerm() !== 'undefined' && self.airportSearchTerm() !== null && self.airportSearchTerm() !== '') {
+        var output = self.remoteSearchBaseURI + self.airportSearchInput();
+        console.log('Airport.airportSearchUrl: Airport Search Url: ' + output);
         return output;
       } else {
+        console.log('Airport.airportRemoteSearchUrl: Airport is undefined or null or empty');
         return undefined;
       }
     },
@@ -77,6 +84,16 @@ MapIt.Airport = function(map, options) {
     deferEvaluation: true
   }).extend({ rateLimit: 0 });
 
+  self.fetchSearchResultsFailure = function() {
+    console.log('Airport.fetchSearchResultsFailure: FETCHING OF DATA FAILEDDDDDDDD');
+  };
+  self.singleSearchResults = ko.lazyObservable(self.fetchSearchResults.bind(self), self);
+  self.extenderSearchResults = ko.observableArray([]).extend({lazy: {callback: self.fetchSearchResults, context: self}});
+   
+
+
+
+/*
   var AJAXCallback = {
     success: function(results, status) {
       console.log('Airport.AJAXCallback: AJAX Success! Raw Response:');
@@ -104,6 +121,7 @@ MapIt.Airport = function(map, options) {
       failure: AJAXCallback.failure
     });
   });
+*/
 
   /*
   self.airportSearchManager = ko.observable(new Bloodhound({
@@ -113,23 +131,23 @@ MapIt.Airport = function(map, options) {
   }));
 */
 
-  self.airportSearchResults.subscribe(function(newSearchResults){
-    console.log('Triggered airportSearchResults subscription!');
+  self.singleSearchResults.subscribe(function(newSearchResults){
+    //console.log('Airport.singleSearchResults: airportData: Triggered airportSearchResults subscription! About to set airportData for matching airport');
 
-    if(typeof newSearchResults === 'undefined' || typeof newSearchResults[0] === 'undefined') {
-      console.log('Airport.airportData: No airport search input exists, or no JSON data for airports. Returning default data.');
-      return self.emptyData;
-    }
+    //if(typeof newSearchResults === 'undefined' || typeof newSearchResults[0] === 'undefined') {
+     // console.log('Airport.airportData: No airport search input exists, or no JSON data for airports. Returning default data.');
+    //  return self.emptyData;
+    //}
 
-    var resultAirport = '';
-    if(newSearchResults.length > 0 && newSearchResults[0].name === self.airportSearchInput()) {
-      self.airportData(newSearchResults[0]);
+    //var resultAirport = '';
+    //if(newSearchResults.length > 0 && newSearchResults[0].name === self.airportSearchTerm()) {
+      //self.airportData(newSearchResults[0]);
 
-      console.log('Airport.airportData: Found matching airport: ' + resultAirport.name);
-    } else if(self.airportData() !== self.emptyData) {
-      self.airportData(self.emptyData);
-      console.log('Airport.airportData: No matching airport found.');
-    }
+      //console.log('Airport.singleSearchResults: airportData: Found matching airport: ' + resultAirport.name);
+    //} else if(self.airportData() !== self.emptyData) {
+      //self.airportData(self.emptyData);
+      //console.log('Airport.singleSearchResults: airportData: No matching airport found.');
+    //}
   });
   /*
   self.buildAirportNameQuery = function(term) {
@@ -220,7 +238,8 @@ MapIt.Airport = function(map, options) {
         return _LatLng;
       }
     },
-    owner: self
+    owner: self,
+    deferEvaluation: true
   });
 
   self.airportMarker = ko.computed({
@@ -235,7 +254,41 @@ MapIt.Airport = function(map, options) {
         return _Marker;
       }
     },
-    owner: self
+    owner: self,
+    deferEvaluation: true
   });
 
+};
+
+MapIt.Airport.prototype.fetchSearchResults = function() {
+  var self = this;
+  console.log('Airport.fetchSearchResults: base URI: (' + self.localSearchBaseURI + ')');
+  if(typeof self.throttledAirportSearchTerm() === 'undefined' || self.throttledAirportSearchTerm() === null || self.throttledAirportSearchTerm() === '') {
+    console.log('Airport.fetchSearchResults: NO SEARCH TERM SPECIFIED! AJAX CALL WILL NOT EXECUTE');
+    return;
+  }
+
+  console.log('Airport.fetchSearchResults: search_query: (' + self.throttledAirportSearchTerm() + ')');
+  console.log('------------------------------MAKING AJAX REQUEST--------------------------------');
+  $.ajax({
+    type: 'GET',
+    url: self.localSearchBaseURI,
+    data: { 'search_query': self.throttledAirportSearchTerm()},
+    context: self,
+    dataType: 'json',
+    success: function(data) {
+      console.log('Airport.' + self.name + '.fetchSearchResults: Found results!');
+      console.log('Airport.' + self.name + '.fetchSearchResults: Raw result object is below --v ');
+      console.log(data);
+      
+      //self.singleSearchResults(data);
+      self.extenderSearchResults(data);
+      console.log('Airport.' + self.name + '.fetchSearchResults: Value of extenderSearchResults is below (should match raw result object defined immediately above  ---v ');
+      console.log(self.extenderSearchResults());
+   
+      //console.log('Airport.' + self.name + '.fetchSearchResults: Value of singleSearchResults is below (should match raw result object defined immediately above  ---v ');
+      //console.log(self.singleSearchResults());
+    },
+    error:self.fetchSearchResultsFailure
+  });
 };

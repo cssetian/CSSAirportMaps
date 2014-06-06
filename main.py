@@ -59,10 +59,10 @@ class AirportSearchHandler(webapp2.RequestHandler):
       #googlePlacesAPIKey = '&key=' + 'AIzaSyDC0_jxucNVmD3mA40DOUB8463jhdQ0yPE'
       #queryKey = '&name='
       #fullSearchUrl = airportSearchBaseUrl + googlePlacesAPIKey + queryKey + search_query
-      airportTextSearchBaseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?&name=airport&types=airport&sensor=false&key=AIzaSyC_i9CE-MZrDZDLY9MdrfukhcEBkatg3Jc&query='
+      airportTextSearchBaseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?name=airport&types=airport&sensor=false&key=AIzaSyC_i9CE-MZrDZDLY9MdrfukhcEBkatg3Jc&query='
       fullTextSearchUrl = airportTextSearchBaseUrl + search_query
       logging.info(fullTextSearchUrl)
-      logging.info('search query:<' + search_query + '>')
+      logging.info('search query:(' + search_query + ')')
       try:
         results = urllib2.urlopen(fullTextSearchUrl)
         logging.info('url\'s urllib2.urlopen \'results\'-type listed below') 

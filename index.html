@@ -29,19 +29,19 @@
                         class="typeahead second-input-column required"
                         type="text"
                         placeholder="Type to search for a departure airport..."
-                        data-bind=" value: departureAirport().airportSearchInput,
+                        data-bind=" value: departureAirport().airportSearchTerm,
                                     valueUpdate: 'input',
                                     typeahead: { name: 'Departure Airport Selector', displayKey: 'name' }" />
               </div>
               <!-- <input  type="text"
-                        data-bind=" typeaheadValue: departureAirport().airportSearchInput,
+                        data-bind=" typeaheadValue: departureAirport().airportSearchTerm,
                         placeholder="Type to search for a departure airport..."
                         list="departure-airports-list"
                         autocomplete="off"
                         name="departureAirport" 
                         id="departureAirport" 
                         class="second-input-column required" 
-                        data-bind=" value: departureAirport().airportSearchInput, 
+                        data-bind=" value: departureAirport().airportSearchTerm, 
                                     valueUpdate: 'input'" /> -->
               </td>  <!-- data-list input to go with local json or pidgits data -->
           </tr>
@@ -53,7 +53,7 @@
                         class="typeahead second-input-column required" 
                         type="text" 
                         placeholder="Type to search for an arrival airport..." 
-                        data-bind=" value: arrivalAirport().airportSearchInput, 
+                        data-bind=" value: arrivalAirport().airportSearchTerm, 
                                     valueUpdate: 'input'" />
               </div>
             <!--<input  type="text"
@@ -62,7 +62,7 @@
                         name="arrivalAirport"
                         id="arrivalAirport"
                         class="second-input-column required"
-                        data-bind=" value: arrivalAirport().airportSearchInput, 
+                        data-bind=" value: arrivalAirport().airportSearchTerm, 
                                     valueUpdate: 'input'" />-->
             </td> <!-- data-list input to go with local json or pidgits data -->
           </tr>
@@ -243,13 +243,14 @@
   <script type="text/javascript" src="scripts/lib/underscore-1.6.0.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout-3.1.0.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout.mapping-latest.debug.js"></script>
+  <script type="text/javascript" src="scripts/ko.bindings.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout-bootstrap.min.js"></script>
   <script type="text/javascript" src="scripts/lib/bootstrap.js"></script>
   <script type="text/javascript" src="scripts/lib/typeahead.bundle.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout.bindings.typeahead.js"></script>
   <script type="text/javascript" src="scripts/lib/handlebars-v1.3.0.js"></script>
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
-  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
   <script type="text/javascript" src="scripts/lib/latlong.js"></script>
   <script type="text/javascript" src="scripts/MapIt_App.js"></script>
   <script type="text/javascript" src="content/airports.js"></script>

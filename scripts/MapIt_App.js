@@ -18,7 +18,7 @@ MapIt.App = (function($, _, ko) {
 
     viewModel = new MapIt.ViewModel();
 
-    ko.mapping.fromJS(viewModel.departureAirport().airportSearchResults(), viewModel.clientSearchResults);
+    //ko.mapping.fromJS(viewModel.departureAirport().airportSearchResults(), viewModel.clientSearchResults);
 
      /*
     airportSearchManager.initialize();
@@ -29,11 +29,21 @@ MapIt.App = (function($, _, ko) {
       source: bestPictures.ttAdapter()
     });
     */
+   /*
     MapIt.Option = function Option(id, name) {
       var self = this;
       self.Id = ko.observable(id);
       self.Name = ko.observable(name);
     };
+    */
+
+
+    var input = $('#departure-airport-selector');
+    var googleoptions = {
+      types: ['geocode']
+    };
+
+    //autocomplete = new google.maps.places.Autocomplete(input, googleoptions);
 
     // If geolocation is available in this browser, set the initial marker to that person's location
     // Otherwise, set location to Manhattan
@@ -57,7 +67,7 @@ MapIt.App = (function($, _, ko) {
     ko.applyBindings(viewModel);
     options.domEls.appContainer.fadeIn(50);
   };
-
+  /*
   var _substringMatcher = function(strs) {
     return function findMatches(q, cb) {
       var matches, substrRegex;
@@ -81,7 +91,8 @@ MapIt.App = (function($, _, ko) {
       cb(matches);
     };
   };
-
+  */
+ 
   var _initAirportRefData = function(options) {
     console.log('Initializing airport datalist and appending elements to dropdown selects');
 

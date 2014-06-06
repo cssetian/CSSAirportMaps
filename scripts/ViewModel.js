@@ -87,13 +87,13 @@ MapIt.ViewModel = function() {
 
   self.departureAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Departure Airport'})).extend({ rateLimit: 0 });
   self.departureAirport().airportMarker.subscribe(self.departureAirportUpdateHandler);
-  console.log('ViewModel: Map-updating callback function for departureAirport bound to departureAirport.airportData');
+  console.log('ViewModel: Setting DepartureAirport subscribe callback function bound to departureAirport.airportData');
   
   self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'})).extend({ rateLimit: 0 });
   self.arrivalAirport().airportMarker.subscribe(self.arrivalAirportUpdateHandler);
-  console.log('ViewModel: Map-updating callback function for arrialAirport bound to arrivalAirport.airportData');
+  console.log('ViewModel: Setting ArrivalAirport subscribe callback function bound to arrivalAirport.airportData');
 
-
+  /*
   function Option(id, name) {
     var self = this;
     self.Id = ko.observable(id);
@@ -123,7 +123,8 @@ MapIt.ViewModel = function() {
       }
     }
   };
-
+  */
+ 
   /********************** Airport Existance Conditions and Helpers **********************/
   self.departureAirportSelected = ko.computed({
     read: function() {
