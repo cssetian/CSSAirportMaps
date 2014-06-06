@@ -71,8 +71,8 @@ MapIt.Airport = function(map, options) {
 
   self.airportRemoteSearchUrl = ko.computed({
     read: function () {
-      if(typeof self.airportSearchTerm() !== 'undefined' && self.airportSearchTerm() !== null && self.airportSearchTerm() !== '') {
-        var output = self.remoteSearchBaseURI + self.airportSearchInput();
+      if(typeof self.throttledAirportSearchTerm() !== 'undefined' && self.throttledAirportSearchTerm() !== null && self.throttledAirportSearchTerm() !== '') {
+        var output = self.remoteSearchBaseURI + self.throttledAirportSearchTerm();
         console.log('Airport.airportSearchUrl: Airport Search Url: ' + output);
         return output;
       } else {
@@ -82,7 +82,7 @@ MapIt.Airport = function(map, options) {
     },
     owner: self,
     deferEvaluation: true
-  }).extend({ rateLimit: 0 });
+  })
 
   self.fetchSearchResultsFailure = function() {
     console.log('Airport.fetchSearchResultsFailure: FETCHING OF DATA FAILEDDDDDDDD');
