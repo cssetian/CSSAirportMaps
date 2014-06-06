@@ -31,12 +31,6 @@ MapIt.Airport = function(map, options) {
 
   self.airportSearchTerm = ko.observable();
   self.airportSearchResults = ko.mapping.fromJS([]);
-  self.airportData = ko.computed({
-    read: function() {
-      return self.emptyData;
-    },
-    owner: self
-  });
 
   self.remoteSearchBaseURI = 'https://maps.googleapis.com/maps/api/place/textsearch/json?&name=airport&types=airport&sensor=false&key=AIzaSyC_i9CE-MZrDZDLY9MdrfukhcEBkatg3Jc&query=';
   self.localSearchBaseURI = '/airportsearch';
@@ -88,9 +82,64 @@ MapIt.Airport = function(map, options) {
     console.log('Airport.fetchSearchResultsFailure: FETCHING OF DATA FAILEDDDDDDDD');
   };
   self.singleSearchResults = ko.lazyObservable(self.fetchSearchResults.bind(self), self);
-  self.extenderSearchResults = ko.observableArray([]).extend({lazy: {callback: self.fetchSearchResults, context: self}});
-   
+  
+  self.fetchFunctionSearchResults = function() {
+    console.log('Airport.fetchSearchResults: base URI: (' + self.localSearchBaseURI + ')');
+    if(typeof self.throttledAirportSearchTerm() === 'undefined' || self.throttledAirportSearchTerm() === null || self.throttledAirportSearchTerm() === '') {
+      console.log('Airport.fetchSearchResults: NO SEARCH TERM SPECIFIED! AJAX CALL WILL NOT EXECUTE');
+      return;
+    }
 
+    console.log('Airport.fetchSearchResults: search_query: (' + self.throttledAirportSearchTerm() + ')');
+    console.log('------------------------------MAKING AJAX REQUEST--------------------------------');
+    $.ajax({
+      type: 'GET',
+      url: self.localSearchBaseURI,
+      data: { 'search_query': self.throttledAirportSearchTerm()},
+      context: self,
+      dataType: 'json',
+      success: function(data) {
+        console.log('Airport.' + self.name + '.fetchSearchResults: Found results!');
+        console.log('Airport.' + self.name + '.fetchSearchResults: Raw result object is below --v ');
+        console.log(data);
+        
+        //self.singleSearchResults(data);
+        self.extenderSearchResults(data);
+        /*
+        if(data) {
+          self.airportData(self.extenderSearchResults()[0]);
+        }*/
+        console.log('Airport.' + self.name + '.fetchSearchResults: Value of extenderSearchResults is below (should match raw result object defined immediately above  ---v ');
+        console.log(self.extenderSearchResults());
+     
+        //console.log('Airport.' + self.name + '.fetchSearchResults: Value of singleSearchResults is below (should match raw result object defined immediately above  ---v ');
+        //console.log(self.singleSearchResults());
+      },
+      error:self.fetchSearchResultsFailure
+    });
+  };
+
+
+  self.extenderSearchResults = ko.observableArray([]).extend({lazy: {callback: self.fetchFunctionSearchResults, context: self}});
+   
+  self.airportData = ko.computed({
+    read: function() {
+      if(typeof self.extenderSearchResults() !== 'undefined' 
+        && self.extenderSearchResults() !== null 
+        && typeof self.extenderSearchResults().results !== 'undefined' 
+        && typeof self.extenderSearchResults().results !== 'undefined' 
+        && self.extenderSearchResults().results.length > 0) {
+          console.log('Found airport data! Element below -----v');
+          console.log(self.extenderSearchResults().results[0]);
+          return self.extenderSearchResults().results[0];
+      } else {
+          console.log(self.extenderSearchResults());
+          console.log('No airport data found');
+          return self.emptyData;
+      }
+    },
+    owner: self
+  });
 
 
 /*
@@ -283,6 +332,9 @@ MapIt.Airport.prototype.fetchSearchResults = function() {
       
       //self.singleSearchResults(data);
       self.extenderSearchResults(data);
+      //if(data) {
+      //  self.airportData(self.extenderSearchResults()[0]);
+      //}
       console.log('Airport.' + self.name + '.fetchSearchResults: Value of extenderSearchResults is below (should match raw result object defined immediately above  ---v ');
       console.log(self.extenderSearchResults());
    
