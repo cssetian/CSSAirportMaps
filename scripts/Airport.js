@@ -129,12 +129,11 @@ MapIt.Airport = function(map, options) {
         && typeof self.extenderSearchResults().results !== 'undefined' 
         && typeof self.extenderSearchResults().results !== 'undefined' 
         && self.extenderSearchResults().results.length > 0) {
-          console.log('Found airport data! Element below -----v');
+          console.log('Airport.airportData: Found airport data! \'resuts\' copied below -----v');
           console.log(self.extenderSearchResults().results[0]);
           return self.extenderSearchResults().results[0];
       } else {
-          console.log(self.extenderSearchResults());
-          console.log('No airport data found');
+          console.log('Airport.airportData: No airport data found');
           return self.emptyData;
       }
     },

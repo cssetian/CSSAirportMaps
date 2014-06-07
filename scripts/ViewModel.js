@@ -63,12 +63,22 @@ MapIt.ViewModel = function() {
     console.log('ViewModel.DepartureAirportUpdateHandler: Updated Departure Airport!');
     if(typeof newAirportMarker === 'undefined' || newAirportMarker === null || typeof newAirportMarker.title === 'undefined') {
       self.mapMarkers()[1].marker.setMap(null);
+      self.map().panTo(self.arrivalAirport().position);
       console.log('ViewModel.DeptUpdateHandler: No Departure Airport to plot!');
     } else {
       console.log('ViewModel.DeptUpdateHandler: Plotting new Departure Airport ' + newAirportMarker.title + ' at: (k: ' + newAirportMarker.position.k.toFixed(2) + ', A: ' + newAirportMarker.position.A.toFixed(2) + ')');
       self.mapMarkers()[1].marker.setMap(self.map());
       self.mapMarkers()[1].marker.setPosition(newAirportMarker.position);
-      self.map().panTo(newAirportMarker.position);
+      if(self.twoAirportsSelected()) {
+        // Set map to both markers
+        var bounds = new google.maps.LatLngBounds();
+        
+        bounds.extend(self.departureAirport().toAirportCoords());
+        bounds.extend(self.arrivalAirport().toAirportCoords());
+        self.map().fitBounds(bounds);
+      } else {
+        self.map().panTo(newAirportMarker.position);
+      }
     }
   };
 
@@ -76,12 +86,22 @@ MapIt.ViewModel = function() {
     console.log('ViewModel.ArrivalAirportUpdateHandler: Updated Arrival Airport!');
     if(typeof newAirportMarker === 'undefined' || newAirportMarker === null || typeof newAirportMarker.title === 'undefined') {
       self.mapMarkers()[2].marker.setMap(null);
+      self.map().panTo(self.departureAirport().position);
       console.log('ViewModel.ArrUpdateHandler: No Arrival Airport to plot!');
     } else {
       console.log('ViewModel.ArrUpdateHandler: Plotting new Arrival Airport ' + newAirportMarker.title + ' at: (k: ' + newAirportMarker.position.k.toFixed(2) + ', A: ' + newAirportMarker.position.A.toFixed(2) + ')');
       self.mapMarkers()[2].marker.setMap(self.map());
       self.mapMarkers()[2].marker.setPosition(newAirportMarker.position);
-      self.map().panTo(newAirportMarker.position);
+      if(self.twoAirportsSelected()) {
+        // Set map to both markers
+        var bounds = new google.maps.LatLngBounds();
+        
+        bounds.extend(self.departureAirport().toAirportCoords());
+        bounds.extend(self.arrivalAirport().toAirportCoords());
+        self.map().fitBounds(bounds);
+      } else {
+        self.map().panTo(newAirportMarker.position);
+      }
     }
   };
 
@@ -226,8 +246,8 @@ MapIt.ViewModel = function() {
           return '';
         }
 
-        var p1 = new LatLon(self.departureAirport().airportData().lat, self.departureAirport().airportData().lng);
-        var p2 = new LatLon(self.arrivalAirport().airportData().lat, self.arrivalAirport().airportData().lng);
+        var p1 = new LatLon(self.departureAirport().airportData().geometry.location.lat, self.departureAirport().airportData().geometry.location.lng);
+        var p2 = new LatLon(self.arrivalAirport().airportData().geometry.location.lat, self.arrivalAirport().airportData().geometry.location.lng);
         var dist = p1.distanceTo(p2);
 
         var distanceToReturn = dist;
