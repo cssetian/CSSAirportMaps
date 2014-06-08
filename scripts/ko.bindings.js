@@ -3,8 +3,8 @@
   ko.lazyObservable = function(callback, target) {
     var _internalValue = ko.observable();
     console.log('Defining lazyObservable!');
-    console.log('lazyObservable ' + target.name + ' result.read: CALLBACK Function ----v');
-    console.log(callback);
+    console.log('lazyObservable ' + target.name + ' result.read: CALLBACK Function ----v - not logging read value');
+    //console.log(callback); // This returns the string representation of the callback function. Takes up a lot of logging space
     console.log('lazyObservable ' + target.name + ' result.read: TARGET Object -------v');
     console.log(target);
 
@@ -15,10 +15,12 @@
         if(!result.loaded()) {
           console.log('lazyObservable.' + target.name + '.result.read: observable not loaded! Calling callback function, and passing target');
           callback.call(target);
+        } else {
+          console.log('lazyObservable.' + target.name + '.result.read: observable is already loaded. Not calling callback function. This logic block is only for logging.');
         }
         console.log('lazyObservable.' + target.name + '.result.read: Back to result.read after calling the callback method');
-        console.log('lazyObservable.' + target.name + '.result.read: returning internal observable value! read value -----v');
-        console.log(_internalValue);
+        console.log('lazyObservable.' + target.name + '.result.read: returning internal observable value! read value -----v - not logging read value');
+        console.log(_internalValue()); // This returns the string representation of the callback function. Takes up some unnecessary logging space
         return _internalValue();
       },
       write: function(newValue) {
@@ -43,15 +45,19 @@
   };
 
   ko.extenders.lazy = function(target, options) {
+    console.log('ko.extenders.lazy: Setting up lazy observable!');
     var result = ko.computed({
         read: function() {
+            console.log('ko.extenders.lazy: Reading the lazy observable extenderSearchResults');
             if (!result.loaded() && options.callback) {
+                console.log('ko.extenders.lazy: Result is not loaded, executing callback function!');
                 options.callback.call(target);
             }
- 
+            console.log('ko.extenders.lazy: calling target!');
             return target();
         },
         write: function(newValue) {
+            console.log('ko.extenders.lazy: Writing the lazy observable extenderSearchResults');
             result.loaded(true);
             target(newValue);
         },
@@ -62,9 +68,11 @@
     result.loaded = ko.observable();
  
     result.refresh = function() {
+        console.log('ko.extenders.lazy: refreshing result');
         result.loaded(false);
     };
- 
+    
+    console.log('ko.extenders.lazy: returning result');
     return result;
 };
 

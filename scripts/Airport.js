@@ -30,19 +30,35 @@ MapIt.Airport = function(map, options) {
 
 
   self.airportSearchTerm = ko.observable();
+  self.airportSearchTermThrottled = ko.computed(self.airportSearchTerm).extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 }});
+  
   self.airportSearchResults = ko.mapping.fromJS([]);
-
   self.remoteSearchBaseURI = 'https://maps.googleapis.com/maps/api/place/textsearch/json?&name=airport&types=airport&sensor=false&key=AIzaSyC_i9CE-MZrDZDLY9MdrfukhcEBkatg3Jc&query=';
   self.localSearchBaseURI = '/airportsearch';
 
+  self.airportSearchTermThrottledEncoded = ko.computed({
+    read: function() {
+      console.log('------------------------BEGINNING AIRPORT SEARCH (' + self.name + ')-------------------------------');
+      if(typeof self.airportSearchTermThrottled() !== 'undefined' && self.airportSearchTermThrottled() !== null && self.airportSearchTermThrottled() !== '') {
+        console.log('Airport.' + self.name + '.airportSearchTermThrottledEncoded: Encoded & Throttled Airport Search Term is: ' + self.airportSearchTermThrottled());
+        return encodeURI(self.airportSearchTermThrottled());
+      } else {
+        console.log('Airport.' + self.name + '.airportSearchTermThrottledEncoded: Airport is undefined or null or empty');
+        return undefined;
+      }
+    },
+    owner: self//,
+    //deferEvaluation: true
+  });
+/*
   self.encodedAirportSearchTerm = ko.computed({
     read: function() {
-      console.log('------------------------BEGINNING AIRPORT SEARCH-------------------------------');
-      if(typeof self.airportSearchTerm() !== 'undefined' && self.airportSearchTerm() !== null && self.airportSearchTerm() !== '') {
-        console.log('Airport.encodedAirportSearchTerm: Encoded Airport Search Term is: ' + self.airportSearchTerm())
-        return encodeURI(self.airportSearchTerm.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 } })());
+      console.log('------------------------BEGINNING AIRPORT SEARCH (' + self.name + ')-------------------------------');
+      if(typeof self.airportSearchTermDelayed() !== 'undefined' && self.airportSearchTermDelayed() !== null && self.airportSearchTermDelayed() !== '') {
+        console.log('Airport.' + self.name + '.encodedAirportSearchTerm: Encoded Airport Search Term is: ' + self.airportSearchTermDelayed())
+        return encodeURI(self.airportSearchTermDelayed());
       } else {
-        console.log('Airport.encodedAirportSearchTerm: Airport is undefined or null or empty');
+        console.log('Airport.' + self.name + '.encodedAirportSearchTerm: Airport is undefined or null or empty');
         return undefined;
       }
     },
@@ -51,90 +67,111 @@ MapIt.Airport = function(map, options) {
   });
   self.throttledAirportSearchTerm = ko.computed({
     read: function() {
-      if(typeof self.encodedAirportSearchTerm() !== 'undefined' && self.encodedAirportSearchTerm() !== null && self.encodedAirportSearchTerm() !== '') {
-        console.log('Airport.throttledAirportSearchTerm: Throttled Airport Search Term: ' + self.encodedAirportSearchTerm());
-        return self.encodedAirportSearchTerm();
+      if(typeof self.airportSearchTermDelayed() !== 'undefined' && self.airportSearchTermDelayed() !== null && self.airportSearchTermDelayed() !== '') {
+        console.log('Airport.' + self.name + '.throttledAirportSearchTerm: Throttled Airport Search Term: ' + self.airportSearchTermDelayed());
+        return self.encodedAirportSearchTerm();//.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 } })();
       } else {
-        console.log('Airport.throttledAirportSearchTerm: Throttled Airport is undefined or null or empty');
+        console.log('Airport.' + self.name + '.throttledAirportSearchTerm: Throttled Airport is undefined or null or empty');
         return undefined;
       }
     },
     owner: self,
     deferEvaluation: true
   });
-
+*/
   self.airportRemoteSearchUrl = ko.computed({
     read: function () {
-      if(typeof self.throttledAirportSearchTerm() !== 'undefined' && self.throttledAirportSearchTerm() !== null && self.throttledAirportSearchTerm() !== '') {
-        var output = self.remoteSearchBaseURI + self.throttledAirportSearchTerm();
-        console.log('Airport.airportSearchUrl: Airport Search Url: ' + output);
+      if(typeof self.airportSearchTermThrottledEncoded() !== 'undefined' && self.airportSearchTermThrottledEncoded() !== null && self.airportSearchTermThrottledEncoded() !== '') {
+        var output = self.remoteSearchBaseURI + self.airportSearchTermThrottledEncoded();
+        console.log('Airport.' + self.name + '.airportSearchUrl: Airport Search Url: ' + output);
         return output;
       } else {
-        console.log('Airport.airportRemoteSearchUrl: Airport is undefined or null or empty');
+        console.log('Airport.' + self.name + '.airportRemoteSearchUrl: Airport is undefined or null or empty');
         return undefined;
       }
     },
-    owner: self,
-    deferEvaluation: true
-  })
+    owner: self//,
+    //deferEvaluation: true
+  });
 
   self.fetchSearchResultsFailure = function() {
-    console.log('Airport.fetchSearchResultsFailure: FETCHING OF DATA FAILEDDDDDDDD');
+    console.log('Airport.' + self.name + '.fetchSearchResultsFailure: FETCHING OF DATA FAILEDDDDDDDD');
+    self.extenderSearchResults(null);
   };
-  self.singleSearchResults = ko.lazyObservable(self.fetchSearchResults.bind(self), self);
+  self.fetchSearchResultsSuccess = function(data) {
+    console.log('Airport.' + self.name + '.fetchSearchResultsSuccess: Fetching of Data Success!');
+    console.log('Airport.' + self.name + '.fetchSearchResultsSuccess: Found results!');
+    console.log('Airport.' + self.name + '.fetchSearchResultsSuccess: Raw result object of ' + self.name + ' is copied below and written to extenderSearchResults, and is a subset from the input parameter as data.results[0] --v ');
+    console.log(data);
+    
+    self.extenderSearchResults(data.results);
+    
+    console.log('Airport.' + self.name + '.fetchSearchResultsSuccess: Value of extenderSearchResults is below (should match raw result object defined immediately above  ---v ');
+    console.log(self.extenderSearchResults());
+  };
   
   self.fetchFunctionSearchResults = function() {
-    console.log('Airport.fetchSearchResults: base URI: (' + self.localSearchBaseURI + ')');
-    if(typeof self.throttledAirportSearchTerm() === 'undefined' || self.throttledAirportSearchTerm() === null || self.throttledAirportSearchTerm() === '') {
-      console.log('Airport.fetchSearchResults: NO SEARCH TERM SPECIFIED! AJAX CALL WILL NOT EXECUTE');
+    //var self = this;
+    console.log('Airport.' + self.name + '.fetchFunctionSearchResults: base URI: (' + self.localSearchBaseURI + ')');
+    if(typeof self.airportSearchTermThrottledEncoded() === 'undefined' || self.airportSearchTermThrottledEncoded() === null || self.airportSearchTermThrottledEncoded() === '') {
+      console.log('Airport.' + self.name + '.fetchFunctionSearchResults: NO SEARCH TERM SPECIFIED! AJAX CALL WILL NOT EXECUTE. Resetting extenderSearchResults');
+      self.extenderSearchResults(null);
       return;
     }
 
-    console.log('Airport.fetchSearchResults: search_query: (' + self.throttledAirportSearchTerm() + ')');
+    console.log('Airport.' + self.name + '.fetchFunctionSearchResults: search_query: (' + self.airportSearchTermThrottledEncoded() + ')');
     console.log('------------------------------MAKING AJAX REQUEST--------------------------------');
     $.ajax({
       type: 'GET',
       url: self.localSearchBaseURI,
-      data: { 'search_query': self.throttledAirportSearchTerm()},
+      data: { 'search_query': self.airportSearchTermThrottledEncoded()},
       context: self,
       dataType: 'json',
-      success: function(data) {
+      success: self.fetchSearchResultsSuccess,
+            /*function(data) {
         console.log('Airport.' + self.name + '.fetchSearchResults: Found results!');
         console.log('Airport.' + self.name + '.fetchSearchResults: Raw result object is below --v ');
         console.log(data);
         
         //self.singleSearchResults(data);
         self.extenderSearchResults(data);
-        /*
-        if(data) {
-          self.airportData(self.extenderSearchResults()[0]);
-        }*/
+        //if(data) {
+        //  self.airportData(self.extenderSearchResults()[0]);
+        //}
         console.log('Airport.' + self.name + '.fetchSearchResults: Value of extenderSearchResults is below (should match raw result object defined immediately above  ---v ');
         console.log(self.extenderSearchResults());
      
         //console.log('Airport.' + self.name + '.fetchSearchResults: Value of singleSearchResults is below (should match raw result object defined immediately above  ---v ');
         //console.log(self.singleSearchResults());
-      },
-      error:self.fetchSearchResultsFailure
+      },*/
+      error: self.fetchSearchResultsFailure
     });
   };
 
-
-  self.extenderSearchResults = ko.observableArray([]).extend({lazy: {callback: self.fetchFunctionSearchResults, context: self}});
+  // RIGHT NOW THE EXTENDER SEARCH RESULTS DOES NOT GET UPDATED WHEN AIRPORTS ARE REMOVED, WAS DOING SO BEFORE WHEN THE OTHER MARKER 
+  // AND COORDINATE SUBSCRIBE METHODS WERE UPDATING THE MARKERS/COORDS IN A BUNCH OF DIFFERENT PLACES. LOOK FOR WHICH THINGS THAT 
+  // ARE NOW COMMENTED OUT WOULD CAUSE THIS NOT TO TRIGGER AN UPDATE WHEN AIRPORTS ARE REMOVED. SOMETHING TO DO WITH THE 'NO AJAX REQUEST MADE'
+  // MESSAGE WHEN AN AIRPORT IS REMOVED. PROBABLY NEED TO TRIGGER AN UPDATE THERE SO THAT MARKERS AND DATA ARE REMOVED AND MAP PANS APPROPRIATELY.
+  // THIS IS ALREADY SET UP IN THE SUBSCRIBE METHOD ABOVE FOR THE MAP MARKERS, THE MARKERS JUST AREN'T GETTING CHANGED WHEN DATA CHANGES
+  //self.extenderSearchResults = ko.observableArray([]).extend({lazy: {callback: self.fetchFunctionSearchResults, context: self}});
    
+  self.extenderSearchResults = ko.lazyObservable(self.fetchFunctionSearchResults, self);
+  self.airportSearchTermThrottledEncoded.subscribe(function(newVal) {
+    self.extenderSearchResults.refresh();
+  });
+  
   self.airportData = ko.computed({
     read: function() {
       if(typeof self.extenderSearchResults() !== 'undefined' 
-        && self.extenderSearchResults() !== null 
-        && typeof self.extenderSearchResults().results !== 'undefined' 
-        && typeof self.extenderSearchResults().results !== 'undefined' 
-        && self.extenderSearchResults().results.length > 0) {
-          console.log('Airport.airportData: Found airport data! \'resuts\' copied below -----v');
-          console.log(self.extenderSearchResults().results[0]);
-          return self.extenderSearchResults().results[0];
+      && self.extenderSearchResults() !== null 
+      && self.extenderSearchResults().length > 0
+      && typeof self.extenderSearchResults()[0].geometry !== 'undefined') {
+        console.log('Airport.' + self.name + '.airportData: Found airport data! \'results\' copied below -----v');
+        console.log(self.extenderSearchResults()[0]);
+        return self.extenderSearchResults()[0];
       } else {
-          console.log('Airport.airportData: No airport data found');
-          return self.emptyData;
+        console.log('Airport.' + self.name + '.airportData: No airport data found');
+        return self.emptyData;
       }
     },
     owner: self
@@ -179,7 +216,9 @@ MapIt.Airport = function(map, options) {
   }));
 */
 
-  self.singleSearchResults.subscribe(function(newSearchResults){
+  self.extenderSearchResults.subscribe(function(newSearchResults){
+    console.log('Airport.' + self.name + '.extenderSearchResults.subscribe: Hit the extenderSearchResults subscription, airportSearchterm is: ' + self.airportSearchTermThrottledEncoded());
+    console.log(newSearchResults);
     //console.log('Airport.singleSearchResults: airportData: Triggered airportSearchResults subscription! About to set airportData for matching airport');
 
     //if(typeof newSearchResults === 'undefined' || typeof newSearchResults[0] === 'undefined') {
@@ -268,55 +307,72 @@ MapIt.Airport = function(map, options) {
  
   self.isAirportSelected = ko.computed({
     read: function() {
-      return !(typeof self.airportData() === 'undefined' || typeof self.airportData().code === 'undefined' || self.airportData().code === '');
+      return !(typeof self.airportData() === 'undefined' || typeof self.airportData().geometry === 'undefined' || self.airportData().code === '');
     },
     owner: self,
     deferEvaluation: true
   });
 
-  self.toAirportCoords = ko.computed({
+  self.airportCoords = ko.computed({
     read: function() {
-      console.log('Airport.toAirportCoords: Recomputing toAirportCoords for ' + self.name);
+      console.log('Airport.' + self.name + '.airportCoords: Recomputing airportCoords for ' + self.name);
       if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().name === 'undefined' || self.airportData().name === '') {
-        console.log('Airport.toAirportCoords: No airport supplied to toAirportCoords for ' + self.name + '!');
+        console.log('Airport.airportCoords: No airport supplied to airportCoords for ' + self.name + '!');
         return null;
       } else {
         var _LatLng = new google.maps.LatLng(parseFloat(self.airportData().geometry.location.lat, 10), parseFloat(self.airportData().geometry.location.lng, 10));
-        console.log('Airport.toAirportCoords: New toAirportCoords for ' + self.name + ': (' + _LatLng.lat().toFixed(2) + ', ' + _LatLng.lng().toFixed(2) + ')');
+        console.log('Airport.' + self.name + '.airportCoords: New airportCoords for ' + self.name + ': (' + _LatLng.lat().toFixed(2) + ', ' + _LatLng.lng().toFixed(2) + ')');
         return _LatLng;
       }
     },
-    owner: self,
-    deferEvaluation: true
+    owner: self//,
+    //deferEvaluation: true
   });
 
   self.airportMarker = ko.computed({
     read: function() {
-      console.log('Airport.airportMarker: Recomputing airportMarker for ' + self.name);
+      console.log('Airport.' + self.name + '.airportMarker: Recomputing airportMarker for ' + self.name);
       if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().name === 'undefined' || self.airportData().name === '') {
         console.log('Airport.airportMarker: No airport supplied to airportMarker for ' + self.name + '!');
         return null;
       } else {
-        var _Marker = new google.maps.Marker({ position: self.toAirportCoords(), title: self.name});
-        console.log('Airport.airportMarker: New airport Marker for ' + self.name + ': ' + _Marker.getPosition() .lat().toFixed(2) + ', ' + _Marker.getPosition().lng().toFixed(2));
+        var _Marker = new google.maps.Marker({ position: self.airportCoords(), title: self.name});
+        console.log('Airport.' + self.name + '.airportMarker: New airport Marker for ' + self.name + ': ' + _Marker.getPosition() .lat().toFixed(2) + ', ' + _Marker.getPosition().lng().toFixed(2));
         return _Marker;
       }
     },
-    owner: self,
-    deferEvaluation: true
+    owner: self//,
+    //deferEvaluation: true
   });
 
 };
+/*
+MapIt.Airport.prototype.fetchSearchResultsFailure = function() {
+  console.log('Airport.fetchSearchResultsFailure: FETCHING OF DATA FAILEDDDDDDDD');
+  self.extenderSearchResults(self.emptyData);
+};
+MapIt.Airport.prototype.fetchSearchResultsSuccess = function(data) {
+      console.log('Airport.' + self.name + '.fetchSearchResultsSuccess: Fetching of Data Success!');
+      console.log('Airport.' + self.name + '.fetchSearchResults: Found results!');
+      console.log('Airport.' + self.name + '.fetchSearchResults: Raw result object is below --v ');
+      console.log(data);
+      
+      self.extenderSearchResults(self.data);
+      
+      console.log('Airport.' + self.name + '.fetchSearchResults: Value of extenderSearchResults is below (should match raw result object defined immediately above  ---v ');
+      console.log(self.extenderSearchResults());
+};
 
+*/
 MapIt.Airport.prototype.fetchSearchResults = function() {
   var self = this;
-  console.log('Airport.fetchSearchResults: base URI: (' + self.localSearchBaseURI + ')');
+  console.log('Airport.' + self.name + '.fetchSearchResults: base URI: (' + self.localSearchBaseURI + ')');
   if(typeof self.throttledAirportSearchTerm() === 'undefined' || self.throttledAirportSearchTerm() === null || self.throttledAirportSearchTerm() === '') {
-    console.log('Airport.fetchSearchResults: NO SEARCH TERM SPECIFIED! AJAX CALL WILL NOT EXECUTE');
+    console.log('Airport.' + self.name + '.fetchSearchResults: NO SEARCH TERM SPECIFIED! AJAX CALL WILL NOT EXECUTE');
     return;
   }
 
-  console.log('Airport.fetchSearchResults: search_query: (' + self.throttledAirportSearchTerm() + ')');
+  console.log('Airport.' + self.name + '.fetchSearchResults: search_query: (' + self.throttledAirportSearchTerm() + ')');
   console.log('------------------------------MAKING AJAX REQUEST--------------------------------');
   $.ajax({
     type: 'GET',
@@ -324,7 +380,8 @@ MapIt.Airport.prototype.fetchSearchResults = function() {
     data: { 'search_query': self.throttledAirportSearchTerm()},
     context: self,
     dataType: 'json',
-    success: function(data) {
+    success: self.fetchSearchResultsSuccess,
+          /*function(data) {
       console.log('Airport.' + self.name + '.fetchSearchResults: Found results!');
       console.log('Airport.' + self.name + '.fetchSearchResults: Raw result object is below --v ');
       console.log(data);
@@ -339,7 +396,7 @@ MapIt.Airport.prototype.fetchSearchResults = function() {
    
       //console.log('Airport.' + self.name + '.fetchSearchResults: Value of singleSearchResults is below (should match raw result object defined immediately above  ---v ');
       //console.log(self.singleSearchResults());
-    },
-    error:self.fetchSearchResultsFailure
+    },*/   
+    error: self.fetchSearchResultsFailure
   });
 };

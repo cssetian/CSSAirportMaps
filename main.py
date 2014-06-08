@@ -43,6 +43,7 @@ class AirportSearchHandler(webapp2.RequestHandler):
     def get(self, *args, **kwargs):
       #url = self;
       search_query = self.request.get('search_query')
+      search_query_prefix = '&query='
 
       logging.info(self)
       logging.info('----------------------------')
@@ -59,8 +60,11 @@ class AirportSearchHandler(webapp2.RequestHandler):
       #googlePlacesAPIKey = '&key=' + 'AIzaSyDC0_jxucNVmD3mA40DOUB8463jhdQ0yPE'
       #queryKey = '&name='
       #fullSearchUrl = airportSearchBaseUrl + googlePlacesAPIKey + queryKey + search_query
-      airportTextSearchBaseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?name=airport&types=airport&sensor=false&key=AIzaSyC_i9CE-MZrDZDLY9MdrfukhcEBkatg3Jc&query='
-      fullTextSearchUrl = airportTextSearchBaseUrl + search_query
+      cssairportmapsAPIKey = 'AIzaSyDC0_jxucNVmD3mA40DOUB8463jhdQ0yPE'
+      apiprojectAPIKey = 'AIzaSyC_i9CE-MZrDZDLY9MdrfukhcEBkatg3Jc'
+      APIKeyPrefix = '&key='
+      airportTextSearchBaseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?name=airport&types=airport&sensor=false'
+      fullTextSearchUrl = airportTextSearchBaseUrl + APIKeyPrefix + cssairportmapsAPIKey + search_query_prefix + search_query
       logging.info(fullTextSearchUrl)
       logging.info('search query:(' + search_query + ')')
       try:
