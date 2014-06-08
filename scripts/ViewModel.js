@@ -210,6 +210,8 @@ MapIt.ViewModel = function() {
     }
   });
   */
+ 
+ self.singleAirportMapZoom = 5;
 
 
   self.oneAirportSelected.subscribe(function(newVal){
@@ -241,32 +243,47 @@ MapIt.ViewModel = function() {
       self.bounds(new google.maps.LatLngBounds(null));
       self.bounds().extend(self.departureAirport().airportCoords());
       self.bounds().extend(self.arrivalAirport().airportCoords());
-      self.map().fitBounds(self.bounds());
       console.log('ViewModel.mapMarkersSubscribe: new bounds: ' + self.bounds());
-      var listener = google.maps.event.addListenerOnce(self.map(), 'idle', function() { 
-        if (self.map().getZoom() > 10) {
-          self.map().setZoom(10);
-        }
-      });
+      //var listener = google.maps.event.addListenerOnce(self.map(), 'idle', function() { 
+      //  if (self.map().getZoom() > 10) {
+      //    self.map().setZoom(10);
+      //  }
+      //});
+      self.map().fitBounds(self.bounds());
       self.map().panToBounds(self.bounds());
     } else if(self.departureAirportSelected()) {
       console.log('ViewModel.mapMarkersSubscribe: Only Departure airport selected! Removing flight path and centering on Arrival airport');
       self.flightPath().setMap(null);
-      self.bounds(new google.maps.LatLngBounds(null));
-      self.bounds().extend(self.departureAirport().airportCoords());
-      self.map().panTo(self.departureAirport().airportCoords());
+      //self.bounds(new google.maps.LatLngBounds(null));
+      //self.bounds().extend(self.departureAirport().airportCoords());
+      //self.map().panToBounds(self.bounds());
+      //self.map().setZoom(10);
+      //self.map().panTo(self.departureAirport().airportCoords());
+      
+      self.map().setZoom(10);
+      self.map().setCenter(self.departureAirport().airportCoords());
     } else if(self.arrivalAirportSelected()) {
       console.log('ViewModel.mapMarkersSubscribe: Only Arrival airport selected! Removing flight path and centering on Departure airport');
       self.flightPath().setMap(null);
-      self.bounds(new google.maps.LatLngBounds(null));
-      self.bounds().extend(self.arrivalAirport().airportCoords());
-      self.map().panTo(self.arrivalAirport().airportCoords());
+      //self.bounds(new google.maps.LatLngBounds(null));
+      //self.bounds().extend(self.arrivalAirport().airportCoords());
+      //self.map().panToBounds(self.bounds());
+      //self.map().setZoom(10);
+      //self.map().panTo(self.arrivalAirport().airportCoords());
+      
+      self.map().setZoom(10);
+      self.map().setCenter(self.arrivalAirport().airportCoords());
     } else if(!self.anyAirportSelected()) {
       console.log('ViewModel.mapMarkersSubscribe: No airport selected! Centering on current geolocation or manhattan if geolocation unavailable!');
       self.flightPath().setMap(null);
-      self.bounds(new google.maps.LatLngBounds(null));
-      self.bounds().extend(self.initialPosition());
-      self.map().panTo(self.initialPosition());
+      //self.bounds(new google.maps.LatLngBounds(null));
+      //self.bounds().extend(self.initialPosition());
+      //self.map().panToBounds(self.bounds());
+      //self.map().setZoom(10);
+      //self.map().panTo(self.initialPosition());
+      //
+      self.map().setZoom(10);
+      self.map().setCenter(self.initialPosition());
     }
     /*
     self.map().fitBounds(self.bounds());
