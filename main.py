@@ -64,7 +64,7 @@ class AirportSearchHandler(webapp2.RequestHandler):
       apiprojectAPIKey = 'AIzaSyC_i9CE-MZrDZDLY9MdrfukhcEBkatg3Jc'
       APIKeyPrefix = '&key='
       airportTextSearchBaseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?name=airport&types=airport&sensor=false'
-      fullTextSearchUrl = airportTextSearchBaseUrl + APIKeyPrefix + cssairportmapsAPIKey + search_query_prefix + search_query
+      fullTextSearchUrl = airportTextSearchBaseUrl + APIKeyPrefix + apiprojectAPIKey + search_query_prefix + search_query
       logging.info(fullTextSearchUrl)
       logging.info('search query:(' + search_query + ')')
       try:

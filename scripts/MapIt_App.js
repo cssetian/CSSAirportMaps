@@ -56,13 +56,13 @@ MapIt.App = (function($, _, ko) {
 
     console.log('Creating initial position for map');
     var _initialLatLong = new google.maps.LatLng(40.7056308,-73.9780035);
-    viewModel.initialPosition(_initialLatLong);
-    viewModel.mapMarkers()[0].marker.setPosition(viewModel.initialPosition());
+    viewModel.initialCoords(_initialLatLong);
+    viewModel.mapMarkers()[0].marker.setPosition(viewModel.initialCoords());
 
     console.log('Initializing map!');
     viewModel.map().setZoom(10);
-    viewModel.map().setCenter(viewModel.initialPosition());
-    console.log('Initialized map with default position in Manhattan: ' + viewModel.mapMarkers()[0].marker.position);//+ viewModel.initialPosition());
+    viewModel.map().setCenter(viewModel.initialCoords());
+    console.log('Initialized map with default position in Manhattan: ' + viewModel.mapMarkers()[0].marker.position);//+ viewModel.initialCoords());
 
     ko.applyBindings(viewModel);
     options.domEls.appContainer.fadeIn(50);
@@ -109,11 +109,11 @@ MapIt.App = (function($, _, ko) {
       var _geoLocatedPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
       viewModel.mapMarkers()[0].marker.setPosition(_geoLocatedPosition);
 
-      viewModel.initialPosition(_geoLocatedPosition);
-      console.log('MapModel.GeoLocationCallback: Your current location is: ' + viewModel.initialPosition() + '!');
+      viewModel.initialCoords(_geoLocatedPosition);
+      console.log('MapModel.GeoLocationCallback: Your current location is: ' + viewModel.initialCoords() + '!');
 
-      console.log('MapModel.GeoLocationCallback: Moving center of map to: ' + viewModel.initialPosition());
-      viewModel.map().panTo(viewModel.initialPosition());
+      console.log('MapModel.GeoLocationCallback: Moving center of map to: ' + viewModel.initialCoords());
+      viewModel.map().panTo(viewModel.initialCoords());
     } else {
       console.log('MapModel.GeoLocationCallback: User has already selected an airport, will not update default position with geolocation.');
     }
