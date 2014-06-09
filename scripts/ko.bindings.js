@@ -44,36 +44,4 @@
     return result;
   };
 
-  ko.extenders.lazy = function(target, options) {
-    console.log('ko.extenders.lazy: Setting up lazy observable!');
-    var result = ko.computed({
-        read: function() {
-            console.log('ko.extenders.lazy: Reading the lazy observable extenderSearchResults');
-            if (!result.loaded() && options.callback) {
-                console.log('ko.extenders.lazy: Result is not loaded, executing callback function!');
-                options.callback.call(target);
-            }
-            console.log('ko.extenders.lazy: calling target!');
-            return target();
-        },
-        write: function(newValue) {
-            console.log('ko.extenders.lazy: Writing the lazy observable extenderSearchResults');
-            result.loaded(true);
-            target(newValue);
-        },
- 
-        deferEvaluation: true
-    });
- 
-    result.loaded = ko.observable();
- 
-    result.refresh = function() {
-        console.log('ko.extenders.lazy: refreshing result');
-        result.loaded(false);
-    };
-    
-    console.log('ko.extenders.lazy: returning result');
-    return result;
-};
-
 })();

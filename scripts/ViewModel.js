@@ -17,7 +17,6 @@ MapIt.ViewModel = function() {
         'Closure',
         'jQuery']);
 
-
   self.map = ko.observable(new google.maps.Map(document.getElementById('map-canvas'), {}));
   self.bounds = ko.observable(new google.maps.LatLngBounds(null));
   self.airportList = ko.observableArray([]);
@@ -115,98 +114,6 @@ MapIt.ViewModel = function() {
     self.map().panToBounds(self.bounds());
   };
 
-
-  /********************* Departure and Arrival Airport Variables **********************/
-  // These handlers update the master markers list on the viewmodel, allowing the google map rendering to rerender itself
-  // After updating the marker position and map, the other subscription event is triggered to set the bounds and pan to the appropriate window
-  self.updateMapDeptMarkersHandler = function (newAirportMarker) {
-    console.log('ViewModel.DepartureAirportUpdateHandler: Updated Departure Airport! Value is ----v');
-    console.log(newAirportMarker);
-    if(self.departureAirport().airportData() !== self.departureAirport().emptyData && self.arrivalAirport().airportData() !== self.arrivalAirport().emptyData) {
-      console.log('ViewModel.DepartureAirportUpdateHandler: Two airports selected! Displaying both markers and flight route!');
-      self.displayTwoAirportsAndRouteOnMap(newAirportMarker, self.arrivalAirport().airportMarker(), 1, 2);
-    } else if(self.departureAirport().airportData() === self.departureAirport().emptyData && self.arrivalAirport().airportData() === self.arrivalAirport().emptyData) {
-      console.log('ViewModel.DepartureAirportUpdateHandler: No airports selected! Displaying initial marker!');
-      self.displaySingleMarkerOnMap(self.initialMarker(), 0);
-    } else if(self.departureAirport().airportData() !== self.departureAirport().emptyData && self.arrivalAirport().airportData() === self.arrivalAirport().emptyData) {
-      if(newAirportMarker !== null) {
-        console.log('ViewModel.DepartureAirportUpdateHandler: One airport selected! Displaying departure airport marker!');
-        self.displaySingleMarkerOnMap(newAirportMarker, 1);
-      } else {
-        console.log('ViewModel.DepartureAirportUpdateHandler: Departure airport de-selected! Displaying arrival airport marker!');
-        self.displaySingleMarkerOnMap(self.mapMarkers()[2].marker.position, 2);
-      }
-    } else if(self.departureAirport().airportData() === self.departureAirport().emptyData && self.arrivalAirport().airportData() !== self.arrivalAirport().emptyData) {
-      if(newAirportMarker !== null) {
-        console.log('ViewModel.DepartureAirportUpdateHandler: One airport selected! Displaying arrival airport marker!');
-        self.displaySingleMarkerOnMap(newAirportMarker, 2);
-      } else {
-        console.log('ViewModel.DepartureAirportUpdateHandler: Arrival airport de-selected! Displaying departure airport marker!');
-        self.displaySingleMarkerOnMap(self.mapMarkers()[1].marker.position, 1);
-      }
-    }
-    /*
-    if(typeof newAirportMarker === 'undefined' || newAirportMarker === null || typeof newAirportMarker.title === 'undefined') {
-
-      self.mapMarkers()[1].marker.setMap(null);
-      //self.bounds().
-      //self.map().panTo(self.arrivalAirport().position);
-      console.log('ViewModel.DeptUpdateHandler: No Departure Airport to plot!');
-    } else {
-      console.log('ViewModel.DeptUpdateHandler: Plotting new Departure Airport ' + newAirportMarker.title + ' at: (k: ' + newAirportMarker.position.k.toFixed(2) + ', A: ' + newAirportMarker.position.A.toFixed(2) + ')');
-      self.mapMarkers()[1].marker.setMap(self.map());
-      self.mapMarkers()[1].marker.setPosition(newAirportMarker.position);
-      if(self.twoAirportsSelected()) {
-        // Set map to both markers
-        // 
-        // TRY KEEPING A BOUNDS OBJECT MAINTAINED IN THE VIEWMODEL SO THAT ANYTIME AN AIRPORT IS UPDATED, 
-        // YOU ADD OR REMOVE AIRPORT COORDINATES FROM THE BOUNDS, AND THE MAP WILL AUTOMATICALLY REPOSITION 
-        // ITSELF TO WHATEVER AIRPORTS ARE LEFT IN THE BOUNDS
-        // 
-        /*
-        var bounds = new google.maps.LatLngBounds();
-        bounds.extend(self.departureAirport().airportCoords());
-        bounds.extend(self.arrivalAirport().airportCoords());
-        self.map().fitBounds(bounds);
-        *//*
-      } else {
-        //self.map().panTo(newAirportMarker.position);
-      }
-    }
-    */
-  };
-
-  self.updateMapArrMarkersHandler = function (newAirportMarker) {
-    console.log('ViewModel.ArrivalAirportUpdateHandler: Updated Arrival Airport! Value is ----v');
-    console.log(newAirportMarker);
-
-    if(self.departureAirport().airportData() !== self.departureAirport().emptyData && self.arrivalAirport().airportData() !== self.arrivalAirport().emptyData) {
-      console.log('ViewModel.ArrivalAirportUpdateHandler: Two airports selected! Displaying both markers and flight route!');
-      self.displayTwoAirportsAndRouteOnMap(self.departureAirport().airportMarker(), newAirportMarker, 1, 2);
-    } else if(!self.departureAirportSelected() && !self.arrivalAirportSelected()) {
-      console.log('ViewModel.ArrivalAirportUpdateHandler: No airports selected! Displaying initial marker!');
-      self.displaySingleMarkerOnMap(self.initialCoords(), 0);
-    } else if(self.departureAirport().airportData() !== self.departureAirport().emptyData && self.arrivalAirport().airportData() === self.arrivalAirport().emptyData) {
-      if(newAirportMarker !== null) {
-        console.log('ViewModel.ArrivalAirportUpdateHandler: One airport selected! Displaying arrival airport marker!');
-        self.displaySingleMarkerOnMap(newAirportMarker, 2);
-      } else {
-        console.log('ViewModel.ArrivalAirportUpdateHandler: Arrival airport de-selected! Displaying departure airport marker!');
-        console.log('this should only ever happen when going from 2-1 markers');
-        self.displaySingleMarkerOnMap(self.mapMarkers()[1].marker.position, 1);
-      }
-    } else if(self.departureAirport().airportData() === self.departureAirport().emptyData && self.arrivalAirport().airportData() !== self.arrivalAirport().emptyData) {
-      if(newAirportMarker !== null) {
-        console.log('ViewModel.ArrivalAirportUpdateHandler: One airport selected! Displaying arrival airport marker!');
-        self.displaySingleMarkerOnMap(newAirportMarker, 2);
-      } else {
-        console.log('ViewModel.ArrivalAirportUpdateHandler: Arrival airport de-selected! Displaying departure airport marker!');
-        console.log('this should only ever happen when going from 2-1 markers');
-        self.displaySingleMarkerOnMap(self.mapMarkers()[1].marker.position, 1);
-      }
-    }
-  };
-
   self.renderMapMarkers = function(newAirportMarker) {
     if(newAirportMarker === null) {
       // Handle removing an airportMarker from the map
@@ -229,44 +136,16 @@ MapIt.ViewModel = function() {
         self.displaySingleMarkerOnMap(newAirportMarker, 2);
       } else {
         console.log('App really shouln\'t have gotten here...... there\'s no combination of logic that would yield this result....');
-        self.displaySingleMarkerOnMap(self.initialCoords(), 0);
       }
     }
-    
-    /*
-    if(typeof newAirportMarker === 'undefined' || newAirportMarker === null || typeof newAirportMarker.title === 'undefined') {
-      self.mapMarkers()[2].marker.setMap(null);
-      //self.map().panTo(self.departureAirport().position);
-      console.log('ViewModel.ArrUpdateHandler: No Arrival Airport to plot!');
-    } else if (newAirportMarker.else {
-      console.log('ViewModel.ArrUpdateHandler: Plotting new Arrival Airport ' + newAirportMarker.title + ' at: (k: ' + newAirportMarker.position.k.toFixed(2) + ', A: ' + newAirportMarker.position.A.toFixed(2) + ')');
-      self.mapMarkers()[2].marker.setMap(self.map());
-      self.mapMarkers()[2].marker.setPosition(newAirportMarker.position);
-
-      if(self.twoAirportsSelected()) {
-        // Set map to both markers
-        /*
-        var bounds = new google.maps.LatLngBounds();
-        
-        bounds.extend(self.departureAirport().airportCoords());
-        bounds.extend(self.arrivalAirport().airportCoords());
-        self.map().fitBounds(bounds);
-        *//*
-      } else {
-        //self.map().panTo(newAirportMarker.position);
-      }
-    }
-    */
   };
 
   //   IT'S BREAKING HERE BCEAUSE I CHANGED THE SUBSCRIPTION TO AIRPORTSEARCHTERM SO IT'S NOT FINDING THE MARKER TO UPDATE RESULTS WHEN IT DOES FIND SOMETHING
   self.departureAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Departure Airport'})).extend({ rateLimit: 0 });
-  //self.departureAirport().airportMarker.subscribe(self.updateMapDeptMarkersHandler);
   self.departureAirport().airportMarker.subscribe(self.renderMapMarkers);
   console.log('ViewModel: Setting DepartureAirport subscribe callback function bound to departureAirport.airportData');
 
   self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'})).extend({ rateLimit: 0 });
-  //self.arrivalAirport().airportMarker.subscribe(self.updateMapArrMarkersHandler);
   self.arrivalAirport().airportMarker.subscribe(self.renderMapMarkers);
   console.log('ViewModel: Setting ArrivalAirport subscribe callback function bound to arrivalAirport.airportData');
 
@@ -315,187 +194,9 @@ MapIt.ViewModel = function() {
   }).extend({ rateLimit: 0 });
   /****************************************************************************************/
 
-
-  /*
-  function Option(id, name) {
-    var self = this;
-    self.Id = ko.observable(id);
-    self.Name = ko.observable(name);
-  };
-  self.someOptions = ko.observableArray([
-      new Option(1, 'John'),
-      new Option(2, 'Johnny'),
-      new Option(3, 'This is a defualt option')
-  ]);
-
-
-  self.departureAirport().typeaheadOptions = {
-    name: 'Departure Airport Search Box',
-    minLength: 0,
-    remote: {
-      url: self.departureAirport().airportSearchUrl(),
-      filter: function(parsedResponse) {
-        var dataset = [];
-        for (var key in parsedResponse) {
-          dataset.push({
-            value: parsedResponse[key].firstName + ' ' + parsedResponse[key].surname,
-            tokens: [parsedResponse[key].firstName, parsedResponse[key].surname]
-          });
-        }
-        return dataset;
-      }
-    }
-  };
-  */
- 
-
-  /*************************** Airport Existance Event Handlers ***************************/
-  /*
-  self.anyAirportSelected.subscribe(function(newVal){
-    if(!self.twoAirportsSelected()) {
-      if(newVal === true) {
-        console.log('ViewModel.AnyAirportSelectedSubscriber: An airport was selected, removing default marker.');
-        self.mapMarkers()[0].marker.setMap(null);
-      } else {
-        console.log('ViewModel.AnyAirportSelectedSubscriber: No airports are selected, adding default marker back into map.');
-        self.mapMarkers()[0].marker.setMap(self.map());
-        //self.map().panTo(self.mapMarkers()[0].marker.position);
-      }
-    } else {
-      console.log('ViewModel.AnyAirportsSelectedSubscriber: Two airports are selected. anyAirportsSelected subscriber unnecessary.');
-    }
-  });
-  */
- 
- self.singleAirportMapZoom = 5;
-
-/*
-  self.oneAirportSelected.subscribe(function(newVal){
-    console.log('self.mapMarkersSubscribe.subscribe: Real subscribe is to self.oneAirportSelected: Rendering all the current markers!');
-    if(self.anyAirportSelected()) {
-      console.log('self.mapMarkersSubscribe.subscribe: REMOVED INITIAL MAP MARKER');
-      self.mapMarkers()[0].marker.setMap(null);
-    } else {
-      console.log('self.mapMarkersSubscribe.subscribe: INTIIAL MAP MARKER GETTIN\' PUT BACK IN');
-      console.log('self.mapMarkersSubscribe.subscribe: Re-Initializing map!');
-      self.map().setZoom(10);
-      self.mapMarkers()[0].marker.setMap(self.map());
-      self.map().panTo(self.mapMarkers()[0].marker.position);
-    }
-
-    if(self.twoAirportsSelected()) {
-      console.log('ViewModel.mapMarkersSubscribe: Two airports are selected! Add flight path to map!');
-
-      self.flightPath(new google.maps.Polyline({
-        path: [self.departureAirport().airportCoords(), self.arrivalAirport().airportCoords()],
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2
-      }));
-      self.flightPath().setMap(self.map());
-
-      console.log('ViewModel.mapMarkersSubscribe: Setting view bounds on map to both markers + flight path');
-      self.bounds(new google.maps.LatLngBounds(null));
-      self.bounds().extend(self.departureAirport().airportCoords());
-      self.bounds().extend(self.arrivalAirport().airportCoords());
-      console.log('ViewModel.mapMarkersSubscribe: new bounds: ' + self.bounds());
-      //var listener = google.maps.event.addListenerOnce(self.map(), 'idle', function() { 
-      //  if (self.map().getZoom() > 10) {
-      //    self.map().setZoom(10);
-      //  }
-      //});
-      self.map().fitBounds(self.bounds());
-      self.map().panToBounds(self.bounds());
-    } else if(self.departureAirportSelected()) {
-      console.log('ViewModel.mapMarkersSubscribe: Only Departure airport selected! Removing flight path and centering on Arrival airport');
-      self.flightPath().setMap(null);
-      //self.bounds(new google.maps.LatLngBounds(null));
-      //self.bounds().extend(self.departureAirport().airportCoords());
-      //self.map().panToBounds(self.bounds());
-      //self.map().setZoom(10);
-      //self.map().panTo(self.departureAirport().airportCoords());
-      
-      self.map().setZoom(10);
-      self.map().setCenter(self.departureAirport().airportCoords());
-    } else if(self.arrivalAirportSelected()) {
-      console.log('ViewModel.mapMarkersSubscribe: Only Arrival airport selected! Removing flight path and centering on Departure airport');
-      self.flightPath().setMap(null);
-      //self.bounds(new google.maps.LatLngBounds(null));
-      //self.bounds().extend(self.arrivalAirport().airportCoords());
-      //self.map().panToBounds(self.bounds());
-      //self.map().setZoom(10);
-      //self.map().panTo(self.arrivalAirport().airportCoords());
-      
-      self.map().setZoom(10);
-      self.map().setCenter(self.arrivalAirport().airportCoords());
-    } else if(!self.anyAirportSelected()) {
-      console.log('ViewModel.mapMarkersSubscribe: No airport selected! Centering on current geolocation or manhattan if geolocation unavailable!');
-      self.flightPath().setMap(null);
-      //self.bounds(new google.maps.LatLngBounds(null));
-      //self.bounds().extend(self.initialCoords());
-      //self.map().panToBounds(self.bounds());
-      //self.map().setZoom(10);
-      //self.map().panTo(self.initialCoords());
-      //
-      self.map().setZoom(10);
-      self.map().setCenter(self.initialCoords());
-    }
-    /*
-    self.map().fitBounds(self.bounds());
-    var listener = google.maps.event.addListenerOnce(self.map(), 'idle', function() { 
-      if (self.map().getZoom() > 10) {
-        self.map().setZoom(10);
-      }
-    });
-    self.map().panToBounds(self.bounds());
-    *//*
-
-  });*/
-
-
-
-
-
   self.twoAirportsSelected.subscribe(function(newVal){
     if(newVal === true) {
       console.log('ViewModel.twoAirportsSelectedSusbscriber: Two airports are selected! Add flight path to map!');
-/*
-      self.flightPath(new google.maps.Polyline({
-        path: [self.departureAirport().airportCoords(), self.arrivalAirport().airportCoords()],
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2
-      }));
-      self.flightPath().setMap(self.map());
-      
-      console.log('ViewModel.twoAirportsSelectedSubscriber: Setting view bounds on map');
-      var bounds = new google.maps.LatLngBounds();
-      bounds.extend(self.departureAirport().airportCoords());
-      bounds.extend(self.arrivalAirport().airportCoords());
-
-      self.map().fitBounds(bounds);
-      */
-    } else {
-      /*
-      self.flightPath().setMap(null);
-
-      if(self.departureAirportSelected()) {
-        console.log('ViewModel.twoAirportsSelectedSubscriber: Arrival airport has been deselected. Panning to departureAirport!');
-
-        self.map().setZoom(10);
-        self.map().panTo(self.mapMarkers()[1].marker.position);
-
-      } else if(self.arrivalAirportSelected()) {
-        console.log('ViewModel.twoAirportsSelectedSubscriber: Departure airport has been deselected. Panning to arrivalAirport!');
-
-        self.map().setZoom(10);
-        self.map().panTo(self.mapMarkers()[2].marker.position);
-
-      }
-      console.log('ViewModel.twoAirportsSelectedSubscriber: Two airports are not selected. Deal with any data updates needed.');
-      */
     }
   });
 

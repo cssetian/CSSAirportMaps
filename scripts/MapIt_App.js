@@ -18,31 +18,10 @@ MapIt.App = (function($, _, ko) {
 
     viewModel = new MapIt.ViewModel();
 
-    //ko.mapping.fromJS(viewModel.departureAirport().airportSearchResults(), viewModel.clientSearchResults);
-
-     /*
-    airportSearchManager.initialize();
-     
-    $('#remote .typeahead').typeahead(null, {
-      name: 'best-pictures',
-      displayKey: 'value',
-      source: bestPictures.ttAdapter()
-    });
-    */
-   /*
-    MapIt.Option = function Option(id, name) {
-      var self = this;
-      self.Id = ko.observable(id);
-      self.Name = ko.observable(name);
-    };
-    */
-
-
-    var input = $('#departure-airport-selector');
-    var googleoptions = {
-      types: ['geocode']
-    };
-
+    //var input = $('#departure-airport-selector');
+    //var googleoptions = {
+    //  types: ['geocode']
+    //};
     //autocomplete = new google.maps.places.Autocomplete(input, googleoptions);
 
     // If geolocation is available in this browser, set the initial marker to that person's location
@@ -54,7 +33,7 @@ MapIt.App = (function($, _, ko) {
       console.log('MapModel.init: Geolocation not available!');
     }
 
-    console.log('Creating initial position for map');
+    console.log('Creating default initial position for map - default location is New York, NY');
     var _initialLatLong = new google.maps.LatLng(40.7056308,-73.9780035);
     viewModel.initialCoords(_initialLatLong);
     viewModel.mapMarkers()[0].marker.setPosition(viewModel.initialCoords());

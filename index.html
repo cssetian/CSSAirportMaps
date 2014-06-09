@@ -21,7 +21,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr> <!-- list="departure-airports-list" -->
+          <tr>
             <th class="input-label first-input-column">Departure Airport:</th>
             <td>
               <div id="departure-airport-selector-container">
@@ -33,19 +33,9 @@
                                     valueUpdate: 'input',
                                     typeahead: { name: 'Departure Airport Selector', displayKey: 'name' }" />
               </div>
-              <!-- <input  type="text"
-                        data-bind=" typeaheadValue: departureAirport().airportSearchTerm,
-                        placeholder="Type to search for a departure airport..."
-                        list="departure-airports-list"
-                        autocomplete="off"
-                        name="departureAirport" 
-                        id="departureAirport" 
-                        class="second-input-column required" 
-                        data-bind=" value: departureAirport().airportSearchTerm, 
-                                    valueUpdate: 'input'" /> -->
-              </td>  <!-- data-list input to go with local json or pidgits data -->
+            </td>  <!-- data-list input to go with local json or pidgits data -->
           </tr>
-          <tr><!--list="arrival-airports-list"-->
+          <tr>
             <th class="input-label first-input-column">Arrival Airport:</th>
             <td>
               <div id="arrival-airport-selector-container">
@@ -56,14 +46,6 @@
                         data-bind=" value: arrivalAirport().airportSearchTerm, 
                                     valueUpdate: 'input'" />
               </div>
-            <!--<input  type="text"
-                        placeholder="Type to search for an arrival airport..."
-                        list="arrival-airports-list"
-                        name="arrivalAirport"
-                        id="arrivalAirport"
-                        class="second-input-column required"
-                        data-bind=" value: arrivalAirport().airportSearchTerm, 
-                                    valueUpdate: 'input'" />-->
             </td> <!-- data-list input to go with local json or pidgits data -->
           </tr>
         </tbody>
@@ -83,11 +65,11 @@
         <tbody>
           <tr>
             <td>Airport Name:</td>
-              <!-- ko if: typeof departureAirport().airportData().name !== 'undefined' -->
+            <!-- ko if: typeof departureAirport().airportData().name !== 'undefined' -->
             <td><span data-bind="text: departureAirport().airportData().name"></span></td>
             <!-- /ko -->
 
-              <!-- ko if: typeof arrivalAirport().airportData().name !== 'undefined' -->
+            <!-- ko if: typeof arrivalAirport().airportData().name !== 'undefined' -->
             <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().name" class="hidden-600"></span></td>
             <!-- /ko -->
           </tr><!--
@@ -229,7 +211,7 @@
 
 </body>
 <footer class="footer">
-<div>Chris Setian</div>
+<div>Authored By: Chris Setian</div>
 <div>Last Updated: 
   <script>
   document.write(document.lastModified);
@@ -254,7 +236,6 @@
   <script type="text/javascript" src="scripts/lib/typeahead.bundle.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout.bindings.typeahead.js"></script>
   <script type="text/javascript" src="scripts/lib/handlebars-v1.3.0.js"></script>
-  <!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>-->
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
   <script type="text/javascript" src="scripts/lib/latlong.js"></script>
   <script type="text/javascript" src="scripts/MapIt_App.js"></script>
