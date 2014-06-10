@@ -61,6 +61,7 @@ MapIt.ViewModel = function() {
     {id: 2, marker: new google.maps.Marker({map: self.map()})}
   ]);
 
+  console.log('ViewModel: Defining marker rendering helper and main functions');
   self.displaySingleMarkerOnMap = function(newMarker, idx) {
     console.log('ViewModel.displaySingleMarkerOnMap: Displaying single marker!');
     self.flightPath().setMap(null);
@@ -141,14 +142,188 @@ MapIt.ViewModel = function() {
     }
   };
 
-  //   IT'S BREAKING HERE BCEAUSE I CHANGED THE SUBSCRIPTION TO AIRPORTSEARCHTERM SO IT'S NOT FINDING THE MARKER TO UPDATE RESULTS WHEN IT DOES FIND SOMETHING
+  // Bind airportMarker events so that viewModel map markers are updated and rerendered on the map
+  console.log('ViewModel: Setting DepartureAirport subscribe callback function bound to departureAirport.airportData');
   self.departureAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Departure Airport'})).extend({ rateLimit: 0 });
   self.departureAirport().airportMarker.subscribe(self.renderMapMarkers);
-  console.log('ViewModel: Setting DepartureAirport subscribe callback function bound to departureAirport.airportData');
 
+  console.log('ViewModel: Setting ArrivalAirport subscribe callback function bound to arrivalAirport.airportData');
   self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'})).extend({ rateLimit: 0 });
   self.arrivalAirport().airportMarker.subscribe(self.renderMapMarkers);
-  console.log('ViewModel: Setting ArrivalAirport subscribe callback function bound to arrivalAirport.airportData');
+
+  self.remoteFilter = function(airports) {
+      console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
+      console.log('Bloodhound.remote.filter: Found some airports! ---v');
+      console.log(airports);
+
+      var mappedOutput = $.map(airports.geonames, function (airport) {
+        var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
+        var _filteredIATACode = '';
+        if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
+          _filteredIATACode = _IATACode[0].name;
+        }
+            
+        return {
+          value: airport.toponymName,
+          name: airport.toponymName,
+          lat: airport.lat,
+          lng: airport.lng,
+          city: airport.adminName1,
+          country: airport.countryName,
+          countryCode: airport.countryCode,
+          adminId1: airport.adminId1,
+          geoNameId: airport.geonameId,
+          timeZone: airport.timezone,
+          code: _filteredIATACode
+        };
+      });
+
+      if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
+        console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
+        self.departureAirport().extenderSearchResults(null);
+      } else {
+        console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
+        self.departureAirport().extenderSearchResults(mappedOutput.geonames);
+      }
+
+      console.log('Bloodhound.remote.filter: Mapped Output --v');
+      console.log(mappedOutput);
+      return mappedOutput;
+  };
+
+  // Define the options for bloodhound and typeahead inputs
+  console.log('ViewModel: Defining bloodhound initialization options');
+  var bloodhoundOptions = {
+    datumTokenizer: function (d) {
+      return Bloodhound.tokenizers.whitespace(d.name);
+      //return arr.concat(Bloodhound.tokenizers.whitespace(d.name), Bloodhound.tokenizers.whitespace(d.city), Bloodhound.tokenizers.whitespace(d.country), Bloodhound.tokenizers.whitespace(d.code));
+    },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    limit: 20,
+    log_successful_searches: true,
+    log_failed_searches: true,
+    remote: {
+      url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name=%QUERY',
+      filter: self.remoteFilter, /*function (airports) {
+      console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
+        console.log('Bloodhound.remote.filter: Found some airports! ---v');
+        console.log(airports);
+
+        var mappedOutput = $.map(airports.geonames, function (airport) {
+          var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
+          var _filteredIATACode = '';
+          if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
+            _filteredIATACode = _IATACode[0].name;
+          }
+              
+          return {
+            value: airport.toponymName,
+            name: airport.toponymName,
+            lat: airport.lat,
+            lng: airport.lng,
+            city: airport.adminName1,
+            country: airport.countryName,
+            countryCode: airport.countryCode,
+            adminId1: airport.adminId1,
+            geoNameId: airport.geonameId,
+            timeZone: airport.timezone,
+            code: _filteredIATACode
+          };
+        });
+
+        if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
+          console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
+          self.departureAirport().extenderSearchResults(null);
+        } else {
+          console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
+          self.departureAirport().extenderSearchResults(mappedOutput.geonames);
+        }
+
+        console.log('Bloodhound.remote.filter: Mapped Output --v');
+        console.log(mappedOutput);
+        return mappedOutput;
+      }*/
+    }
+  };
+
+  // Initialize the Bloodhound search engine
+  console.log('ViewModel: Initializing Bloodhound engine');
+  var airportSearch = new Bloodhound(bloodhoundOptions);
+  var searchPromise = airportSearch.initialize();
+  searchPromise.done(function() { console.log('success!'); })
+               .fail(function() { console.log('err!'); });
+
+  // Define the typeahead options for both departure and arrival airports
+  console.log('ViewModel: Defining typeahead options');
+  var departureGenericTypeAheadOptions = {
+    hint: true,
+    highlight: true,
+    minLength: 2,
+    matcher: function () { return true; },
+    templates: {
+      empty: [
+        '<div class="empty-message">',
+        'unable to find any Airports that match the search term',
+        '</div>'
+      ].join('\n'),
+      suggestion: Handlebars.compile('<div><span class=\'typeahead-airport-name\'>{{name}}</span> ({{code}})</div><div class=\'typeahead-airport-state\'><span>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span></div>'),
+      header: '<h3>Airports</h3>'
+    },
+    updater: function(item) {
+      console.log('TypeAhead.DepartureAirportSelector.Updater: Updated typeahead serach term! Setting viewmodel search term.');
+      console.log(item);
+      self.departureAirport().airportSearchTerm(item.value);
+      self.departureAirport().extenderSearchResults();
+      return item;
+    },
+    highlighter: function (item) {
+      var regex = new RegExp( '(' + this.query + ')', 'gi' );
+      return item.replace( regex, '<stronger>$1</stronger>' );
+    }
+  };
+  var departureSpecificTypeAheadOptions = {
+    name: 'departureAirports',
+    //displayKey: 'value',
+    // `ttAdapter` wraps the suggestion engine in an adapter that
+    // is compatible with the typeahead jQuery plugin
+    source: airportSearch.ttAdapter()
+  };
+  var arrivalGenericTypeAheadOptions = {
+    hint: true,
+    highlight: true,
+    minLength: 2,
+    matcher: function () { return true; },
+    templates: {
+      empty: [
+        '<div class="empty-message">',
+        'unable to find any Airports that match the search term',
+        '</div>'
+      ].join('\n'),
+      suggestion: Handlebars.compile('<div><span class=\'typeahead-airport-name\'>{{name}}</span> ({{code}})</div><div class=\'typeahead-airport-state\'><span>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span></div>')
+    },
+    updater: function(item) {
+      console.log('TypeAhead.ArrivalAirportSelector.Updater: Updated typeahead serach term! Setting viewmodel search term.');
+      console.log(item);
+      self.arrivalAirport().airportSearchTerm(item.value);
+      return item;
+    },
+    highlighter: function (item) {
+      var regex = new RegExp( '(' + this.query + ')', 'gi' );
+      return item.replace( regex, '<stronger>$1</stronger>' );
+    }
+  };
+  var arrivalSpecificTypeAheadOptions = {
+    name: 'arrivalAirports',
+    displayKey: 'value',
+    // `ttAdapter` wraps the suggestion engine in an adapter that
+    // is compatible with the typeahead jQuery plugin
+    source: airportSearch.ttAdapter()
+  };
+
+  console.log('ViewModel: Initializing typeaheads');
+  // Initialize the typeahead search inputs
+  $('#departure-airport-selector').typeahead(departureGenericTypeAheadOptions, departureSpecificTypeAheadOptions);
+  $('#arrival-airport-selector').typeahead(arrivalGenericTypeAheadOptions, arrivalSpecificTypeAheadOptions);
 
 
   /********************** Airport Existance Conditions and Helpers **********************/
@@ -212,8 +387,8 @@ MapIt.ViewModel = function() {
           return '';
         }
 
-        var p1 = new LatLon(self.departureAirport().airportData().geometry.location.lat, self.departureAirport().airportData().geometry.location.lng);
-        var p2 = new LatLon(self.arrivalAirport().airportData().geometry.location.lat, self.arrivalAirport().airportData().geometry.location.lng);
+        var p1 = new LatLon(self.departureAirport().airportData().lat, self.departureAirport().airportData().lng);
+        var p2 = new LatLon(self.arrivalAirport().airportData().lat, self.arrivalAirport().airportData().lng);
         var dist = p1.distanceTo(p2);
 
         var distanceToReturn = dist;

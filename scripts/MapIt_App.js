@@ -34,7 +34,7 @@ MapIt.App = (function($, _, ko) {
     */
     viewModel = new MapIt.ViewModel();
 
-    _initTypeAhead();
+   // _initTypeAhead();
 
 
     // If geolocation is available in this browser, set the initial marker to that person's location
@@ -97,143 +97,8 @@ MapIt.App = (function($, _, ko) {
 
   var geoNamesURLBase = 'http://api.geonames.org/searchJSON?lang=en&code=AIRP&maxRows=20&username=cssetian&q=%QUERY';
 
-  var _initTypeAhead = function() {
-    console.log('initializing typeahead!');
-
-    var airportSearch = new Bloodhound({
-      datumTokenizer: function (d) {
-        return Bloodhound.tokenizers.whitespace(d.name);
-        //return arr.concat(Bloodhound.tokenizers.whitespace(d.name), Bloodhound.tokenizers.whitespace(d.city), Bloodhound.tokenizers.whitespace(d.country), Bloodhound.tokenizers.whitespace(d.code));
-      },
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      limit: 20,
-      //local: airportList
-      remote: {
-        url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name=%QUERY',
-        //'http://ws.geonames.org/searchJSON?style=full&lang=en&type=json&maxRows=12&featureClass=S&featureCode=AIRP&username=cssetian&name=%QUERY&orderby=relevance',
-        /*replace: function (url, query) {
-          // Pulled from Issue #542 to ensure endpoint is not cached by TTA
-          console.log('bloodhound.remote.replace: mutating base url ' + url + ' and adding ' + query);
-          return url + '?' + query;
-        },*//*
-        ajax : {
-            beforeSend: function(jqXhr, settings){
-               settings.data = $.param({q: airportSearchTermThrottledEncoded()})
-            },
-            type: "POST"
-
-        },*/
-        filter: function (airports) {
-          console.log('Bloodhound.remote.filter: Found some airports!');
-          console.log(airports);
-
-          var mappedOutput = $.map(airports.geonames, function (airport) {
-
-            var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
-            var _filteredIATACode = '';
-            if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
-              _filteredIATACode = _IATACode[0].name;
-            }
-                
-            return {
-              value: airport.toponymName,
-              name: airport.toponymName,
-              lat: airport.lat,
-              lng: airport.lng,
-              city: airport.adminName1,
-              country: airport.countryName,
-              countryCode: airport.countryCode,
-              adminId1: airport.adminId1,
-              geoNameId: airport.geoNameId,
-              timeZone: airport.timezone,
-              code: _filteredIATACode
-            };
-          });
-          //console.log('Bloodhound.remote.filter: Search Query' + self.throttledAirportSearchTerm());
-          console.log('Bloodhound.remote.filter: URL Fetched --v: ');
-          console.log('http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name=');// + viewModel.airportSearchTerm());
-          console.log('Bloodhound.remote.filter: Mapped Output --v');
-          console.log(mappedOutput);
-          return mappedOutput;
-        }
-      }
-                           /* dataType: "jsonp",
-                            data: {
-                              featureClass: "S",
-                              fcode: "AIRP",
-                              style: "full",
-                              maxRows: 12,
-                              name_startsWith: request.term
-                            }*/
-
-    });
-
-    airportSearch.initialize();
-
-    $('#departure-airport-selector').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 2,
-      matcher: function () { return true; },
-      templates: {
-        empty: [
-          '<div class="empty-message">',
-          'unable to find any Airports that match the search term',
-          '</div>'
-        ].join('\n'),
-        suggestion: Handlebars.compile('<div>{{name}} - {{code}}</div>'),//<div><span class=\'typeahead-airport-name\'>{{name}}</span> ({{code}})</div><div class=\'typeahead-airport-state\'><span>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span></div>'),
-        header: '<h3>Airports</h3>'
-      },
-      updater: function(item) {
-        console.log('TypeAhead.DepartureAirportSelector.Updater: Updated typeahead serach term! Setting viewmodel search term.');
-        console.log(item);
-        viewModel.airportSearchTerm(item.code);
-        return item;
-      },
-      highlighter: function (item) {
-        var regex = new RegExp( '(' + this.query + ')', 'gi' );
-        return item.replace( regex, '<stronger>$1</stronger>' );
-      }
-    },
-    {
-      name: 'departureAirports',
-      displayKey: 'value',
-      // `ttAdapter` wraps the suggestion engine in an adapter that
-      // is compatible with the typeahead jQuery plugin
-      source: airportSearch.ttAdapter()
-    });
-
-    $('#arrival-airport-selector').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 2,
-      matcher: function () { return true; },
-      templates: {
-        empty: [
-          '<div class="empty-message">',
-          'unable to find any Airports that match the search term',
-          '</div>'
-        ].join('\n'),
-        suggestion: Handlebars.compile('<div><span class=\'typeahead-airport-name\'>{{name}}</span> ({{code}})</div><div class=\'typeahead-airport-state\'><span>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span></div>')
-      },
-      updater: function(item) {
-        console.log('TypeAhead.ArrivalAirportSelector.Updater: Updated typeahead serach term! Setting viewmodel search term.');
-        console.log(item);
-        viewModel.airportSearchTerm(item.code);
-        return item;
-      },
-      highlighter: function (item) {
-        var regex = new RegExp( '(' + this.query + ')', 'gi' );
-        return item.replace( regex, '<stronger>$1</stronger>' );
-      }
-    },
-    {
-      name: 'arrivalAirports',
-      displayKey: 'value',
-      // `ttAdapter` wraps the suggestion engine in an adapter that
-      // is compatible with the typeahead jQuery plugin
-      source: airportSearch.ttAdapter()
-    });
+  //var _initTypeAhead = function() {
+//    console.log('initializing typeahead!');
 
 /*
     $('#departure-airport-selector.typeahead').keypress(function (e) {
@@ -317,7 +182,7 @@ MapIt.App = (function($, _, ko) {
         suggestion: Handlebars.compile('<p><strong>{{name}}</strong> – {{code}}</p>')
       }
     });*/
-  };
+ // };
  
   var _initAirportRefData = function(options) {
     console.log('Initializing airport datalist and appending elements to dropdown selects');

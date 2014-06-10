@@ -100,11 +100,13 @@ MapIt.Airport = function(map, options) {
     });
   };
 
-  self.extenderSearchResults = ko.lazyObservable(self.fetchFunctionSearchResults, self);
-  self.airportSearchTermThrottledEncoded.subscribe(function(newVal) {
+  
+  self.extenderSearchResults = ko.observable();
+  //self.extenderSearchResults = ko.lazyObservable(self.fetchFunctionSearchResults, self);
+  /*self.airportSearchTermThrottledEncoded.subscribe(function(newVal) {
     self.extenderSearchResults.refresh();
   });
-
+  */
   self.airportData = ko.computed({
     read: function() {
       if(typeof self.extenderSearchResults() !== 'undefined' 
@@ -113,7 +115,7 @@ MapIt.Airport = function(map, options) {
       && typeof self.extenderSearchResults()[0].geometry !== 'undefined') {
         console.log('Airport.' + self.name + '.airportData: Found airport data! \'results\' copied below -----v');
         console.log(self.extenderSearchResults()[0]);
-        return self.extenderSearchResults()[0];
+        return self.extenderSearchResults().geonames[0];
       } else {
         console.log('Airport.' + self.name + '.airportData: No airport data found');
         return self.emptyData;
@@ -121,11 +123,12 @@ MapIt.Airport = function(map, options) {
     },
     owner: self
   });
-
+/*
   self.extenderSearchResults.subscribe(function(newSearchResults){
-    console.log('Airport.' + self.name + '.extenderSearchResults.subscribe: Hit the extenderSearchResults subscription, airportSearchterm is: ' + self.airportSearchTermThrottledEncoded());
+    console.log('Airport.' + self.name + '.extenderSearchResults.subscribe: Hit the extenderSearchResults subscription - no reason for this to happen - , airportSearchterm is: ' + self.airportSearchTermThrottledEncoded());
     console.log(newSearchResults);
-  });
+    console.log('Aiprort.' + self.name + '.extenderSearchResults.subscribe: Again - no reason for this to be here...');
+  });*/
  
   self.isAirportSelected = ko.computed({
     read: function() {
@@ -142,7 +145,7 @@ MapIt.Airport = function(map, options) {
         console.log('Airport.airportCoords: No airport supplied to airportCoords for ' + self.name + '!');
         return null;
       } else {
-        var _LatLng = new google.maps.LatLng(parseFloat(self.airportData().geometry.location.lat, 10), parseFloat(self.airportData().geometry.location.lng, 10));
+        var _LatLng = new google.maps.LatLng(parseFloat(self.airportData().lat, 10), parseFloat(self.airportData().lng, 10));
         console.log('Airport.' + self.name + '.airportCoords: New airportCoords for ' + self.name + ': (' + _LatLng.lat().toFixed(2) + ', ' + _LatLng.lng().toFixed(2) + ')');
         return _LatLng;
       }
