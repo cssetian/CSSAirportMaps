@@ -29,6 +29,7 @@ MapIt.Airport = function(map, options) {
   self.name = options.name;
 
   self.airportSearchTerm = ko.observable();
+  self.typeAheadSearchTerm = ko.observable();
   self.airportSearchTermThrottled = ko.computed(self.airportSearchTerm).extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 }});
   
   self.airportSearchResults = ko.mapping.fromJS([]);

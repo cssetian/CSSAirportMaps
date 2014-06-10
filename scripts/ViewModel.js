@@ -25,7 +25,7 @@ MapIt.ViewModel = function() {
     read: function () {
       console.log('initialCoords.initialMarker: Recomputing airportMarker for initialCoords');
       if(typeof self.initialCoords() === 'undefined' || self.initialCoords() === null || self.initialCoords() === '') {
-        console.log('No intiialCoords provided');
+        console.log('No initialCoords provided');
         return null;
       } else {
         var _Marker = new google.maps.Marker({ position: self.initialCoords(), title: 'Let\'s plot some maps!'});
@@ -33,7 +33,8 @@ MapIt.ViewModel = function() {
         return _Marker;
       }
     },
-    owner: self
+    owner: self,
+    deferEvaluation: true
   });
   self.flightPath = ko.observable(new google.maps.Polyline());
   self.clientSearchResults = ko.mapping.fromJS([]);

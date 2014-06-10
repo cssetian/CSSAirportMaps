@@ -77,5 +77,30 @@ input::-webkit-calendar-picker-indicator {
   text-align: center;
 }
 
+.typeahead-airport-name {
+  font-size: 12px;
+  font-weight: bold;
+}
 
+.typeahead-airport-state {
+  font-size: 10px;
+  padding-left: 5px;
+
+}
+
+.typeahead-airport-country {
+  font-size: 11px;
+  
+}
+
+.twitter-typeahead{
+     width: 97%;
+}
+.tt-dropdown-menu{
+    width: 102%;
+}
+
+.tt-cursor{
+    color:#f1b218;
+}
 
