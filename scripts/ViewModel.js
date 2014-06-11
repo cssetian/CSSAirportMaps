@@ -1,5 +1,5 @@
 
-MapIt.ViewModel = function() {
+MapIt.ViewModel = function(options) {
   var self = this;
 
   self.dummyAirportSearches =  ko.observableArray([
@@ -152,43 +152,43 @@ MapIt.ViewModel = function() {
   self.arrivalAirport().airportMarker.subscribe(self.renderMapMarkers);
 
   self.remoteFilter = function(airports) {
-      console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
-      console.log('Bloodhound.remote.filter: Found some airports! ---v');
-      console.log(airports);
+    console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
+    console.log('Bloodhound.remote.filter: Found some airports! ---v');
+    console.log(airports);
 
-      var mappedOutput = $.map(airports.geonames, function (airport) {
-        var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
-        var _filteredIATACode = '';
-        if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
-          _filteredIATACode = _IATACode[0].name;
-        }
-            
-        return {
-          value: airport.toponymName,
-          name: airport.toponymName,
-          lat: airport.lat,
-          lng: airport.lng,
-          city: airport.adminName1,
-          country: airport.countryName,
-          countryCode: airport.countryCode,
-          adminId1: airport.adminId1,
-          geoNameId: airport.geonameId,
-          timeZone: airport.timezone,
-          code: _filteredIATACode
-        };
-      });
-
-      if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
-        console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
-        self.departureAirport().extenderSearchResults(null);
-      } else {
-        console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
-        self.departureAirport().extenderSearchResults(mappedOutput.geonames);
+    var mappedOutput = $.map(airports.geonames, function (airport) {
+      var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
+      var _filteredIATACode = '';
+      if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
+        _filteredIATACode = _IATACode[0].name;
       }
+          
+      return {
+        value: airport.toponymName,
+        name: airport.toponymName,
+        lat: airport.lat,
+        lng: airport.lng,
+        city: airport.adminName1,
+        country: airport.countryName,
+        countryCode: airport.countryCode,
+        adminId1: airport.adminId1,
+        geoNameId: airport.geonameId,
+        timeZone: airport.timezone,
+        code: _filteredIATACode
+      };
+    });
 
-      console.log('Bloodhound.remote.filter: Mapped Output --v');
-      console.log(mappedOutput);
-      return mappedOutput;
+    if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
+      console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
+      self.departureAirport().extenderSearchResults(null);
+    } else {
+      console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
+      self.departureAirport().extenderSearchResults(mappedOutput.geonames);
+    }
+
+    console.log('Bloodhound.remote.filter: Mapped Output --v');
+    console.log(mappedOutput);
+    return mappedOutput;
   };
 
   // Define the options for bloodhound and typeahead inputs
@@ -259,16 +259,6 @@ MapIt.ViewModel = function() {
     hint: true,
     highlight: true,
     minLength: 2,
-    matcher: function () { return true; },
-    templates: {
-      empty: [
-        '<div class="empty-message">',
-        'unable to find any Airports that match the search term',
-        '</div>'
-      ].join('\n'),
-      suggestion: Handlebars.compile('<div><span class=\'typeahead-airport-name\'>{{name}}</span> ({{code}})</div><div class=\'typeahead-airport-state\'><span>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span></div>'),
-      header: '<h3>Airports</h3>'
-    },
     updater: function(item) {
       console.log('TypeAhead.DepartureAirportSelector.Updater: Updated typeahead serach term! Setting viewmodel search term.');
       console.log(item);
@@ -283,7 +273,24 @@ MapIt.ViewModel = function() {
   };
   var departureSpecificTypeAheadOptions = {
     name: 'departureAirports',
-    //displayKey: 'value',
+    displayKey: 'value',
+    engine: Handlebars,
+    templates: {
+      empty: [
+        '<div class="empty-message">',
+        'unable to find any Airports that match the search term',
+        '</div>'
+      ].join('\n'),
+      suggestion: Handlebars.compile([
+        '<div>',
+        '<span class=\'typeahead-airport-name\'>{{name}} - ({{code}})</span>',
+        '</div>',
+        '<div>',
+        '<span class=\'typeahead-airport-state\'>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
+        '</div>'
+      ].join('\n')),
+      header: '<h4>Airports</h4>'
+    },
     // `ttAdapter` wraps the suggestion engine in an adapter that
     // is compatible with the typeahead jQuery plugin
     source: airportSearch.ttAdapter()
@@ -292,15 +299,6 @@ MapIt.ViewModel = function() {
     hint: true,
     highlight: true,
     minLength: 2,
-    matcher: function () { return true; },
-    templates: {
-      empty: [
-        '<div class="empty-message">',
-        'unable to find any Airports that match the search term',
-        '</div>'
-      ].join('\n'),
-      suggestion: Handlebars.compile('<div><span class=\'typeahead-airport-name\'>{{name}}</span> ({{code}})</div><div class=\'typeahead-airport-state\'><span>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span></div>')
-    },
     updater: function(item) {
       console.log('TypeAhead.ArrivalAirportSelector.Updater: Updated typeahead serach term! Setting viewmodel search term.');
       console.log(item);
@@ -315,6 +313,23 @@ MapIt.ViewModel = function() {
   var arrivalSpecificTypeAheadOptions = {
     name: 'arrivalAirports',
     displayKey: 'value',
+    engine: Handlebars,
+    templates: {
+      empty: [
+        '<div class="empty-message">',
+        'unable to find any Airports that match the search term',
+        '</div>'
+      ].join('\n'),
+      suggestion: Handlebars.compile([
+        '<div>',
+        '<span class=\'typeahead-airport-name\'>{{name}} - ({{code}})</span>',
+        '</div>',
+        '<div>',
+        '<span class=\'typeahead-airport-state\'>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
+        '</div>'
+      ].join('\n')),
+      header: '<h3>Airports</h3>'
+    },
     // `ttAdapter` wraps the suggestion engine in an adapter that
     // is compatible with the typeahead jQuery plugin
     source: airportSearch.ttAdapter()
@@ -322,8 +337,44 @@ MapIt.ViewModel = function() {
 
   console.log('ViewModel: Initializing typeaheads');
   // Initialize the typeahead search inputs
-  $('#departure-airport-selector').typeahead(departureGenericTypeAheadOptions, departureSpecificTypeAheadOptions);
-  $('#arrival-airport-selector').typeahead(arrivalGenericTypeAheadOptions, arrivalSpecificTypeAheadOptions);
+  options.domEls.departureSearch.typeahead(departureGenericTypeAheadOptions, departureSpecificTypeAheadOptions);
+  options.domEls.arrivalSearch.typeahead(arrivalGenericTypeAheadOptions, arrivalSpecificTypeAheadOptions);
+
+  function onOpened($e) {
+    console.log('opened');
+  }
+
+  function onAutocompleted($e, datum) {
+      //Only fires whenever you search for an item and hit tab or enter to autocomplete to the first suggested result
+    console.log('autocompleted');
+    console.log(datum);
+  }
+
+  function onSelected($e, datum) {
+      //Fires when you select one of the options in the autocomplete either with the mouse or using the arrow keys and tab/enter
+    console.log('selected');
+    console.log(datum);
+
+    
+  }
+
+  function registerEnterKeyAutocomplete(typeAheadEl) {
+    typeAheadEl.on('keydown', function(event) {
+      // Define tab key
+      var e = jQuery.Event('keydown');
+      e.keyCode = e.which = 9; // 9 == tab
+      
+      if (event.which === 13) {// if pressing enter
+        typeAheadEl.trigger(e); // trigger "tab" key - which works as "enter"
+      }
+    })
+    .on('typeahead:opened', onOpened)
+    .on('typeahead:selected', onSelected)
+    .on('typeahead:autocompleted', onAutocompleted);
+  }
+
+  registerEnterKeyAutocomplete(options.domEls.departureSearch);
+  registerEnterKeyAutocomplete(options.domEls.arrivalSearch);
 
 
   /********************** Airport Existance Conditions and Helpers **********************/

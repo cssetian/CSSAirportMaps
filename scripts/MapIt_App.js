@@ -15,24 +15,7 @@ MapIt.App = (function($, _, ko) {
   var _init = function (options) {
     _initAirportRefData(options);
 
-    /*
-    airportList = _.map(options.airportsJSON, function(airport) {
-      return {
-        name: airport.name,
-        value: airport.name,
-        code: airport.code,
-        lat: airport.lat,
-        lng: airport.lon,
-        city: airport.city,
-        state: airport.state,
-        country: airport.country,
-        icao: airport.icao
-      };
-    });
-    console.log('airportList: ');
-    console.log(airportList);
-    */
-    viewModel = new MapIt.ViewModel();
+    viewModel = new MapIt.ViewModel(options);
 
    // _initTypeAhead();
 

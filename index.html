@@ -23,14 +23,14 @@
         <tbody>
           <tr>
             <th class="input-label first-input-column">Departure Airport:</th>
-            <td>
+            <td><!-- value: departureAirport().airportSearchTerm,-->
               <div id="departure-airport-selector-container">
                 <input  id="departure-airport-selector"
                         class="typeahead second-input-column required"
                         type="text"
                         autocomplete="off"
                         placeholder="Type to search for a departure airport..."
-                        data-bind=" value: departureAirport().airportSearchTerm,
+                        data-bind="
                                     valueUpdate: 'input' "/>
                 <input type="hidden" name="departureAirportId" id="departureAirportId" value="" />
               </div>
@@ -38,14 +38,14 @@
           </tr>
           <tr>
             <th class="input-label first-input-column">Arrival Airport:</th>
-            <td>
+            <td><!-- value: arrivalAirport().airportSearchTerm, -->
               <div id="arrival-airport-selector-container">
                 <input  id="arrival-airport-selector"
                         class="typeahead second-input-column required"
                         autocomplete="off"
                         type="text" 
                         placeholder="Type to search for an arrival airport..." 
-                        data-bind=" value: arrivalAirport().airportSearchTerm, 
+                        data-bind="
                                     valueUpdate: 'input'" />
                 <input type="hidden" name="arrivalAirportId" id="arrivalAirportId" value="" />
               </div>
@@ -264,6 +264,8 @@
           domEls: {
             appContainer: $("#container"),
             appTitle: $("#app-title"),
+            departureSearch: $("#departure-airport-selector"),
+            arrivalSearch: $("#arrival-airport-selector"),
             departureAirportsList: $("#departure-airports-list"),
             arrivalAirportsList: $("#arrival-airports-list")
           },
