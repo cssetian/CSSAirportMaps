@@ -62,13 +62,14 @@ MapIt.ViewModel = function(options) {
   ]);
 
   console.log('ViewModel: Defining marker rendering helper and main functions');
+
   self.displaySingleMarkerOnMap = function(newMarker, idx) {
     console.log('ViewModel.displaySingleMarkerOnMap: Displaying single marker!');
     self.flightPath().setMap(null);
 
     var i;
     for(i = 0; i < self.mapMarkers().length; i++) {
-      if(i === idx) {
+      if(i === idx && newMarker !== null) {
         console.log('ViewModel.displaySingleMarkerOnMap: Displaying marker #' + i);
         self.mapMarkers()[i].marker.setPosition(newMarker.position);
         self.mapMarkers()[i].marker.setMap(self.map());
@@ -116,28 +117,29 @@ MapIt.ViewModel = function(options) {
     self.map().panToBounds(self.bounds());
   };
 
-  self.renderMapMarkers = function(newAirportMarker) {
-    if(newAirportMarker === null) {
+  self.renderMapMarkers = function(newAirportData) {
+    console.log('ViewModel.renderMapMarkers: RENDERING MAP MARKERS');
+    if(newAirportData === self.departureAirport.emptyData) {
       // Handle removing an airportMarker from the map
-      if(self.departureAirport().airportData() === self.departureAirport().emptyData && self.arrivalAirport().airportData() === self.arrivalAirport().emptyData) {
+      if(self.departureAirport().currentSelectionObj() === self.departureAirport().emptyData && self.arrivalAirport().currentSelectionObj() === self.arrivalAirport().emptyData) {
         self.displaySingleMarkerOnMap(self.initialMarker(), 0);
-      } else if(self.departureAirport().airportMarker() === null) {//self.departureAirport().emptyData) {
+      } else if(self.departureAirport().currentSelectionObj() === newAirportData) {//self.departureAirport().emptyData) {
         self.displaySingleMarkerOnMap(self.arrivalAirport().airportMarker(), 1);
-      } else if(self.arrivalAirport().airportMarker() === null) {//self.arrivalAirport().emptyData) {
+      } else if(self.arrivalAirport().currentSelectionObj() === newAirportData) {//self.arrivalAirport().emptyData) {
         self.displaySingleMarkerOnMap(self.departureAirport().airportMarker(), 2);
       } else {
         console.log('App really shouldn\'t have gotten here..... there\'s no combination of logic that would yield this result...');
       }
     } else {
       // Handle an airportMarker being added to the map
-      if(self.departureAirport().airportData() !== self.departureAirport().emptyData && self.arrivalAirport().airportData() !== self.arrivalAirport().emptyData) {
+      if(self.departureAirport().currentSelectionObj() !== self.departureAirport().emptyData && self.arrivalAirport().currentSelectionObj() !== self.arrivalAirport().emptyData) {
         self.displayTwoAirportsAndRouteOnMap(self.departureAirport().airportMarker(), self.arrivalAirport().airportMarker(), 1, 2);
-      } else if(self.departureAirport().airportMarker() === newAirportMarker) {
-        self.displaySingleMarkerOnMap(newAirportMarker, 1);
-      } else if(self.arrivalAirport().airportMarker() === newAirportMarker) {
-        self.displaySingleMarkerOnMap(newAirportMarker, 2);
+      } else if(self.departureAirport().currentSelectionObj() === newAirportData) {
+        self.displaySingleMarkerOnMap(self.departureAirport().airportMarker(), 1);
+      } else if(self.arrivalAirport().currentSelectionObj() === newAirportData) {
+        self.displaySingleMarkerOnMap(self.arrivalAirport().airportMarker(), 2);
       } else {
-        console.log('App really shouln\'t have gotten here...... there\'s no combination of logic that would yield this result....');
+        console.log('App really shouldn\'t have gotten here...... there\'s no combination of logic that would yield this result....');
       }
     }
   };
@@ -145,135 +147,31 @@ MapIt.ViewModel = function(options) {
   // Bind airportMarker events so that viewModel map markers are updated and rerendered on the map
   console.log('ViewModel: Setting DepartureAirport subscribe callback function bound to departureAirport.airportData');
   self.departureAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Departure Airport'})).extend({ rateLimit: 0 });
-  self.departureAirport().airportMarker.subscribe(self.renderMapMarkers);
+  self.departureAirport().currentSelectionObj.subscribe(self.renderMapMarkers);
 
   console.log('ViewModel: Setting ArrivalAirport subscribe callback function bound to arrivalAirport.airportData');
   self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'})).extend({ rateLimit: 0 });
-  self.arrivalAirport().airportMarker.subscribe(self.renderMapMarkers);
+  self.arrivalAirport().currentSelectionObj.subscribe(self.renderMapMarkers);
 
-  self.remoteFilter = function(airports) {
-    console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
-    console.log('Bloodhound.remote.filter: Found some airports! ---v');
-    console.log(airports);
-
-    var mappedOutput = $.map(airports.geonames, function (airport) {
-      var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
-      var _filteredIATACode = '';
-      if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
-        _filteredIATACode = _IATACode[0].name;
-      }
-          
-      return {
-        value: airport.toponymName,
-        name: airport.toponymName,
-        lat: airport.lat,
-        lng: airport.lng,
-        city: airport.adminName1,
-        country: airport.countryName,
-        countryCode: airport.countryCode,
-        adminId1: airport.adminId1,
-        geoNameId: airport.geonameId,
-        timeZone: airport.timezone,
-        code: _filteredIATACode
-      };
-    });
-
-    if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
-      console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
-      self.departureAirport().extenderSearchResults(null);
-    } else {
-      console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
-      self.departureAirport().extenderSearchResults(mappedOutput.geonames);
-    }
-
-    console.log('Bloodhound.remote.filter: Mapped Output --v');
-    console.log(mappedOutput);
-    return mappedOutput;
-  };
-
-  // Define the options for bloodhound and typeahead inputs
-  console.log('ViewModel: Defining bloodhound initialization options');
-  var bloodhoundOptions = {
-    datumTokenizer: function (d) {
-      return Bloodhound.tokenizers.whitespace(d.name);
-      //return arr.concat(Bloodhound.tokenizers.whitespace(d.name), Bloodhound.tokenizers.whitespace(d.city), Bloodhound.tokenizers.whitespace(d.country), Bloodhound.tokenizers.whitespace(d.code));
-    },
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    limit: 20,
-    log_successful_searches: true,
-    log_failed_searches: true,
-    remote: {
-      url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name=%QUERY',
-      filter: self.remoteFilter, /*function (airports) {
-      console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
-        console.log('Bloodhound.remote.filter: Found some airports! ---v');
-        console.log(airports);
-
-        var mappedOutput = $.map(airports.geonames, function (airport) {
-          var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
-          var _filteredIATACode = '';
-          if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
-            _filteredIATACode = _IATACode[0].name;
-          }
-              
-          return {
-            value: airport.toponymName,
-            name: airport.toponymName,
-            lat: airport.lat,
-            lng: airport.lng,
-            city: airport.adminName1,
-            country: airport.countryName,
-            countryCode: airport.countryCode,
-            adminId1: airport.adminId1,
-            geoNameId: airport.geonameId,
-            timeZone: airport.timezone,
-            code: _filteredIATACode
-          };
-        });
-
-        if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
-          console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
-          self.departureAirport().extenderSearchResults(null);
-        } else {
-          console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
-          self.departureAirport().extenderSearchResults(mappedOutput.geonames);
-        }
-
-        console.log('Bloodhound.remote.filter: Mapped Output --v');
-        console.log(mappedOutput);
-        return mappedOutput;
-      }*/
-    }
-  };
-
-  // Initialize the Bloodhound search engine
-  console.log('ViewModel: Initializing Bloodhound engine');
-  var airportSearch = new Bloodhound(bloodhoundOptions);
-  var searchPromise = airportSearch.initialize();
-  searchPromise.done(function() { console.log('success!'); })
-               .fail(function() { console.log('err!'); });
 
   // Define the typeahead options for both departure and arrival airports
   console.log('ViewModel: Defining typeahead options');
   var departureGenericTypeAheadOptions = {
-    hint: true,
+    //hint: true,
     highlight: true,
     minLength: 2,
-    updater: function(item) {
-      console.log('TypeAhead.DepartureAirportSelector.Updater: Updated typeahead serach term! Setting viewmodel search term.');
-      console.log(item);
-      self.departureAirport().airportSearchTerm(item.value);
-      self.departureAirport().extenderSearchResults();
-      return item;
-    },
     highlighter: function (item) {
       var regex = new RegExp( '(' + this.query + ')', 'gi' );
-      return item.replace( regex, '<stronger>$1</stronger>' );
+      return item.replace( regex, '<mark>$1</mark>' );
     }
   };
   var departureSpecificTypeAheadOptions = {
+    // `ttAdapter` wraps the suggestion engine in an adapter that
+    // is compatible with the typeahead jQuery plugin
+    source: self.departureAirport().airportSearch.ttAdapter(),
     name: 'departureAirports',
     displayKey: 'value',
+    hint: false,
     engine: Handlebars,
     templates: {
       empty: [
@@ -290,27 +188,27 @@ MapIt.ViewModel = function(options) {
         '</div>'
       ].join('\n')),
       header: '<h4>Airports</h4>'
-    },
-    // `ttAdapter` wraps the suggestion engine in an adapter that
-    // is compatible with the typeahead jQuery plugin
-    source: airportSearch.ttAdapter()
+    }
   };
   var arrivalGenericTypeAheadOptions = {
-    hint: true,
+    //hint: true,
     highlight: true,
-    minLength: 2,
+    minLength: 2/*\\,
     updater: function(item) {
       console.log('TypeAhead.ArrivalAirportSelector.Updater: Updated typeahead serach term! Setting viewmodel search term.');
       console.log(item);
       self.arrivalAirport().airportSearchTerm(item.value);
       return item;
-    },
+    }*/,
     highlighter: function (item) {
       var regex = new RegExp( '(' + this.query + ')', 'gi' );
-      return item.replace( regex, '<stronger>$1</stronger>' );
+      return item.replace( regex, '<mark>$1</mark>' );
     }
   };
   var arrivalSpecificTypeAheadOptions = {
+    // `ttAdapter` wraps the suggestion engine in an adapter that
+    // is compatible with the typeahead jQuery plugin
+    source: self.arrivalAirport().airportSearch.ttAdapter(),
     name: 'arrivalAirports',
     displayKey: 'value',
     engine: Handlebars,
@@ -329,52 +227,25 @@ MapIt.ViewModel = function(options) {
         '</div>'
       ].join('\n')),
       header: '<h3>Airports</h3>'
-    },
-    // `ttAdapter` wraps the suggestion engine in an adapter that
-    // is compatible with the typeahead jQuery plugin
-    source: airportSearch.ttAdapter()
+    }
   };
 
   console.log('ViewModel: Initializing typeaheads');
   // Initialize the typeahead search inputs
-  options.domEls.departureSearch.typeahead(departureGenericTypeAheadOptions, departureSpecificTypeAheadOptions);
-  options.domEls.arrivalSearch.typeahead(arrivalGenericTypeAheadOptions, arrivalSpecificTypeAheadOptions);
+  options.domEls.departureSearch.typeahead(departureGenericTypeAheadOptions, departureSpecificTypeAheadOptions)
+    .on('typeahead:opened', self.departureAirport().onOpened)
+    .on('typeahead:selected', self.departureAirport().onSelected)
+    .on('typeahead:autocompleted', self.departureAirport().onAutocompleted)
+    .on('typeahead:closed', self.departureAirport().onClosed);
+  options.domEls.arrivalSearch.typeahead(arrivalGenericTypeAheadOptions, arrivalSpecificTypeAheadOptions)
+    .on('typeahead:opened', self.arrivalAirport().onOpened)
+    .on('typeahead:selected', self.arrivalAirport().onSelected)
+    .on('typeahead:autocompleted', self.arrivalAirport().onAutocompleted)
+    .on('typeahead:closed', self.arrivalAirport().onClosed);
 
-  function onOpened($e) {
-    console.log('opened');
-  }
 
-  function onAutocompleted($e, datum) {
-      //Only fires whenever you search for an item and hit tab or enter to autocomplete to the first suggested result
-    console.log('autocompleted');
-    console.log(datum);
-  }
-
-  function onSelected($e, datum) {
-      //Fires when you select one of the options in the autocomplete either with the mouse or using the arrow keys and tab/enter
-    console.log('selected');
-    console.log(datum);
-
-    
-  }
-
-  function registerEnterKeyAutocomplete(typeAheadEl) {
-    typeAheadEl.on('keydown', function(event) {
-      // Define tab key
-      var e = jQuery.Event('keydown');
-      e.keyCode = e.which = 9; // 9 == tab
-      
-      if (event.which === 13) {// if pressing enter
-        typeAheadEl.trigger(e); // trigger "tab" key - which works as "enter"
-      }
-    })
-    .on('typeahead:opened', onOpened)
-    .on('typeahead:selected', onSelected)
-    .on('typeahead:autocompleted', onAutocompleted);
-  }
-
-  registerEnterKeyAutocomplete(options.domEls.departureSearch);
-  registerEnterKeyAutocomplete(options.domEls.arrivalSearch);
+  self.departureAirport().registerEnterKeyAutocomplete(options.domEls.departureSearch);
+  self.arrivalAirport().registerEnterKeyAutocomplete(options.domEls.arrivalSearch);
 
 
   /********************** Airport Existance Conditions and Helpers **********************/
