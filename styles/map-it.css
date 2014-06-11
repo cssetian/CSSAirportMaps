@@ -4,8 +4,16 @@
   padding-right: 5px;
 }
 
+.hidden {
+  display: none;
+}
+
 h2 {
   margin: 10px 0;
+}
+
+h3 {
+  font-size: 14px;
 }
 
 th {

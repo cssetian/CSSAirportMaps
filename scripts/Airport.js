@@ -28,7 +28,6 @@ MapIt.Airport = function(map, options) {
   self.emptyData = JSON.parse(emptyJSON);
   self.name = options.name;
 
-  self.selectedResult = ko.observable(self.emptyData);
   self.airportSearchTerm = ko.observable();
   self.typeAheadSearchTerm = ko.observable();
   self.airportSearchTermThrottled = ko.computed(self.airportSearchTerm).extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 }});
@@ -63,52 +62,18 @@ MapIt.Airport = function(map, options) {
     },
     owner: self
   });
-/*
-  self.fetchSearchResultsFailure = function() {
-    console.log('Airport.' + self.name + '.fetchSearchResultsFailure: FETCHING OF DATA FAILEDDDDDDDD');
-    self.extenderSearchResults(null);
-  };
-  self.fetchSearchResultsSuccess = function(data) {
-    console.log('Airport.' + self.name + '.fetchSearchResultsSuccess: Fetching of Data Success!');
-    console.log('Airport.' + self.name + '.fetchSearchResultsSuccess: Found results!');
-    console.log('Airport.' + self.name + '.fetchSearchResultsSuccess: Raw result object of ' + self.name + ' is copied below and written to extenderSearchResults, and is a subset from the input parameter as data.results[0] --v ');
-    console.log(data);
-    
-    self.extenderSearchResults(data.results);
-    
-    console.log('Airport.' + self.name + '.fetchSearchResultsSuccess: Value of extenderSearchResults is below (should match raw result object defined immediately above  ---v ');
-    console.log(self.extenderSearchResults());
-  };
-  
-  self.fetchFunctionSearchResults = function() {
-    console.log('Airport.' + self.name + '.fetchFunctionSearchResults: base URI: (' + self.localSearchBaseURI + ')');
-    if(typeof self.airportSearchTermThrottledEncoded() === 'undefined' || self.airportSearchTermThrottledEncoded() === null || self.airportSearchTermThrottledEncoded() === '') {
-      console.log('Airport.' + self.name + '.fetchFunctionSearchResults: NO SEARCH TERM SPECIFIED! AJAX CALL WILL NOT EXECUTE. Resetting extenderSearchResults');
-      self.extenderSearchResults(null);
-      return;
-    }
 
-    console.log('Airport.' + self.name + '.fetchFunctionSearchResults: search_query: (' + self.airportSearchTermThrottledEncoded() + ')');
-    console.log('------------------------------MAKING AJAX REQUEST--------------------------------');
-    $.ajax({
-      type: 'GET',
-      url: self.localSearchBaseURI,
-      data: { 'search_query': self.airportSearchTermThrottledEncoded()},
-      context: self,
-      dataType: 'json',
-      success: self.fetchSearchResultsSuccess,
-      error: self.fetchSearchResultsFailure
-    });
-  };
 
-  */
   self.extenderSearchResults = ko.observable();
-  //self.extenderSearchResults = ko.lazyObservable(self.fetchFunctionSearchResults, self);
-  /*self.airportSearchTermThrottledEncoded.subscribe(function(newVal) {
-    self.extenderSearchResults.refresh();
+   //self.selectedResult = ko.observable(self.emptyData);
+  self.selectedResult = ko.computed(function(){
+    if(typeof self.extenderSearchResults() !== 'undefined' && self.extenderSearchResults() !== null && self.extenderSearchResults().length > 0) {
+      return self.extenderSearchResults()[0];
+    } else {
+      return self.emptyData;
+    }
   });
-  */
- 
+
   self.airportData = ko.computed({
     read: function() {
       return self.selectedResult();
@@ -132,14 +97,6 @@ MapIt.Airport = function(map, options) {
     },
     owner: self
   });*/
-
-
-/*
-  self.extenderSearchResults.subscribe(function(newSearchResults){
-    console.log('Airport.' + self.name + '.extenderSearchResults.subscribe: Hit the extenderSearchResults subscription - no reason for this to happen - , airportSearchterm is: ' + self.airportSearchTermThrottledEncoded());
-    console.log(newSearchResults);
-    console.log('Aiprort.' + self.name + '.extenderSearchResults.subscribe: Again - no reason for this to be here...');
-  });*/
  
   self.isAirportSelected = ko.computed({
     read: function() {
@@ -152,11 +109,11 @@ MapIt.Airport = function(map, options) {
   self.airportCoords = ko.computed({
     read: function() {
       console.log('Airport.' + self.name + '.airportCoords: Recomputing airportCoords for ' + self.name);
-      if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().name === 'undefined' || self.airportData().name === '') {
+      if(typeof self.selectedResult() === 'undefined' ||  typeof self.selectedResult().name === 'undefined' || self.selectedResult().name === '') {
         console.log('Airport.airportCoords: No airport supplied to airportCoords for ' + self.name + '!');
         return null;
       } else {
-        var _LatLng = new google.maps.LatLng(parseFloat(self.airportData().lat, 10), parseFloat(self.airportData().lng, 10));
+        var _LatLng = new google.maps.LatLng(parseFloat(self.selectedResult().lat, 10), parseFloat(self.selectedResult().lng, 10));
         console.log('Airport.' + self.name + '.airportCoords: New airportCoords for ' + self.name + ': (' + _LatLng.lat().toFixed(2) + ', ' + _LatLng.lng().toFixed(2) + ')');
         return _LatLng;
       }
@@ -167,7 +124,7 @@ MapIt.Airport = function(map, options) {
   self.airportMarker = ko.computed({
     read: function() {
       console.log('Airport.' + self.name + '.airportMarker: Recomputing airportMarker for ' + self.name);
-      if(typeof self.airportData() === 'undefined' ||  typeof self.airportData().name === 'undefined' || self.airportData().name === '') {
+      if(typeof self.selectedResult() === 'undefined' ||  typeof self.selectedResult().name === 'undefined' || self.selectedResult().name === '') {
         console.log('Airport.airportMarker: No airport supplied to airportMarker for ' + self.name + '!');
         return null;
       } else {
@@ -179,22 +136,30 @@ MapIt.Airport = function(map, options) {
     owner: self
   });
 
+  /*********************** Bloodhound and Typeahead Functions *************************/
+
   function onOpened($e) {
     console.log('opened');
   }
 
-  function onAutocompleted($e, datum) {
-      //Only fires whenever you search for an item and hit tab or enter to autocomplete to the first suggested result
-    console.log('autocompleted');
-    console.log(datum);
-    self.selectedResult(datum);
+  function onClosed($e) {
+
   }
 
-  function onSelected($e, datum) {
-      //Fires when you select one of the options in the autocomplete either with the mouse or using the arrow keys and tab/enter
-    console.log('selected');
+  function onAutocompleted($e, s, datum) {
+      //Only fires whenever you search for an item and hit tab or enter to autocomplete to the first suggested result
+    console.log('AUTOCOMPLETED DATA - AUTOCOMPLETED RESULT SHOULD UPDATE AUTOMATICALLY');
     console.log(datum);
-    self.selectedResult(datum);
+    //self.selectedResult(datum);
+    //typeAheadEl.typeahead('val', datum.name);
+  }
+
+  function onSelected($e, s, datum) {
+      //Fires when you select one of the options in the autocomplete either with the mouse or using the arrow keys and tab/enter
+    console.log('SELECTED DATA - SELECTED RESULT SHOULD UPDATE AUTOMATICALLY');
+    console.log(datum);
+    //self.selectedResult(datum);
+    //typeAheadEl.typeahead('val', datum.name);
   }
 
   self.registerEnterKeyAutocomplete = function (typeAheadEl) {
@@ -206,11 +171,15 @@ MapIt.Airport = function(map, options) {
       if (event.which === 13) {// if pressing enter
         typeAheadEl.trigger(e); // trigger "tab" key - which works as "enter"
       }
+
+      // Closes the typeahead when tab or enter selects an item
+      typeAheadEl.typeahead('close');
     });
   }
 
   self.remoteFilter = function(airports) {
     console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
+    
     console.log('Bloodhound.remote.filter: Found some airports! ---v');
     console.log(airports);
 
@@ -242,14 +211,15 @@ MapIt.Airport = function(map, options) {
       return (typeof item.code !== 'undefined' && item.code !== null && item.code !== '');
     });
 
+    // Update the stored data variables with retrieved values, or empty data if nothing was retrieved
     if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
       console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
       self.extenderSearchResults(null);
-      self.selectedResult(self.EmptyData);
+      //self.selectedResult(self.emptyData);
     } else {
       console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
       self.extenderSearchResults(mappedOutput);
-      self.selectedResult(self.extenderSearchResults()[0]);
+      //self.selectedResult(self.extenderSearchResults()[0]);
     }
 
     console.log('Bloodhound.remote.filter: Mapped Output --v');
