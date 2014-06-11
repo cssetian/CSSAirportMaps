@@ -28,6 +28,7 @@ MapIt.Airport = function(map, options) {
   self.emptyData = JSON.parse(emptyJSON);
   self.name = options.name;
 
+  self.selectedResult = ko.observable(self.emptyData);
   self.airportSearchTerm = ko.observable();
   self.typeAheadSearchTerm = ko.observable();
   self.airportSearchTermThrottled = ko.computed(self.airportSearchTerm).extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 }});
@@ -62,7 +63,7 @@ MapIt.Airport = function(map, options) {
     },
     owner: self
   });
-
+/*
   self.fetchSearchResultsFailure = function() {
     console.log('Airport.' + self.name + '.fetchSearchResultsFailure: FETCHING OF DATA FAILEDDDDDDDD');
     self.extenderSearchResults(null);
@@ -100,13 +101,21 @@ MapIt.Airport = function(map, options) {
     });
   };
 
-  
+  */
   self.extenderSearchResults = ko.observable();
   //self.extenderSearchResults = ko.lazyObservable(self.fetchFunctionSearchResults, self);
   /*self.airportSearchTermThrottledEncoded.subscribe(function(newVal) {
     self.extenderSearchResults.refresh();
   });
   */
+ 
+  self.airportData = ko.computed({
+    read: function() {
+      return self.selectedResult();
+    }
+  });
+
+ /*
   self.airportData = ko.computed({
     read: function() {
       if(typeof self.extenderSearchResults() !== 'undefined' 
@@ -122,7 +131,9 @@ MapIt.Airport = function(map, options) {
       }
     },
     owner: self
-  });
+  });*/
+
+
 /*
   self.extenderSearchResults.subscribe(function(newSearchResults){
     console.log('Airport.' + self.name + '.extenderSearchResults.subscribe: Hit the extenderSearchResults subscription - no reason for this to happen - , airportSearchterm is: ' + self.airportSearchTermThrottledEncoded());
@@ -167,6 +178,108 @@ MapIt.Airport = function(map, options) {
     },
     owner: self
   });
+
+  function onOpened($e) {
+    console.log('opened');
+  }
+
+  function onAutocompleted($e, datum) {
+      //Only fires whenever you search for an item and hit tab or enter to autocomplete to the first suggested result
+    console.log('autocompleted');
+    console.log(datum);
+    self.selectedResult(datum);
+  }
+
+  function onSelected($e, datum) {
+      //Fires when you select one of the options in the autocomplete either with the mouse or using the arrow keys and tab/enter
+    console.log('selected');
+    console.log(datum);
+    self.selectedResult(datum);
+  }
+
+  self.registerEnterKeyAutocomplete = function (typeAheadEl) {
+    typeAheadEl.on('keydown', function(event) {
+      // Define tab key
+      var e = jQuery.Event('keydown');
+      e.keyCode = e.which = 9; // 9 == tab
+      
+      if (event.which === 13) {// if pressing enter
+        typeAheadEl.trigger(e); // trigger "tab" key - which works as "enter"
+      }
+    });
+  }
+
+  self.remoteFilter = function(airports) {
+    console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
+    console.log('Bloodhound.remote.filter: Found some airports! ---v');
+    console.log(airports);
+
+    // Map the properties of the returned geoplanet data to the viewmodel properties
+    var mappedOutputPreFiltering = $.map(airports.geonames, function (airport) {
+      var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
+      var _filteredIATACode = '';
+      if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
+        _filteredIATACode = _IATACode[0].name;
+      }
+          
+      return {
+        value: airport.toponymName,
+        name: airport.toponymName,
+        lat: airport.lat,
+        lng: airport.lng,
+        city: airport.adminName1,
+        country: airport.countryName,
+        countryCode: airport.countryCode,
+        adminId1: airport.adminId1,
+        geoNameId: airport.geonameId,
+        timeZone: airport.timezone,
+        code: _filteredIATACode
+      };
+    });
+
+    // Filter out airports without IATA codes - they're probably not legit
+    var mappedOutput = _.filter(mappedOutputPreFiltering, function(item) {
+      return (typeof item.code !== 'undefined' && item.code !== null && item.code !== '');
+    });
+
+    if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
+      console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
+      self.extenderSearchResults(null);
+      self.selectedResult(self.EmptyData);
+    } else {
+      console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
+      self.extenderSearchResults(mappedOutput);
+      self.selectedResult(self.extenderSearchResults()[0]);
+    }
+
+    console.log('Bloodhound.remote.filter: Mapped Output --v');
+    console.log(mappedOutput);
+    return mappedOutput;
+  };
+
+  // Define the options for bloodhound and typeahead inputs
+  console.log('ViewModel: Defining bloodhound initialization options');
+  var bloodhoundOptions = {
+    datumTokenizer: function (d) {
+      return Bloodhound.tokenizers.whitespace(d.name);
+      //return arr.concat(Bloodhound.tokenizers.whitespace(d.name), Bloodhound.tokenizers.whitespace(d.city), Bloodhound.tokenizers.whitespace(d.country), Bloodhound.tokenizers.whitespace(d.code));
+    },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    limit: 20,
+    log_successful_searches: true,
+    log_failed_searches: true,
+    remote: {
+      url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name=%QUERY',
+      filter: self.remoteFilter
+    }
+  };
+
+  // Initialize the Bloodhound search engine
+  console.log('ViewModel: Initializing Bloodhound engine');
+  self.searchEngine = new Bloodhound(bloodhoundOptions);
+  var searchPromise = self.searchEngine.initialize();
+  searchPromise.done(function() { console.log('success!'); })
+               .fail(function() { console.log('err!'); });
 
 };
 

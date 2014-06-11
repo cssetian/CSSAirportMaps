@@ -151,107 +151,6 @@ MapIt.ViewModel = function(options) {
   self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'})).extend({ rateLimit: 0 });
   self.arrivalAirport().airportMarker.subscribe(self.renderMapMarkers);
 
-  self.remoteFilter = function(airports) {
-    console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
-    console.log('Bloodhound.remote.filter: Found some airports! ---v');
-    console.log(airports);
-
-    var mappedOutput = $.map(airports.geonames, function (airport) {
-      var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
-      var _filteredIATACode = '';
-      if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
-        _filteredIATACode = _IATACode[0].name;
-      }
-          
-      return {
-        value: airport.toponymName,
-        name: airport.toponymName,
-        lat: airport.lat,
-        lng: airport.lng,
-        city: airport.adminName1,
-        country: airport.countryName,
-        countryCode: airport.countryCode,
-        adminId1: airport.adminId1,
-        geoNameId: airport.geonameId,
-        timeZone: airport.timezone,
-        code: _filteredIATACode
-      };
-    });
-
-    if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
-      console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
-      self.departureAirport().extenderSearchResults(null);
-    } else {
-      console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
-      self.departureAirport().extenderSearchResults(mappedOutput.geonames);
-    }
-
-    console.log('Bloodhound.remote.filter: Mapped Output --v');
-    console.log(mappedOutput);
-    return mappedOutput;
-  };
-
-  // Define the options for bloodhound and typeahead inputs
-  console.log('ViewModel: Defining bloodhound initialization options');
-  var bloodhoundOptions = {
-    datumTokenizer: function (d) {
-      return Bloodhound.tokenizers.whitespace(d.name);
-      //return arr.concat(Bloodhound.tokenizers.whitespace(d.name), Bloodhound.tokenizers.whitespace(d.city), Bloodhound.tokenizers.whitespace(d.country), Bloodhound.tokenizers.whitespace(d.code));
-    },
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    limit: 20,
-    log_successful_searches: true,
-    log_failed_searches: true,
-    remote: {
-      url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name=%QUERY',
-      filter: self.remoteFilter, /*function (airports) {
-      console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
-        console.log('Bloodhound.remote.filter: Found some airports! ---v');
-        console.log(airports);
-
-        var mappedOutput = $.map(airports.geonames, function (airport) {
-          var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
-          var _filteredIATACode = '';
-          if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
-            _filteredIATACode = _IATACode[0].name;
-          }
-              
-          return {
-            value: airport.toponymName,
-            name: airport.toponymName,
-            lat: airport.lat,
-            lng: airport.lng,
-            city: airport.adminName1,
-            country: airport.countryName,
-            countryCode: airport.countryCode,
-            adminId1: airport.adminId1,
-            geoNameId: airport.geonameId,
-            timeZone: airport.timezone,
-            code: _filteredIATACode
-          };
-        });
-
-        if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
-          console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
-          self.departureAirport().extenderSearchResults(null);
-        } else {
-          console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
-          self.departureAirport().extenderSearchResults(mappedOutput.geonames);
-        }
-
-        console.log('Bloodhound.remote.filter: Mapped Output --v');
-        console.log(mappedOutput);
-        return mappedOutput;
-      }*/
-    }
-  };
-
-  // Initialize the Bloodhound search engine
-  console.log('ViewModel: Initializing Bloodhound engine');
-  var airportSearch = new Bloodhound(bloodhoundOptions);
-  var searchPromise = airportSearch.initialize();
-  searchPromise.done(function() { console.log('success!'); })
-               .fail(function() { console.log('err!'); });
 
   // Define the typeahead options for both departure and arrival airports
   console.log('ViewModel: Defining typeahead options');
@@ -293,7 +192,7 @@ MapIt.ViewModel = function(options) {
     },
     // `ttAdapter` wraps the suggestion engine in an adapter that
     // is compatible with the typeahead jQuery plugin
-    source: airportSearch.ttAdapter()
+    source: self.departureAirport().searchEngine.ttAdapter()
   };
   var arrivalGenericTypeAheadOptions = {
     hint: true,
@@ -332,49 +231,21 @@ MapIt.ViewModel = function(options) {
     },
     // `ttAdapter` wraps the suggestion engine in an adapter that
     // is compatible with the typeahead jQuery plugin
-    source: airportSearch.ttAdapter()
+    source: self.arrivalAirport().searchEngine.ttAdapter()
   };
 
   console.log('ViewModel: Initializing typeaheads');
   // Initialize the typeahead search inputs
-  options.domEls.departureSearch.typeahead(departureGenericTypeAheadOptions, departureSpecificTypeAheadOptions);
-  options.domEls.arrivalSearch.typeahead(arrivalGenericTypeAheadOptions, arrivalSpecificTypeAheadOptions);
-
-  function onOpened($e) {
-    console.log('opened');
-  }
-
-  function onAutocompleted($e, datum) {
-      //Only fires whenever you search for an item and hit tab or enter to autocomplete to the first suggested result
-    console.log('autocompleted');
-    console.log(datum);
-  }
-
-  function onSelected($e, datum) {
-      //Fires when you select one of the options in the autocomplete either with the mouse or using the arrow keys and tab/enter
-    console.log('selected');
-    console.log(datum);
-
-    
-  }
-
-  function registerEnterKeyAutocomplete(typeAheadEl) {
-    typeAheadEl.on('keydown', function(event) {
-      // Define tab key
-      var e = jQuery.Event('keydown');
-      e.keyCode = e.which = 9; // 9 == tab
-      
-      if (event.which === 13) {// if pressing enter
-        typeAheadEl.trigger(e); // trigger "tab" key - which works as "enter"
-      }
-    })
-    .on('typeahead:opened', onOpened)
-    .on('typeahead:selected', onSelected)
-    .on('typeahead:autocompleted', onAutocompleted);
-  }
-
-  registerEnterKeyAutocomplete(options.domEls.departureSearch);
-  registerEnterKeyAutocomplete(options.domEls.arrivalSearch);
+  options.domEls.departureSearch.typeahead(departureGenericTypeAheadOptions, departureSpecificTypeAheadOptions)
+    .on('typeahead:opened', self.departureAirport().onOpened)
+    .on('typeahead:selected', self.departureAirport().onSelected)
+    .on('typeahead:autocompleted', self.departureAirport().onAutocompleted);
+  options.domEls.arrivalSearch.typeahead(arrivalGenericTypeAheadOptions, arrivalSpecificTypeAheadOptions)
+    .on('typeahead:opened', self.arrivalAirport().onOpened)
+    .on('typeahead:selected', self.arrivalAirport().onSelected)
+    .on('typeahead:autocompleted', self.arrivalAirport().onAutocompleted);
+  self.departureAirport().registerEnterKeyAutocomplete(options.domEls.departureSearch);
+  self.arrivalAirport().registerEnterKeyAutocomplete(options.domEls.arrivalSearch);
 
 
   /********************** Airport Existance Conditions and Helpers **********************/
