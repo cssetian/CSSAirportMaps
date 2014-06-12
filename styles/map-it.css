@@ -8,6 +8,10 @@
   display: none;
 }
 
+.tt-dataset-departureAirports {
+  cursor: default;
+}
+
 h2 {
   margin: 10px 0;
 }
