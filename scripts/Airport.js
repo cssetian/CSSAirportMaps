@@ -3,35 +3,29 @@ MapIt.Airport = function(map, options) {
   var self = this;
   var service;
   // This is JSON so the quotes should stay as double quotes
-  var emptyJSON = '{' +
-    '"code":"",' +
-    '"lat":"",' +
-    '"lon":"",' +
-    '"name":"",' +
-    '"city":"",' +
-    '"state":"",' +
-    '"country":"",' +
-    '"woeid":"",' +
-    '"tz":"",' +
-    '"phone":"",' +
-    '"type":"",' +
-    '"email":"",' +
-    '"url":"",' +
-    '"runway_length":"",' +
-    '"elev":"",' +
-    '"icao":"",' +
-    '"direct_flights":"",' +
-    '"carriers":"",' +
-    '"geometry":{"location":{"lat":"","lng":""}}' +
-  '}';
+  var emptyJSON = {
+    value: '',
+    name: '',
+    lat: '',
+    lng: '',
+    city: '',
+    country: '',
+    countryCode: '',
+    adminId1: '',
+    geoNameId: '',
+    timeZone: '',
+    code: ''
+  };
 
   self.emptyData = JSON.parse(emptyJSON);
   self.name = options.name;
 
   self.airportSearchTerm = ko.observable();
-  self.typeAheadSearchTerm = ko.observable();
-  self.airportSearchTermThrottled = ko.computed(self.airportSearchTerm).extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 }});
+  //self.typeAheadSearchTerm = ko.observable();
+  //self.airportSearchTermThrottled = ko.computed(self.airportSearchTerm).extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 1000 }});
   
+
+  /* Right now just unnecessary and clouding up some of the debugging
   self.airportSearchResults = ko.mapping.fromJS([]);
   self.remoteSearchBaseURI = 'https://maps.googleapis.com/maps/api/place/textsearch/json?&name=airport&types=airport&sensor=false&key=AIzaSyC_i9CE-MZrDZDLY9MdrfukhcEBkatg3Jc&query=';
   self.localSearchBaseURI = '/airportsearch';
@@ -61,37 +55,42 @@ MapIt.Airport = function(map, options) {
       }
     },
     owner: self
-  });
+  });*/
 
 
-  self.extenderSearchResults = ko.observable();
+  self.bloodhoundSearchResultSet = ko.observable();
+  self.selectedSearchResultObj = ko.observable(self.emptyData);
    //self.selectedResult = ko.observable(self.emptyData);
+   //
+   //
+  /* THIS WAS A PART OF FIRST WORKING COPY, COMMENTING OUT SO I CAN HAVE MANUAL SELECTION OF AIRPORT ON AUTOCOMPLETE SELECTED
   self.selectedResult = ko.computed(function(){
-    if(typeof self.extenderSearchResults() !== 'undefined' && self.extenderSearchResults() !== null && self.extenderSearchResults().length > 0) {
-      return self.extenderSearchResults()[0];
+    if(typeof self.bloodhoundSearchResultSet() !== 'undefined' && self.bloodhoundSearchResultSet() !== null && self.bloodhoundSearchResultSet().length > 0) {
+      return self.bloodhoundSearchResultSet()[0];
     } else {
       return self.emptyData;
     }
   });
 
-  self.airportData = ko.computed({
+  self.selectedSearchResultObj = ko.computed({
     read: function() {
       return self.selectedResult();
     }
   });
+*/
 
  /*
-  self.airportData = ko.computed({
+  self.selectedSearchResultObj = ko.computed({
     read: function() {
-      if(typeof self.extenderSearchResults() !== 'undefined' 
-      && self.extenderSearchResults() !== null 
-      && self.extenderSearchResults().length > 0
-      && typeof self.extenderSearchResults()[0].geometry !== 'undefined') {
-        console.log('Airport.' + self.name + '.airportData: Found airport data! \'results\' copied below -----v');
-        console.log(self.extenderSearchResults()[0]);
-        return self.extenderSearchResults().geonames[0];
+      if(typeof self.bloodhoundSearchResultSet() !== 'undefined' 
+      && self.bloodhoundSearchResultSet() !== null 
+      && self.bloodhoundSearchResultSet().length > 0
+      && typeof self.bloodhoundSearchResultSet()[0].geometry !== 'undefined') {
+        console.log('Airport.' + self.name + '.selectedSearchResultObj: Found airport data! \'results\' copied below -----v');
+        console.log(self.bloodhoundSearchResultSet()[0]);
+        return self.bloodhoundSearchResultSet().geonames[0];
       } else {
-        console.log('Airport.' + self.name + '.airportData: No airport data found');
+        console.log('Airport.' + self.name + '.selectedSearchResultObj: No airport data found');
         return self.emptyData;
       }
     },
@@ -100,7 +99,7 @@ MapIt.Airport = function(map, options) {
  
   self.isAirportSelected = ko.computed({
     read: function() {
-      return !(typeof self.airportData() === 'undefined' || typeof self.airportData().geometry === 'undefined' || self.airportData().code === '');
+      return !(typeof self.selectedSearchResultObj() === 'undefined' || typeof self.selectedSearchResultObj().name === 'undefined' || self.selectedSearchResultObj().name === '');
     },
     owner: self,
     deferEvaluation: true
@@ -109,11 +108,11 @@ MapIt.Airport = function(map, options) {
   self.airportCoords = ko.computed({
     read: function() {
       console.log('Airport.' + self.name + '.airportCoords: Recomputing airportCoords for ' + self.name);
-      if(typeof self.selectedResult() === 'undefined' ||  typeof self.selectedResult().name === 'undefined' || self.selectedResult().name === '') {
+      if(typeof self.selectedSearchResultObj() === 'undefined' ||  typeof self.selectedSearchResultObj().name === 'undefined' || self.selectedSearchResultObj().name === '') {
         console.log('Airport.airportCoords: No airport supplied to airportCoords for ' + self.name + '!');
         return null;
       } else {
-        var _LatLng = new google.maps.LatLng(parseFloat(self.selectedResult().lat, 10), parseFloat(self.selectedResult().lng, 10));
+        var _LatLng = new google.maps.LatLng(parseFloat(self.selectedSearchResultObj().lat, 10), parseFloat(self.selectedSearchResultObj().lng, 10));
         console.log('Airport.' + self.name + '.airportCoords: New airportCoords for ' + self.name + ': (' + _LatLng.lat().toFixed(2) + ', ' + _LatLng.lng().toFixed(2) + ')');
         return _LatLng;
       }
@@ -123,13 +122,13 @@ MapIt.Airport = function(map, options) {
 
   self.airportMarker = ko.computed({
     read: function() {
-      console.log('Airport.' + self.name + '.airportMarker: Recomputing airportMarker for ' + self.name);
-      if(typeof self.selectedResult() === 'undefined' ||  typeof self.selectedResult().name === 'undefined' || self.selectedResult().name === '') {
-        console.log('Airport.airportMarker: No airport supplied to airportMarker for ' + self.name + '!');
+      console.log('Airport.' + self.name + '.airportMarker: Recomputing airport marker for ' + self.name);
+      if(typeof self.selectedSearchResultObj() === 'undefined' ||  typeof self.selectedSearchResultObj().name === 'undefined' || self.selectedSearchResultObj().name === '') {
+        console.log('Airport.' + self.name + '.airportMarker: Current search term is - ' + self.airportSearchTerm() + ', and has no results and no MapMarker');
         return null;
       } else {
         var _Marker = new google.maps.Marker({ position: self.airportCoords(), title: self.name});
-        console.log('Airport.' + self.name + '.airportMarker: New airport Marker for ' + self.name + ': ' + _Marker.getPosition() .lat().toFixed(2) + ', ' + _Marker.getPosition().lng().toFixed(2));
+        console.log('Airport.' + self.name + '.airportMarker: New airport marker for ' + self.name + ': ' + _Marker.getPosition() .lat().toFixed(2) + ', ' + _Marker.getPosition().lng().toFixed(2));
         return _Marker;
       }
     },
@@ -153,55 +152,82 @@ MapIt.Airport = function(map, options) {
     //self.selectedResult(datum);
     //typeAheadEl.typeahead('val', datum.name);
   }
-
+  /*
   function onSelected($e, s, datum) {
       //Fires when you select one of the options in the autocomplete either with the mouse or using the arrow keys and tab/enter
     console.log('SELECTED DATA - SELECTED RESULT SHOULD UPDATE AUTOMATICALLY');
     console.log(datum);
+    self.selectedResultObj(datum)
     //self.selectedResult(datum);
     //typeAheadEl.typeahead('val', datum.name);
-  }
+  }*/
+
+  self.airportSearchTerm.subscribe(function(newVal){
+    read: function(newVal) {
+
+    },
+    owner: self
+  });
+
+  // https://github.com/twitter/typeahead.js/issues/300
+  self.onSelectedAndAutocompleted = function(obj, datum, name) {
+    //Fires when you select one of the options in the autocomplete either with the mouse or using the arrow keys and tab/enter
+    console.log('Airport.' + self.name + '.onSelectedAndAutocompleted: SELECTED DATA W MOUSE OR TAB/ENTER- SELECTED RESULT SHOULD UPDATE AUTOMATICALLY --v');
+    console.log(datum);
+
+    self.selectedSearchResultObj(datum);  // Assign the selected result object that will be used for rendering when an option of the autocomplete is selected
+
+    //console.log(JSON.stringify(obj)); // object
+    // outputs, e.g., {"type":"typeahead:selected","timeStamp":1371822938628,"jQuery19105037956037711017":true,"isTrigger":true,"namespace":"","namespace_re":null,"target":{"jQuery19105037956037711017":46},"delegateTarget":{"jQuery19105037956037711017":46},"currentTarget":
+    console.log(JSON.stringify(datum)); // contains datum value, tokens and custom fields
+    // outputs, e.g., {"redirect_url":"http://localhost/test/topic/test_topic","image_url":"http://localhost/test/upload/images/t_FWnYhhqd.jpg","description":"A test description","value":"A test value","tokens":["A","test","value"]}
+    // in this case I created custom fields called 'redirect_url', 'image_url', 'description'   
+    console.log(JSON.stringify(name)); // contains dataset name
+    // outputs, e.g., "my_dataset"
+    console.log('Airport.' + self.name + '.onSelected: END OF onSELECTED EVENT HANDLER AND LOGGING');
+  };
 
   self.registerEnterKeyAutocomplete = function (typeAheadEl) {
     typeAheadEl.on('keydown', function(event) {
       // Define tab key
-      var e = jQuery.Event('keydown');
+      var e = $.Event('keydown');
       e.keyCode = e.which = 9; // 9 == tab
       
-      if (event.which === 13) {// if pressing enter
-        typeAheadEl.trigger(e); // trigger "tab" key - which works as "enter"
+      if (event.which === 13) {  // if user is pressing enter key
+        typeAheadEl.trigger(e); // trigger "tab" key - which works as "enter" for typeahead
       }
-
-      // Closes the typeahead when tab or enter selects an item
-      typeAheadEl.typeahead('close');
+      typeAheadEl.typeahead('close');  // Closes the typeahead when tab or enter selects an item
     });
   }
 
-  self.remoteFilter = function(airports) {
-    console.log('****************************EXECUTED AIRPORT SEARCH (' + self.name + ') ************************************');
-    
-    console.log('Bloodhound.remote.filter: Found some airports! ---v');
-    console.log(airports);
+  self.remoteFilter = function(bloodhoundSearchResultObj) {
+    console.log('*************************COMPLETED BLOODHOUND AIRPORT SEARCH EXECUTION (' + self.name + ') ****************************');
+    console.log('Airport.remoteFilter: (Bloodhound Callback) Found some airports! ---v');
+    console.log(bloodhoundSearchResultObj);
 
     // Map the properties of the returned geoplanet data to the viewmodel properties
-    var mappedOutputPreFiltering = $.map(airports.geonames, function (airport) {
-      var _IATACode = _.filter(airport.alternateNames, function(item) { return item.lang === 'iata'; });
+    var mappedOutputPreFiltering = $.map(bloodhoundSearchResultObj.geonames, function (airportSearchResultItem) {
+      var _IATACode = _.filter(airportSearchResultItem.alternateNames, function(alternateNamesItem) {
+        return alternateNamesItem.lang === 'iata';
+      });
+
+      //Attempt to match the name of one of the alternateNames in a geoData result item to the official airport code name (IATA)
       var _filteredIATACode = '';
       if(typeof _IATACode !== 'undefined' && _IATACode.length > 0) {
         _filteredIATACode = _IATACode[0].name;
       }
-          
+
       return {
-        value: airport.toponymName,
-        name: airport.toponymName,
-        lat: airport.lat,
-        lng: airport.lng,
-        city: airport.adminName1,
-        country: airport.countryName,
-        countryCode: airport.countryCode,
-        adminId1: airport.adminId1,
-        geoNameId: airport.geonameId,
-        timeZone: airport.timezone,
+        value: airportSearchResultItem.toponymName,
+        name: airportSearchResultItem.toponymName,
+        lat: airportSearchResultItem.lat,
+        lng: airportSearchResultItem.lng,
+        city: airportSearchResultItem.adminName1,
+        country: airportSearchResultItem.countryName,
+        countryCode: airportSearchResultItem.countryCode,
+        adminId1: airportSearchResultItem.adminId1,
+        geoNameId: airportSearchResultItem.geonameId,
+        timeZone: airportSearchResultItem.timezone,
         code: _filteredIATACode
       };
     });
@@ -213,16 +239,17 @@ MapIt.Airport = function(map, options) {
 
     // Update the stored data variables with retrieved values, or empty data if nothing was retrieved
     if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
-      console.log('Bloodhound.remote.filter: No airports found. Resetting data to emptyData');
-      self.extenderSearchResults(null);
+      // It gets here if you delete data but not the entire search box, but how do you make htis trigger the rendering event??
+      console.log('Airport.remoteFilter: (Bloodhound Callback) No airports found. Resetting data to emptyData');
+      self.bloodhoundSearchResultSet(null);
       //self.selectedResult(self.emptyData);
     } else {
-      console.log('Bloodhound.remote.filter: Airports found! Setting data to retrieved results');
-      self.extenderSearchResults(mappedOutput);
-      //self.selectedResult(self.extenderSearchResults()[0]);
+      console.log('Airport.remoteFilter: (Bloodhound Callback) Airports found! Setting data to retrieved results');
+      self.bloodhoundSearchResultSet(mappedOutput);
+      //self.selectedResult(self.bloodhoundSearchResultSet()[0]);
     }
 
-    console.log('Bloodhound.remote.filter: Mapped Output --v');
+    console.log('Airport.remoteFilter: (Bloodhound Callback) Mapped Output --v');
     console.log(mappedOutput);
     return mappedOutput;
   };

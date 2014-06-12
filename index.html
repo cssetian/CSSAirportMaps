@@ -68,57 +68,57 @@
         <tbody>
           <tr>
             <td>Airport Name:</td>
-            <!-- ko if: typeof departureAirport().airportData().name !== 'undefined' -->
-            <td><span data-bind="text: departureAirport().airportData().name"></span></td>
+            <!-- ko if: typeof departureAirport().selectedSearchResultObj().name !== 'undefined' -->
+            <td><span data-bind="text: departureAirport().selectedSearchResultObj().name"></span></td>
             <!-- /ko -->
 
-            <!-- ko if: typeof arrivalAirport().airportData().name !== 'undefined' -->
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().name" class="hidden-600"></span></td>
+            <!-- ko if: typeof arrivalAirport().selectedSearchResultObj().name !== 'undefined' -->
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().name" class="hidden-600"></span></td>
             <!-- /ko -->
           </tr><!--
           <tr>
             <td>Airport Code:</td>
-            <td><span data-bind="text: departureAirport().airportData().code"></span></td>
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().code" class="hidden-600"></span></td>
+            <td><span data-bind="text: departureAirport().selectedSearchResultObj().code"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().code" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>City:</td>
-            <td><span data-bind="text: departureAirport().airportData().city"></span></td>
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().city" class="hidden-600"></span></td>
+            <td><span data-bind="text: departureAirport().selectedSearchResultObj().city"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().city" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>State:</td>
-            <td><span data-bind="text: departureAirport().airportData().state"></span></td>
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().state" class="hidden-600"></span></td>
+            <td><span data-bind="text: departureAirport().selectedSearchResultObj().state"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().state" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>Country:</td>
-            <td><span data-bind="text: departureAirport().airportData().country"></span></td>
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().airportData().country" class="hidden-600"></span></td>
+            <td><span data-bind="text: departureAirport().selectedSearchResultObj().country"></span></td>
+            <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().country" class="hidden-600"></span></td>
           </tr>-->
           <tr>
             <td>Latitude:</td>
             <td>
-              <!-- ko if: typeof departureAirport().airportData().lat !== 'undefined' -->
-                <span data-bind="text: departureAirport().airportData().lat"></span>
+              <!-- ko if: typeof departureAirport().selectedSearchResultObj().lat !== 'undefined' -->
+                <span data-bind="text: departureAirport().selectedSearchResultObj().lat"></span>
               <!-- /ko -->
             </td>
             <td class="hidden-700">
-              <!-- ko if: typeof arrivalAirport().airportData().lat !== 'undefined' -->
-                <span data-bind="text: arrivalAirport().airportData().lat" class="hidden-600"></span>
+              <!-- ko if: typeof arrivalAirport().selectedSearchResultObj().lat !== 'undefined' -->
+                <span data-bind="text: arrivalAirport().selectedSearchResultObj().lat" class="hidden-600"></span>
               <!-- /ko -->
             </td>
           </tr>
           <tr>
             <td>Longitude:</td>
             <td>
-              <!-- ko if: typeof departureAirport().airportData().lng !== 'undefined' -->
-                <span data-bind="text: departureAirport().airportData().lng"></span>
+              <!-- ko if: typeof departureAirport().selectedSearchResultObj().lng !== 'undefined' -->
+                <span data-bind="text: departureAirport().selectedSearchResultObj().lng"></span>
               <!-- /ko -->
             </td>
             <td class="hidden-700">
-              <!-- ko if: typeof arrivalAirport().airportData().lng !== 'undefined' -->
-                <span data-bind="text: arrivalAirport().airportData().lng"></span>
+              <!-- ko if: typeof arrivalAirport().selectedSearchResultObj().lng !== 'undefined' -->
+                <span data-bind="text: arrivalAirport().selectedSearchResultObj().lng"></span>
               <!-- /ko -->
             </td>
           </tr>
@@ -135,37 +135,37 @@
         <tbody>
           <tr>
             <td>Airport Name:</td>
-            <td><span data-bind="text: arrivalAirport().airportData().name"></span></td>
+            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj().name"></span></td>
           </tr><!--
           <tr>
             <td>Airport Code:</td>
-            <td><span data-bind="text: arrivalAirport().airportData().code"></span></td>
+            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj().code"></span></td>
           </tr>
           <tr>
             <td>City:</td>
-            <td><span data-bind="text: arrivalAirport().airportData().city"></span></td>
+            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj().city"></span></td>
           </tr>
           <tr>
             <td>State:</td>
-            <td><span data-bind="text: arrivalAirport().airportData().state"></span></td>
+            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj().state"></span></td>
           </tr>
           <tr>
             <td>Country:</td>
-            <td><span data-bind="text: arrivalAirport().airportData().country"></span></td>
+            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj().country"></span></td>
           </tr>-->
           <tr>
             <td>Latitude:</td>
             <td>
-              <!-- ko if: typeof arrivalAirport().airportData().lat !== undefined -->
-                <span data-bind="text: arrivalAirport().airportData().lat"></span>
+              <!-- ko if: typeof arrivalAirport().selectedSearchResultObj().lat !== undefined -->
+                <span data-bind="text: arrivalAirport().selectedSearchResultObj().lat"></span>
               <!-- /ko -->
             </td>
           </tr>
           <tr>
             <td>Longitude:</td>
             <td>
-              <!-- ko if: typeof arrivalAirport().airportData().lat !== undefined -->
-                <span data-bind="text: arrivalAirport().airportData().lng"></span>
+              <!-- ko if: typeof arrivalAirport().selectedSearchResultObj().lat !== undefined -->
+                <span data-bind="text: arrivalAirport().selectedSearchResultObj().lng"></span>
               <!-- /ko -->
             </td>
           </tr>
@@ -182,7 +182,7 @@
         <tr>
           <td>Kilometers:</td>
           <td>
-            <!-- ko if: typeof departureAirport().airportData().name !== undefined && arrivalAirport().airportData().name !== undefined-->
+            <!-- ko if: typeof departureAirport().selectedSearchResultObj().name !== undefined && arrivalAirport().selectedSearchResultObj().name !== undefined-->
             <span data-bind="text: distBtwnAirports('Km')"></span>
             <!-- /ko -->
           </td>
@@ -190,7 +190,7 @@
         <tr>
           <td>Miles:</td>
           <td>
-            <!-- ko if: typeof departureAirport().airportData().name !== undefined && arrivalAirport().airportData().name !== undefined -->
+            <!-- ko if: typeof departureAirport().selectedSearchResultObj().name !== undefined && arrivalAirport().selectedSearchResultObj().name !== undefined -->
             <div data-bind="text: distBtwnAirports('M')"></div>
             <!-- /ko -->
           </td>
@@ -198,7 +198,7 @@
         <tr>
           <td>Nautical Miles:</td>
           <td>
-            <!-- ko if: typeof departureAirport().airportData().name !== undefined && arrivalAirport().airportData().name !== undefined -->
+            <!-- ko if: typeof departureAirport().selectedSearchResultObj().name !== undefined && arrivalAirport().selectedSearchResultObj().name !== undefined -->
             <div data-bind="text: distBtwnAirports('NM')"></div>
             <!-- /ko -->
           </td>
