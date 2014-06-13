@@ -2,21 +2,6 @@
 MapIt.ViewModel = function(options) {
   var self = this;
 
-  self.dummyAirportSearches =  ko.observableArray([
-        'Angular',
-        'Canjs',
-        'Batman',
-        'Meteor',
-        'Ember',
-        'Backbone',
-        'Knockout',
-        'Knockback',
-        'Spine',
-        'Sammy',
-        'YUI',
-        'Closure',
-        'jQuery']);
-
   self.map = ko.observable(new google.maps.Map(document.getElementById('map-canvas'), {}));
   self.bounds = ko.observable(new google.maps.LatLngBounds(null));
   self.airportList = ko.observableArray([]);
@@ -187,6 +172,7 @@ MapIt.ViewModel = function(options) {
     self.renderMapMarkers(self.arrivalAirport().selectedSearchResultObj());
   });
 
+/* this is now covered in the airport
   // Necessary right now to bind erasing events to the rendering function
   self.departureAirport().airportSearchTerm.subscribe(function(newVal){
     console.log('ViewModel.departure.airportSearchTerm.subscribe: new Search Term: (' + newVal + ')');
@@ -196,16 +182,7 @@ MapIt.ViewModel = function(options) {
       self.renderMapMarkers(self.departureAirport().emptyData);
     }
   });
-
-  self.arrivalAirport().airportSearchTerm.subscribe(function(newVal){
-    console.log('ViewModel.arrival.airportSearchTerm.subscribe: new Search Term: (' + newVal + ')');
-    if(typeof newVal === 'undefined' || newVal === null || newVal === '') {
-      console.log('ViewModel.arrival.airportSearchTerm.subscribe: Search Term deleted! Re-rendering map');
-      self.arrivalAirport().bloodhoundSearchResultSet(null);
-      self.renderMapMarkers(self.arrivalAirport().emptyData);
-    }
-  });
-
+*/
 
   // Define the typeahead options for both departure and arrival airports
   console.log('ViewModel: Defining typeahead options');
@@ -232,7 +209,7 @@ MapIt.ViewModel = function(options) {
         '<span class=\'typeahead-airport-name\'>{{name}} - ({{code}})</span>',
         '</div>',
         '<div>',
-        '<span class=\'typeahead-airport-state\'>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
+        '<span class=\'typeahead-airport-country\'>{{country}}</span>',
         '</div>'
       ].join('\n')),
       header: '<h3>Select An Airport</h3>'

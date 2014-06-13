@@ -2,7 +2,21 @@ MapIt.Airport = function(map, options) {
   console.log('MapIt.Airport: Initializing Airport ViewModel for ' + options.name);
   var self = this;
   var service;
+  //_viewModel = viewModel;
   // This is JSON so the quotes should stay as double quotes
+  /*var emptyJSON3 = {
+    'value': '',
+    'name': '',
+    'lat': '',
+    'lng': '',
+    'city': '',
+    'country': '',
+    'countryCode': '',
+    'adminId1': '',
+    'geoNameId': '',
+    'timeZone': '',
+    'code': ''
+  };*/
   var emptyJSON = {
     value: '',
     name: '',
@@ -16,8 +30,24 @@ MapIt.Airport = function(map, options) {
     timeZone: '',
     code: ''
   };
+  // This is JSON so the quotes should stay as double quotes
+ /*
+  var emptyJSON2 = {
+    "value": "",
+    "name": "",
+    "lat": "",
+    "lng": "",
+    "city": "",
+    "country": "",
+    "countryCode": "",
+    "adminId1": "",
+    "geoNameId": "",
+    "timeZone": "",
+    "code": ""
+  };
+*/
 
-  self.emptyData = JSON.parse(emptyJSON);
+  self.emptyData = emptyJSON;//JSON.parse(emptyJSON);
   self.name = options.name;
 
   self.airportSearchTerm = ko.observable();
@@ -162,17 +192,31 @@ MapIt.Airport = function(map, options) {
     //typeAheadEl.typeahead('val', datum.name);
   }*/
 
+
+  // Subscribe to the input airport search term so you can turn off all the visual data stuff and render in between selecting airprots
+  self.airportSearchTerm.subscribe(function(newVal) {
+    console.log('ViewModel.<' + self.name + '>.airportSearchTerm.subscribe: new Search Term: (' + newVal + ')');
+
+    if(typeof newVal === 'undefined' || newVal === null || newVal === '') {
+      console.log('ViewModel.<' + self.name + '>.airportSearchTerm.subscribe: Search Term deleted! Re-rendering map');
+
+      self.bloodhoundSearchResultSet(null);
+    }
+  });
+
+/*
   self.airportSearchTerm.subscribe(function(newVal){
     read: function(newVal) {
 
     },
     owner: self
   });
+*/
 
   // https://github.com/twitter/typeahead.js/issues/300
   self.onSelectedAndAutocompleted = function(obj, datum, name) {
     //Fires when you select one of the options in the autocomplete either with the mouse or using the arrow keys and tab/enter
-    console.log('Airport.' + self.name + '.onSelectedAndAutocompleted: SELECTED DATA W MOUSE OR TAB/ENTER- SELECTED RESULT SHOULD UPDATE AUTOMATICALLY --v');
+    console.log('Airport.<' + self.name + '>.onSelectedAndAutocompleted: SELECTED DATA W MOUSE OR TAB/ENTER- SELECTED RESULT SHOULD UPDATE AUTOMATICALLY --v');
     console.log(datum);
 
     self.selectedSearchResultObj(datum);  // Assign the selected result object that will be used for rendering when an option of the autocomplete is selected
@@ -184,7 +228,7 @@ MapIt.Airport = function(map, options) {
     // in this case I created custom fields called 'redirect_url', 'image_url', 'description'   
     console.log(JSON.stringify(name)); // contains dataset name
     // outputs, e.g., "my_dataset"
-    console.log('Airport.' + self.name + '.onSelected: END OF onSELECTED EVENT HANDLER AND LOGGING');
+    console.log('Airport.<' + self.name + '>.onSelected: END OF onSELECTED EVENT HANDLER AND LOGGING');
   };
 
   self.registerEnterKeyAutocomplete = function (typeAheadEl) {
@@ -240,22 +284,22 @@ MapIt.Airport = function(map, options) {
     // Update the stored data variables with retrieved values, or empty data if nothing was retrieved
     if(typeof mappedOutput === 'undefined' || mappedOutput === null || mappedOutput.length < 1) {
       // It gets here if you delete data but not the entire search box, but how do you make htis trigger the rendering event??
-      console.log('Airport.remoteFilter: (Bloodhound Callback) No airports found. Resetting data to emptyData');
+      console.log('Airport.<' + self.name + '>.remoteFilter: (Bloodhound Callback) No airports found. Resetting data to emptyData');
       self.bloodhoundSearchResultSet(null);
       //self.selectedResult(self.emptyData);
     } else {
-      console.log('Airport.remoteFilter: (Bloodhound Callback) Airports found! Setting data to retrieved results');
+      console.log('Airport.<' + self.name + '>.remoteFilter: (Bloodhound Callback) Airports found! Setting data to retrieved results');
       self.bloodhoundSearchResultSet(mappedOutput);
       //self.selectedResult(self.bloodhoundSearchResultSet()[0]);
     }
 
-    console.log('Airport.remoteFilter: (Bloodhound Callback) Mapped Output --v');
+    console.log('Airport.<' + self.name + '>.remoteFilter: (Bloodhound Callback) Mapped Output --v');
     console.log(mappedOutput);
     return mappedOutput;
   };
 
   // Define the options for bloodhound and typeahead inputs
-  console.log('ViewModel: Defining bloodhound initialization options');
+  console.log('Airport.<' + self.name + '>.body: Defining bloodhound initialization options');
   var bloodhoundOptions = {
     datumTokenizer: function (d) {
       return Bloodhound.tokenizers.whitespace(d.name);
@@ -272,7 +316,7 @@ MapIt.Airport = function(map, options) {
   };
 
   // Initialize the Bloodhound search engine
-  console.log('ViewModel: Initializing Bloodhound engine');
+  console.log('Airport.<' + self.name + '>.body: Initializing Bloodhound engine');
   self.searchEngine = new Bloodhound(bloodhoundOptions);
   var searchPromise = self.searchEngine.initialize();
   searchPromise.done(function() { console.log('success!'); })
