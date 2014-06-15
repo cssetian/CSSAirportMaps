@@ -80,6 +80,7 @@ MapIt.ViewModel = function(options) {
         }
 
         if(self.airportCollection().length === 0) {
+          self.initialAirport().airportMarker().setMap(self.map());
           self.addAirport(self.initialAirport());
           self.positionAndZoomToAirport(self.initialAirport());
         }
@@ -101,6 +102,7 @@ MapIt.ViewModel = function(options) {
       }
 
       if(self.airportCollection().length === 0) {
+        self.initialAirport().airportMarker().setMap(self.map());
         self.addAirport(self.initialAirport());
         self.positionAndZoomToAirport(self.initialAirport());
       }
