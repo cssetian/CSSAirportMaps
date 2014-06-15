@@ -24,15 +24,21 @@
           <tr>
             <th class="input-label first-input-column">Departure Airport:</th>
             <td><!-- value: departureAirport().airportSearchTerm,-->
+              <!--event: { 
+                                      focus: function() {departureSearchActive(true);},
+                                      blur: function() {departureSearchActive(false);}
+                                    }-->
               <div id="departure-airport-selector-container">
                 <input  id="departure-airport-selector"
                         class="typeahead second-input-column required"
+                        name="departureAirports"
                         type="text"
                         autocomplete="off"
                         placeholder="Type to search for a departure airport..."
-                        data-bind=" value: departureAirport().airportSearchTerm
-                                    valueUpdate: 'input' "/>
-                <input type="hidden" name="departureAirportId" id="departureAirportId" value="" />
+                        data-bind=" typeahead: departureSearchOptions,
+                                    value: departureSearchInput,
+                                    airportId: 1,
+                                    valueUpdate: ['input'] "/>
               </div>
             </td>  <!-- data-list input to go with local json or pidgits data -->
           </tr>
@@ -45,9 +51,10 @@
                         autocomplete="off"
                         type="text" 
                         placeholder="Type to search for an arrival airport..." 
-                        data-bind=" value: arrivalAirport().airportSearchTerm
-                                    valueUpdate: 'input'" />
-                <input type="hidden" name="arrivalAirportId" id="arrivalAirportId" value="" />
+                        data-bind=" typeahead: arrivalSearchOptions,
+                                    value: arrivalSearchInput,
+                                    airportId: 2,
+                                    valueUpdate: ['input']" />
               </div>
             </td> <!-- data-list input to go with local json or pidgits data -->
           </tr>
@@ -68,57 +75,61 @@
         <tbody>
           <tr>
             <td>Airport Name:</td>
-            <!-- ko if: typeof departureAirport().selectedSearchResultObj().name !== 'undefined' -->
-            <td><span data-bind="text: departureAirport().selectedSearchResultObj().name"></span></td>
-            <!-- /ko -->
-
-            <!-- ko if: typeof arrivalAirport().selectedSearchResultObj().name !== 'undefined' -->
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().name" class="hidden-600"></span></td>
-            <!-- /ko -->
-          </tr><!--
+            <td>
+              <!-- ko if: isDepartureSelected -->
+                <span data-bind="text: getAirportById(1).airportData().name"></span>
+              <!-- /ko -->
+            </td>
+            <td class="hidden-700">
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().name" class="hidden-600"></span>
+              <!-- /ko -->
+            </td>
+          </tr>
+          <!--
           <tr>
             <td>Airport Code:</td>
-            <td><span data-bind="text: departureAirport().selectedSearchResultObj().code"></span></td>
+            <td><span data-bind="text: departureAirport().selectedSearchResultObj()"></span></td>
             <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().code" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>City:</td>
-            <td><span data-bind="text: departureAirport().selectedSearchResultObj().city"></span></td>
+            <td><span data-bind="text: departureAirport().selectedSearchResultObj()"></span></td>
             <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().city" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>State:</td>
-            <td><span data-bind="text: departureAirport().selectedSearchResultObj().state"></span></td>
+            <td><span data-bind="text: departureAirport().selectedSearchResultObj()"></span></td>
             <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().state" class="hidden-600"></span></td>
           </tr>
           <tr>
             <td>Country:</td>
-            <td><span data-bind="text: departureAirport().selectedSearchResultObj().country"></span></td>
+            <td><span data-bind="text: departureAirport().selectedSearchResultObj()"></span></td>
             <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().country" class="hidden-600"></span></td>
           </tr>-->
           <tr>
             <td>Latitude:</td>
             <td>
-              <!-- ko if: typeof departureAirport().selectedSearchResultObj().lat !== 'undefined' -->
-                <span data-bind="text: departureAirport().selectedSearchResultObj().lat"></span>
+              <!-- ko if: isDepartureSelected -->
+                <span data-bind="text: getAirportById(1).airportData().lat"></span>
               <!-- /ko -->
             </td>
             <td class="hidden-700">
-              <!-- ko if: typeof arrivalAirport().selectedSearchResultObj().lat !== 'undefined' -->
-                <span data-bind="text: arrivalAirport().selectedSearchResultObj().lat" class="hidden-600"></span>
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().lat" class="hidden-600"></span>
               <!-- /ko -->
             </td>
           </tr>
           <tr>
             <td>Longitude:</td>
             <td>
-              <!-- ko if: typeof departureAirport().selectedSearchResultObj().lng !== 'undefined' -->
-                <span data-bind="text: departureAirport().selectedSearchResultObj().lng"></span>
+              <!-- ko if: isDepartureSelected -->
+                <span data-bind="text: getAirportById(1).airportData().lng"></span>
               <!-- /ko -->
             </td>
             <td class="hidden-700">
-              <!-- ko if: typeof arrivalAirport().selectedSearchResultObj().lng !== 'undefined' -->
-                <span data-bind="text: arrivalAirport().selectedSearchResultObj().lng"></span>
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().lng"></span>
               <!-- /ko -->
             </td>
           </tr>
@@ -135,37 +146,41 @@
         <tbody>
           <tr>
             <td>Airport Name:</td>
-            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj().name"></span></td>
+            <td>
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().name"></span>
+              <!-- /ko -->
+            </td>
           </tr><!--
           <tr>
             <td>Airport Code:</td>
-            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj().code"></span></td>
+            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj()"></span></td>
           </tr>
           <tr>
             <td>City:</td>
-            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj().city"></span></td>
+            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj()"></span></td>
           </tr>
           <tr>
             <td>State:</td>
-            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj().state"></span></td>
+            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj()"></span></td>
           </tr>
           <tr>
             <td>Country:</td>
-            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj().country"></span></td>
+            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj()"></span></td>
           </tr>-->
           <tr>
             <td>Latitude:</td>
             <td>
-              <!-- ko if: typeof arrivalAirport().selectedSearchResultObj().lat !== undefined -->
-                <span data-bind="text: arrivalAirport().selectedSearchResultObj().lat"></span>
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().lat"></span>
               <!-- /ko -->
             </td>
           </tr>
           <tr>
             <td>Longitude:</td>
             <td>
-              <!-- ko if: typeof arrivalAirport().selectedSearchResultObj().lat !== undefined -->
-                <span data-bind="text: arrivalAirport().selectedSearchResultObj().lng"></span>
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().lng"></span>
               <!-- /ko -->
             </td>
           </tr>
@@ -182,7 +197,7 @@
         <tr>
           <td>Kilometers:</td>
           <td>
-            <!-- ko if: typeof departureAirport().selectedSearchResultObj().name !== undefined && arrivalAirport().selectedSearchResultObj().name !== undefined-->
+            <!-- ko if: isDepartureSelected && isArrivalSelected -->
             <span data-bind="text: distBtwnAirports('Km')"></span>
             <!-- /ko -->
           </td>
@@ -190,7 +205,7 @@
         <tr>
           <td>Miles:</td>
           <td>
-            <!-- ko if: typeof departureAirport().selectedSearchResultObj().name !== undefined && arrivalAirport().selectedSearchResultObj().name !== undefined -->
+            <!-- ko if: isDepartureSelected && isArrivalSelected -->
             <div data-bind="text: distBtwnAirports('M')"></div>
             <!-- /ko -->
           </td>
@@ -198,7 +213,7 @@
         <tr>
           <td>Nautical Miles:</td>
           <td>
-            <!-- ko if: typeof departureAirport().selectedSearchResultObj().name !== undefined && arrivalAirport().selectedSearchResultObj().name !== undefined -->
+            <!-- ko if:  isDepartureSelected && isArrivalSelected -->
             <div data-bind="text: distBtwnAirports('NM')"></div>
             <!-- /ko -->
           </td>
@@ -212,6 +227,10 @@
 
   </div>
 
+  <div class="span4">
+      <small>Errors</small>
+      <pre id="printError" style="background:pink;" title="errors"></pre>
+  </div>
 </body>
 <footer class="footer">
 <div>Authored By: Chris Setian</div>
@@ -233,19 +252,21 @@
   <script type="text/javascript" src="scripts/lib/underscore-1.6.0.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout-3.1.0.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout.mapping-latest.debug.js"></script>
-  <script type="text/javascript" src="scripts/ko.bindings.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout-bootstrap.min.js"></script>
   <script type="text/javascript" src="scripts/lib/bootstrap.js"></script>
   <script type="text/javascript" src="scripts/lib/typeahead.bundle.js"></script>
-  <script type="text/javascript" src="scripts/lib/knockout.bindings.typeahead.js"></script>
+  <!--<script type="text/javascript" src="scripts/lib/knockout.bindings.typeahead.js"></script>-->
   <script type="text/javascript" src="scripts/lib/handlebars-v1.3.0.js"></script>
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
+  <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markermanager/src/markermanager.js"></script>
   <script type="text/javascript" src="scripts/lib/latlong.js"></script>
   <script type="text/javascript" src="scripts/MapIt_App.js"></script>
   <script type="text/javascript" src="content/airports.js"></script>
+  <script type="text/javascript" src="scripts/SearchEngine.js"></script>
   <script type="text/javascript" src="scripts/ViewModel.js"></script>
   <script type="text/javascript" src="scripts/Airport.js"></script>
   <script type="text/javascript" src="content/dummy-google-places.json"></script>
+  <script type="text/javascript" src="scripts/ko.bindings.js"></script>
 </div>
 
 <script type="text/javascript">

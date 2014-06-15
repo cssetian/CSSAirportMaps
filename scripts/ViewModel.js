@@ -1,28 +1,134 @@
 
 MapIt.ViewModel = function(options) {
   var self = this;
+  self.initialAirport = ko.observable();
+
+  self.initialize = function() {
+    self.departureSearchOptions = {
+      source: self.departureSearchEngine().search.ttAdapter(),
+      name: 'departureAirports',
+      templates: {
+          empty: [
+            '<div class="empty-message">',
+            'unable to find any Airports that match the search term',
+            '</div>'
+          ].join('\n'),
+          suggestion: Handlebars.compile([
+            '<div>',
+            '<span class=\'typeahead-airport-name\'>{{name}} - ({{code}})</span>',
+            '</div>',
+            '<div>',
+            '<span class=\'typeahead-airport-state\'>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
+            '</div>'
+          ].join('\n')),
+          header: '<h3>Select An Airport</h3>'
+      },
+      onOpened: self.onOpened,
+      onSelected: self.onSelected,
+      onAutoCompleted: self.onAutoCompleted,
+      searchInputVal: self.departureSearchInput
+    };
+    self.arrivalSearchOptions = {
+      source: self.arrivalSearchEngine().search.ttAdapter(),
+      name: 'arrivalAirports',
+      templates: {
+          empty: [
+            '<div class="empty-message">',
+            'unable to find any Airports that match the search term',
+            '</div>'
+          ].join('\n'),
+          suggestion: Handlebars.compile([
+            '<div>',
+            '<span class=\'typeahead-airport-name\'>{{name}} - ({{code}})</span>',
+            '</div>',
+            '<div>',
+            '<span class=\'typeahead-airport-state\'>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
+            '</div>'
+          ].join('\n')),
+          header: '<h3>Select An Airport</h3>'
+      },
+      onOpened: self.onOpened,
+      onSelected: self.onSelected,
+      onAutoCompleted: self.onAutoCompleted,
+      searchInputVal: self.arrivalSearchInput
+    };
+
+  };
 
   self.map = ko.observable(new google.maps.Map(document.getElementById('map-canvas'), {}));
+  //var mgrOptions = { borderPadding: 50, maxZoom: 15, trackMarkers: true };
+  //self.markerManager = ko.observable(new MarkerManager(self.map(), mgrOptions));
+  self.airportCollection = ko.observableArray([]);
   self.bounds = ko.observable(new google.maps.LatLngBounds(null));
-  self.airportList = ko.observableArray([]);
-  self.initialCoords = ko.observable();
-  self.initialMarker = ko.computed({
-    read: function () {
-      console.log('initialCoords.initialMarker: Recomputing airportMarker for initialCoords');
-      if(typeof self.initialCoords() === 'undefined' || self.initialCoords() === null || self.initialCoords() === '') {
-        console.log('No initialCoords provided');
-        return null;
-      } else {
-        var _Marker = new google.maps.Marker({ position: self.initialCoords(), title: 'Let\'s plot some maps!'});
-        console.log('initialCoords.initialMarker: New Marker for initialCoords: ' + _Marker.getPosition().lat().toFixed(2) + ', ' + _Marker.getPosition().lng().toFixed(2));
-        return _Marker;
-      }
-    },
-    owner: self,
-    deferEvaluation: true
-  });
   self.flightPath = ko.observable(new google.maps.Polyline());
-  self.clientSearchResults = ko.mapping.fromJS([]);
+
+  self.departureSearchInput = ko.observable('');
+  self.arrivalSearchInput = ko.observable('');
+  self.departureSearchActive = ko.observable(false);
+  self.arrivalSearchActive = ko.observable(false);
+
+  self.departureSearchActive.subscribe(function(newVal) {
+    console.log('ViewModel.departureSearchActive: ' + newVal);
+    if(newVal === true) {
+      if(self.getAirportById(1) !== undefined) {
+        self.isDepartureSelected(false);
+        self.removeAirportById(1);
+
+        if(self.getAirportById(2) !== undefined) {
+          self.removeFlightPathFromMap();
+          self.positionAndZoomToAirport(self.getAirportById(2));
+        }
+
+        if(self.airportCollection().length === 0) {
+          self.addAirport(self.initialAirport());
+          self.positionAndZoomToAirport(self.initialAirport());
+        }
+      }
+    }
+
+  });
+  self.arrivalSearchActive.subscribe(function(newVal) {
+    console.log('ViewModel.arrivalSearchActive: ' + newVal);
+    if(newVal === true) {
+      if(self.getAirportById(2) !== undefined) {
+        self.isArrivalSelected(false);
+        self.removeAirportById(2);
+
+        if(self.getAirportById(1) !== undefined) {
+          self.removeFlightPathFromMap();
+          self.positionAndZoomToAirport(self.getAirportById(1));
+        }
+      }
+
+      if(self.airportCollection().length === 0) {
+        self.addAirport(self.initialAirport());
+        self.positionAndZoomToAirport(self.initialAirport());
+      }
+    }
+  });
+
+  self.isDepartureSelected = ko.observable(false);
+  self.isArrivalSelected = ko.observable(false);
+
+  self.departureSearchInput.subscribe(function(newDepartureSearchInput) {
+    console.log('ViewModel.departureSearchInput.subscribe: I am subscribed to departureSearchInput right now.');
+    console.log('ViewModel.departureSearchInput.subscribe: The new value of departureSearchInput is: <' + newDepartureSearchInput + '>');
+    //self.airportCollection.remove(function(airport) { return airport.id === 1; }); // Removes item from collection of airports -- data
+    self.departureSearchActive(true);
+    self.isDepartureSelected(false);
+  });
+
+
+  self.arrivalSearchInput.subscribe(function(newArrivalSearchInput) {
+    console.log('ViewModel.departureSearchInput.subscribe: I am subscribed to departureSearchInput right now.');
+    console.log('ViewModel.departureSearchInput.subscribe: The new value of departureSearchInput is: <' + newArrivalSearchInput + '>');
+    //self.airportCollection.remove(function(airport) { return airport.id === 2; }); // Removes item from collection of airports -- data
+    self.arrivalSearchActive(true);
+    self.isArrivalSelected(false);
+  });
+
+  self.departureSearchEngine = ko.observable(new MapIt.SearchEngine());
+  self.arrivalSearchEngine = ko.observable(new MapIt.SearchEngine());
 
   // BUILDS THE SEARCHABLE WORDS AND TOKENS FOR BLOODHOUND TO USE
   self.SearchText = ko.computed({
@@ -38,163 +144,116 @@ MapIt.ViewModel = function(options) {
     owner: self,
     deferEvaluation: true
   });
-  // Initialize an array of map markers to keep track of all 3 markers on the map.
-  // Google Maps API does not automatically keep track of and clean up markers on a map.
-  // That must be done manually by either updating existing markers' positions or remove/readding them.
-  self.mapMarkers = ko.observable([
-    {id: 0, marker: new google.maps.Marker({map: self.map()})},
-    {id: 1, marker: new google.maps.Marker({map: self.map()})},
-    {id: 2, marker: new google.maps.Marker({map: self.map()})}
-  ]);
 
-  console.log('ViewModel: Defining marker rendering helper and main functions');
-  self.displaySingleMarkerOnMap = function(newMarker, idx) {
-    console.log('ViewModel.displaySingleMarkerOnMap: Displaying single marker!');
-    self.flightPath().setMap(null);
+  /************ MAP RENDERING FUNCTIONS *************/
 
-    var i;
-    for(i = 0; i < self.mapMarkers().length; i++) {
-      if(i === idx && newMarker !== null) {
-        console.log('ViewModel.displaySingleMarkerOnMap: Displaying marker #' + i);
-        self.mapMarkers()[i].marker.setPosition(newMarker.position);
-        self.mapMarkers()[i].marker.setMap(self.map());
-      } else {
-        self.mapMarkers()[i].marker.setMap(null);
-      }
-    }
-      console.log('ViewModel.displaySingleMarkerOnMap: Centering on coordinate at ' + self.mapMarkers()[idx].marker.position);
-      self.map().setZoom(10);
-      self.map().setCenter(self.mapMarkers()[idx].marker.position);
+  self.addAirport = function(newAirport) {
+    console.log('ViewModel.addAirportToMap: Adding airport to the airprotCollection with an id of ' + newAirport.id + '! Copying airport below --v');
+    console.log(newAirport);
+    self.airportCollection.push(newAirport);
+    console.log('ViewModel.addAirportToMap: Added airport to collection with id of <' + newAirport.id + '>! New collection size: <' + self.airportCollection().length + '>');
+    
+    // If the marker is a proeprty of the airport and is always set to the map on creation, it might just work since it creates / destroys items from the array
+    //self.airportCollection()[newAirport.id].marker.setPosition(airportModel.position);
+    //self.airportCollection()[newAirport.id].marker.setMap(self.map());
   };
 
-  self.displayTwoAirportsAndRouteOnMap = function(newMarker1, newMarker2, idx1, idx2) {
-    console.log('ViewModel.displayTwoAirportsAndRouteOnMap: Two airports are selected! Add flight path to map!');
-    self.flightPath().setMap(null);
+  self.removeAirport = function(airportModelToRemove) {
+    self.airportCollection.remove(airportModelToRemove);
+  };
+  self.removeAirportById = function(idToRemove) {
+    console.log('ViewModel.removeAirportById: Removing airport from collection with id of <' + idToRemove + '>. Current collection size: <' + self.airportCollection().length + '>');
 
-    var i;
-    for(i = 0; i < self.mapMarkers().length; i++) {
-      if(i === idx1 && newMarker1 !== null) {
-        self.mapMarkers()[i].marker.setPosition(newMarker1.position);
-        self.mapMarkers()[i].marker.setMap(self.map());
-      } else if(i === idx2 && newMarker2 !== null) {
-        self.mapMarkers()[i].marker.setPosition(newMarker2.position);
-        self.mapMarkers()[i].marker.setMap(self.map());
-      } else {
-        self.mapMarkers()[i].marker.setMap(null);
-      }
+    var airportToRemove;
+    var airportToRemoveArray = _.filter(self.airportCollection(), function(airport) {
+      return airport.id === idToRemove;
+    });
+
+    if(typeof airportToRemoveArray !== 'undefined' && airportToRemoveArray !== null && airportToRemoveArray.length > 0) {
+      airportToRemove = airportToRemoveArray[0];
+      console.log(airportToRemove);
+      airportToRemove.airportMarker().setMap(null);
+      self.airportCollection.remove(airportToRemove);
+      console.log('ViewModel.removeAirportById: Airport <' + idToRemove + '> removed! Size of airportCollection is now <' + self.airportCollection().length + '>. Removed airport copied below --v');
+    } else {
+      console.log('ViewModel.removeAirportById: No airport was found to remove with id of <' + idToRemove + '>, copying data below that remove was attempted on --v');
+
     }
-  
+    return airportToRemove;
+  };
+
+  self.getAirportById = function(idToRetrieve) {
+    console.log('ViewModel.getAirportById: Retrieving airport with id: <' + idToRetrieve + '>');
+
+    var airportToReturn;
+    var airportToReturnArray = _.filter(self.airportCollection(), function(airport) {
+      return airport.id === idToRetrieve;
+    });
+
+    if(typeof airportToReturnArray !== 'undefined' && airportToReturnArray !== null && airportToReturnArray.length > 0) {
+      airportToReturn = airportToReturnArray[0];
+      //console.log('ViewModel.getAirportById: Airport <' + idToRetrieve + '> retrieved! Added airport is copied below --v');
+      //console.log(airportToReturn);
+    } else {
+      console.log('ViewModel.getAirportById: No airport was found with an id of <' + idToRetrieve + '>');
+    }
+    return airportToReturn;
+  };
+
+  self.removeMarkerFromMap = function(airportModel) {
+    console.log('ViewModel.removeMarkerFromMap: Removing airport the map!');
+    self.airportCollection()[airportModel.id].marker.setMap(null);
+  };
+
+  self.fitBounds = function() {
+    self.bounds(new google.maps.LatLngBounds(null));
+    ko.utils.arrayForEach(self.airportCollection(), function(airport) {
+      self.bounds().extend(airport.airportMarker().position);
+    });
+  };
+
+  self.panAndZoomToBounds = function() {
+    self.map().fitBounds(self.bounds());
+    self.map().panToBounds(self.bounds());
+  };
+
+  self.positionAndZoomToAirport = function(airport) {
+    console.log('ViewModel.positionAndZoomToAirport: Moving map to the coordinates: <' + airport.airportMarker().position + '>');
+    self.map().setZoom(10);
+    self.map().setCenter(airport.airportMarker().position);
+  };
+  self.positionAndZoomToMarker = function(marker) {
+    self.map().setZoom(10);
+    self.map().setCenter(marker.position);
+  };
+  self.positionAndZoomToPosition = function(position) {
+    self.map().setZoom(10);
+    self.map().setCenter(position);
+  };
+
+  self.addFlightPathToMap = function() {
     self.flightPath(new google.maps.Polyline({
-      path: [self.departureAirport().airportCoords(), self.arrivalAirport().airportCoords()],
+      path: [self.getAirportById(1).airportMarker().position, self.getAirportById(2).airportMarker().position],
       geodesic: true,
       strokeColor: '#FF0000',
       strokeOpacity: 1.0,
       strokeWeight: 2
     }));
     self.flightPath().setMap(self.map());
-
-    console.log('ViewModel.displayTwoAirportsAndRouteOnMap: Setting view bounds on map to both markers + flight path');
-    self.bounds(new google.maps.LatLngBounds(null));
-    self.bounds().extend(self.departureAirport().airportCoords());
-    self.bounds().extend(self.arrivalAirport().airportCoords());
-    console.log('ViewModel.displayTwoAirportsAndRouteOnMap: new bounds: ' + self.bounds());
-    self.map().fitBounds(self.bounds());
-    self.map().panToBounds(self.bounds());
   };
 
-  self.renderMapMarkers = function(newSelectedSearchResultObj) {
-
-    console.log('RENDERING MAP MARKERS! newSelectedSearchResultObj ---v');
-    console.log(newSelectedSearchResultObj);
-    if(newSelectedSearchResultObj === self.departureAirport().emptyData) {
-      // Handle removing an airportMarker from the map
-      if(self.departureAirport().selectedSearchResultObj() === self.departureAirport().emptyData && self.arrivalAirport().selectedSearchResultObj() === self.arrivalAirport().emptyData) {
-        console.log('ViewModel.renderMapMarkers: Neither airport selected, rendering initial airport');
-        self.displaySingleMarkerOnMap(self.initialMarker(), 0);
-      } else if(self.departureAirport().selectedSearchResultObj() === newSelectedSearchResultObj) {//self.departureAirport().emptyData) {
-        console.log('ViewModel.renderMapMarkers: DepartureAirport not selected, rendering arrival airport');
-        self.displaySingleMarkerOnMap(self.arrivalAirport().airportMarker(), 1);
-      } else if(self.arrivalAirport().selectedSearchResultObj() === newSelectedSearchResultObj) {//self.arrivalAirport().emptyData) {
-        console.log('ViewModel.renderMapMarkers: ArrivalAirport not selected, rendering departure airport');
-        self.displaySingleMarkerOnMap(self.departureAirport().airportMarker(), 2);
-      } else {
-        console.log('App really shouldn\'t have gotten here..... there\'s no combination of logic that would yield this result...');
-        console.log('New selected airport:');
-        console.log(newSelectedSearchResultObj);
-        console.log(self.departureAirport().airportMarker());
-        console.log(self.arrivalAirport().airportMarker());
-      }
-    } else {
-      // Handle an airportMarker being added to the map
-      if(self.departureAirport().selectedSearchResultObj() !== self.departureAirport().emptyData && self.arrivalAirport().selectedSearchResultObj() !== self.arrivalAirport().emptyData) {
-        console.log('ViewModel.renderMapMarkers: Both airports are selected, rendering flight between airports');
-        self.displayTwoAirportsAndRouteOnMap(self.departureAirport().airportMarker(), self.arrivalAirport().airportMarker(), 1, 2);
-      } else if(self.departureAirport().selectedSearchResultObj() === newSelectedSearchResultObj) {
-        console.log('ViewModel.renderMapMarkers: DepartureAiroprt has data, rendering it');
-        self.displaySingleMarkerOnMap(self.departureAirport().airportMarker(), 1);
-      } else if(self.arrivalAirport().selectedSearchResultObj() === newSelectedSearchResultObj) {
-        console.log('ViewModel.renderMapMarkers: ArrivalAirport has data, rendering it');
-        self.displaySingleMarkerOnMap(self.arrivalAirport().airportMarker(), 2);
-      } else {
-        console.log('App really shouln\'t have gotten here...... there\'s no combination of logic that would yield this result....');
-        console.log('New selected airport search results object:');
-        console.log(newSelectedSearchResultObj);
-        console.log(self.departureAirport().airportMarker());
-        console.log(self.arrivalAirport().airportMarker());
-      }
-    }
+  self.removeFlightPathFromMap = function() {
+    self.flightPath().setMap(null);
   };
 
-  // Bind airportMarker events so that viewModel map markers are updated and rerendered on the map
-  console.log('ViewModel: Setting DepartureAirport subscribe callback function bound to departureAirport.selectedSearchResultObj');
-  self.departureAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Departure Airport'})).extend({ rateLimit: 0 });
-  //self.departureAirport().selectedSearchResultObj.subscribe(self.renderMapMarkers);
-  self.departureAirport().selectedSearchResultObj.subscribe(function(newVal) {
-    console.log('SELECTEDRESULT.SUBSCRIBE: NEW SELECTED RESULT: (' + newVal.name + ') FOR DEPARTURE AIRPORT. RENDERING NEW MARKER.');
-    console.log('ViewModel.DptAirport.SelectedResult.Subscribe: New departure airport data ----v: ');
-    console.log(newVal);
-    console.log('ViewModel.DptAirport.SelectedResult.Subscribe: New departure airport marker ----v: ');
-    console.log(self.departureAirport().airportMarker());
-    self.renderMapMarkers(self.departureAirport().selectedSearchResultObj());
-  });
-
-  console.log('ViewModel: Setting ArrivalAirport subscribe callback function bound to arrivalAirport.selectedSearchResultObj');
-  self.arrivalAirport = ko.observable(new MapIt.Airport(self.map(), {name: 'Arrival Airport'})).extend({ rateLimit: 0 });
-  //self.arrivalAirport().selectedSearchResultObj.subscribe(self.renderMapMarkers);
-  //
-  
-  self.arrivalAirport().selectedSearchResultObj.subscribe(function(newVal) {
-    console.log('SELECTEDRESULT.SUBSCRIBE: NEW SELECTED RESULT: (' + newVal.name + ') FOR ARRIVAL AIRPORT. RENDERING NEW MARKER.');
-    console.log('ViewModel.ArrAirport.SelectedResult.Subscribe: New arrival airport data ----v: ');
-    console.log(newVal);
-    console.log('ViewModel.ArrAirport.SelectedResult.Subscribe: New arrival airport marker ----v: ');
-    console.log(self.arrivalAirport().airportMarker());
-    self.renderMapMarkers(self.arrivalAirport().selectedSearchResultObj());
-  });
-
-/* this is now covered in the airport
-  // Necessary right now to bind erasing events to the rendering function
-  self.departureAirport().airportSearchTerm.subscribe(function(newVal){
-    console.log('ViewModel.departure.airportSearchTerm.subscribe: new Search Term: (' + newVal + ')');
-    if(typeof newVal === 'undefined' || newVal === null || newVal === '') {
-      console.log('ViewModel.departure.airportSearchTerm.subscribe: Search Term deleted! Re-rendering map');
-      self.departureAirport().bloodhoundSearchResultSet(null);
-      self.renderMapMarkers(self.departureAirport().emptyData);
-    }
-  });
-*/
-
+/*
   // Define the typeahead options for both departure and arrival airports
   console.log('ViewModel: Defining typeahead options');
   var departureGenericTypeAheadOptions = {
     hint: true,
     highlight: true,
-    //minLength: 0,
-  //};
-  //var departureSpecificTypeAheadOptions = {
-    // `ttAdapter` wraps the suggestion engine in an adapter that
-    // is compatible with the typeahead jQuery plugin
-    source: self.departureAirport().searchEngine.ttAdapter(),
+    //minLength: 2,
+    source: self.departureSearchEngine().search.ttAdapter(),
     name: 'departureAirports',
     displayKey: 'value',
     engine: Handlebars,
@@ -215,16 +274,17 @@ MapIt.ViewModel = function(options) {
       header: '<h3>Select An Airport</h3>'
     },
     updater: function(item) {
-      console.log('TYPEHAEAD.DepartureAirportSelector.Updater: Updated typeahead serach term! Setting viewmodel search term.');
+      console.log('ViewModel.departureTypeahead.Updater: Updater method for typeahead! Just returning item --v');
       console.log(item);
       return item;
     },
     highlighter: function (item) {
+      console.log('ViewModel.departureTypeahead.Highlighter: Highlighting via regex and returning item.');
       var regex = new RegExp( '(' + this.query + ')', 'gi' );
       return item.replace( regex, '<stronger>$1</stronger>' );
     },
     response: function( event, ui ) {
-      console.log('TYPEHAEAD.DEPARTUREAIRPORT.RESPONSE: RESPONSE LOGGGG');
+      console.log('ViewModel.departureTypeahead.Response: Response method for typeahead! Returning true and logging event and ui --v');
       console.log(event);
       console.log(ui);
       return true;
@@ -234,20 +294,9 @@ MapIt.ViewModel = function(options) {
     hint: true,
     highlight: true,
     //minLength: 2,
-    updater: function(item) {
-      console.log('TYPEAHEAD.ArrivalAirportSelector.Updater: Updated typeahead serach term! Setting viewmodel search term.');
-      console.log(item);
-      return item;
-    },
-    highlighter: function (item) {
-      var regex = new RegExp( '(' + this.query + ')', 'gi' );
-      return item.replace( regex, '<stronger>$1</stronger>' );
-    }
-  };
-  var arrivalSpecificTypeAheadOptions = {
     // `ttAdapter` wraps the suggestion engine in an adapter that
     // is compatible with the typeahead jQuery plugin
-    source: self.arrivalAirport().searchEngine.ttAdapter(),
+    source: self.arrivalSearchEngine().search.ttAdapter(),
     name: 'arrivalAirports',
     displayKey: 'value',
     engine: Handlebars,
@@ -266,77 +315,129 @@ MapIt.ViewModel = function(options) {
         '</div>'
       ].join('\n')),
       header: '<h3>Select An Airport</h3>'
+    },
+    updater: function(item) {
+      console.log('ViewModel.arrivalTypeahead.Updater: Updater method for typeahead! Just returning item --v');
+      console.log(item);
+      return item;
+    },
+    highlighter: function (item) {
+      console.log('ViewModel.departureTypeahead.Highlighter: Highlighting via regex and returning item.');
+      var regex = new RegExp( '(' + this.query + ')', 'gi' );
+      return item.replace( regex, '<stronger>$1</stronger>' );
+    },
+    response: function( event, ui ) {
+      console.log('ViewModel.departureTypeahead.Response: Response method for typeahead! Returning true and logging event and ui --v');
+      console.log(event);
+      console.log(ui);
+      return true;
     }
+  };*/
+
+  self.onSelected = function(obj, datum, name) {
+    console.log('ViewModel.onSelected: Typeahead ' + datum.name + ' was autocompleted!');
+    console.log('ViewModel.onSelected: Data Results: --v');
+    console.log(datum);
+
+    self.removeAirportById(0);
+
+    var newAirport = new MapIt.Airport(self.map(), {name: datum.name, id: datum.id, airportData: datum});
+    self.addAirport(newAirport);
+    if(datum.id === 1) {
+      self.isDepartureSelected(true);
+      self.departureSearchActive(false);
+    } else if (datum.id === 2) {
+      self.isArrivalSelected(true);
+      self.arrivalSearchActive(false);
+    }
+
+    if(self.airportCollection().length === 1) {
+      self.removeFlightPathFromMap();
+
+      self.positionAndZoomToAirport(newAirport);
+    } else if (self.airportCollection().length == 2) {
+      self.removeFlightPathFromMap();
+
+      self.fitBounds();
+      self.panAndZoomToBounds();
+      self.addFlightPathToMap();
+    } else {
+      console.log('ViewModel.onAutoCompleted: This should never get to this block of code, there will always be either 1, 2, or 0 mapMarkers on the map.');
+    }
+
+    //console.log('ViewModel.onSelected: Stringifying, obj, then datum, then name: --v');
+    //console.log(JSON.stringify(obj)); // object
+    // outputs, e.g., {"type":"typeahead:selected","timeStamp":1371822938628,"jQuery19105037956037711017":true,"isTrigger":true,"namespace":"","namespace_re":null,"target":{"jQuery19105037956037711017":46},"delegateTarget":{"jQuery19105037956037711017":46},"currentTarget":
+    //console.log(JSON.stringify(datum)); // contains datum value, tokens and custom fields
+    // outputs, e.g., {"redirect_url":"http://localhost/test/topic/test_topic","image_url":"http://localhost/test/upload/images/t_FWnYhhqd.jpg","description":"A test description","value":"A test value","tokens":["A","test","value"]}
+    // in this case I created custom fields called 'redirect_url', 'image_url', 'description'   
+    //console.log(JSON.stringify(name)); // contains dataset name
+    // outputs, e.g., "my_dataset"
   };
 
+  self.onAutoCompleted = function(obj, datum, name) {
+    console.log('ViewModel.onAutoCompleted: Typeahead ' + datum.name + ' was autocompleted!');
+    console.log('ViewModel.onAutoCompleted: Data Results: --v');
+    console.log(datum);
+
+    self.removeAirportById(0);
+
+    var newAirport = new MapIt.Airport(self.map(), {name: datum.name, id: datum.id, airportData: datum});
+    self.addAirport(newAirport);
+    if(datum.id === 1) {
+      self.isDepartureSelected(true);
+      self.departureSearchActive(false);
+    } else if (datum.id === 2) {
+      self.isArrivalSelected(true);
+      self.arrivalSearchActive(false);
+    }
+
+    if(self.airportCollection().length === 1) {
+      self.removeFlightPathFromMap();
+
+      self.positionAndZoomToAirport(newAirport);
+    } else if (self.airportCollection().length == 2) {
+      self.removeFlightPathFromMap();
+
+      self.fitBounds();
+      self.panAndZoomToBounds();
+      self.addFlightPathToMap();
+    } else {
+      console.log('ViewModel.onAutoCompleted: Shouldn\'t really have gotten here...');
+    }
+
+    console.log('ViewModel.onAutoCompleted: Stringifying, obj, then datum, then name: --v');
+    console.log(JSON.stringify(obj)); // object
+    // outputs, e.g., {"type":"typeahead:selected","timeStamp":1371822938628,"jQuery19105037956037711017":true,"isTrigger":true,"namespace":"","namespace_re":null,"target":{"jQuery19105037956037711017":46},"delegateTarget":{"jQuery19105037956037711017":46},"currentTarget":
+    console.log(JSON.stringify(datum)); // contains datum value, tokens and custom fields
+    // outputs, e.g., {"redirect_url":"http://localhost/test/topic/test_topic","image_url":"http://localhost/test/upload/images/t_FWnYhhqd.jpg","description":"A test description","value":"A test value","tokens":["A","test","value"]}
+    // in this case I created custom fields called 'redirect_url', 'image_url', 'description'   
+    console.log(JSON.stringify(name)); // contains dataset name
+    // outputs, e.g., "my_dataset"
+  };
+
+  self.onOpened = function(obj, datum, name) {
+    console.log('opened typeahead');
+  };
+/*
   // Initialize the typeahead search inputs
   console.log('ViewModel: Initializing typeaheads and binding typeahead events');
 
+  
   options.domEls.departureSearch.typeahead(null, departureGenericTypeAheadOptions)//, departureSpecificTypeAheadOptions)
-    .on('typeahead:opened', self.departureAirport().onOpened)
-    .on('typeahead:selected', self.departureAirport().onSelectedAndAutocompleted)
-    .on('typeahead:autocompleted', self.departureAirport().onSelectedAndAutocompleted);
-
-  options.domEls.arrivalSearch.typeahead(arrivalGenericTypeAheadOptions, arrivalSpecificTypeAheadOptions)
-    .on('typeahead:opened', self.arrivalAirport().onOpened)
-    .on('typeahead:selected', self.arrivalAirport().onSelectedAndAutocompleted)
-    .on('typeahead:autocompleted', self.arrivalAirport().onSelectedAndAutocompleted);
-
+    .on('typeahead:opened', self.onOpened)
+    .on('typeahead:selected', self.onSelected)
+    .on('typeahead:autocompleted', self.onAutoCompleted);
+  
+  options.domEls.arrivalSearch.typeahead(null, arrivalGenericTypeAheadOptions)
+    .on('typeahead:opened', self.onOpened)
+    .on('typeahead:selected', self.onSelected)
+    .on('typeahead:autocompleted', self.onAutoCompleted);
+*/
   //Because I've bound both selected and autocompleted, do I need to do this
   //Because I think I read that one event is triggered by tab, and the other is triggered by enter
-  self.departureAirport().registerEnterKeyAutocomplete(options.domEls.departureSearch);
-  self.arrivalAirport().registerEnterKeyAutocomplete(options.domEls.arrivalSearch);
-
-
-  /********************** Airport Existance Conditions and Helpers **********************/
-  self.departureAirportSelected = ko.computed({
-    read: function() {
-      var _departureAirportSelected = (self.departureAirport().selectedSearchResultObj() !== self.departureAirport().emptyData);
-      console.log('DepartureAirportSelected: ' + _departureAirportSelected);
-      return _departureAirportSelected;
-    },
-    owner: self
-  }).extend({ rateLimit: 0 });
-  self.arrivalAirportSelected = ko.computed({
-    read: function() {
-      var _arrivalAirportSelected = (self.arrivalAirport().selectedSearchResultObj() !== self.arrivalAirport().emptyData);
-      console.log('ArrivalAirportSelected: ' + _arrivalAirportSelected);
-      return _arrivalAirportSelected;
-    },
-    owner: self
-  }).extend({ rateLimit: 0 });
-  self.anyAirportSelected = ko.computed({
-    read: function() {
-      var _anyAirportSelected = (self.departureAirportSelected() || self.arrivalAirportSelected());
-      console.log ('AnyAirportSelected: ' + _anyAirportSelected);
-      return _anyAirportSelected;
-    },
-    owner: self
-  }).extend({ rateLimit: 0 });
-  self.twoAirportsSelected = ko.computed({
-    read: function() {
-      var _bothAirportsSelected = (self.arrivalAirportSelected() && self.departureAirportSelected());
-      console.log('BothAirportsSelected: ' + _bothAirportsSelected);
-      return _bothAirportsSelected;
-    },
-    owner: self
-  }).extend({ rateLimit: 0 });
-
-  self.oneAirportSelected = ko.computed({
-    read: function() {
-      var _oneAirportSelected = ((self.arrivalAirportSelected() || self.departureAirportSelected()) && !(self.departureAirportSelected() && self.arrivalAirportSelected()));
-      console.log('OneAirportSelected: ' + _oneAirportSelected);
-      return _oneAirportSelected;
-    },
-    owner: self
-  }).extend({ rateLimit: 0 });
-  /****************************************************************************************/
-
-  self.twoAirportsSelected.subscribe(function(newVal){
-    if(newVal === true) {
-      console.log('ViewModel.twoAirportsSelectedSusbscriber: Two airports are selected! Add flight path to map!');
-    }
-  });
+  //self.departureAirport().registerEnterKeyAutocomplete(options.domEls.departureSearch);
+  //self.arrivalAirport().registerEnterKeyAutocomplete(options.domEls.arrivalSearch);
 
   self.distBtwnAirports = function(unit) {
     return ko.computed({
@@ -344,13 +445,13 @@ MapIt.ViewModel = function(options) {
         //console.log('ViewModel.distBtwnAirports: Calculating the distance between airport 1: ' 
         // + self.departureAirport().selectedSearchResultObj().name + ' and airport 2: ' 
         // + self.arrivalAirport().selectedSearchResultObj().name);
-        if(!self.twoAirportsSelected()) {
+        if(!self.isDepartureSelected() || !self.isArrivalSelected()) {
           //console.log('ViewModel.distBtwnAirports: Error calculating distance: Make sure departure airport, arrival airport, and units are specified!');
           return '';
         }
 
-        var p1 = new LatLon(self.departureAirport().selectedSearchResultObj().lat, self.departureAirport().selectedSearchResultObj().lng);
-        var p2 = new LatLon(self.arrivalAirport().selectedSearchResultObj().lat, self.arrivalAirport().selectedSearchResultObj().lng);
+        var p1 = new LatLon(self.getAirportById(1).airportData().lat, self.getAirportById(1).airportData().lng);
+        var p2 = new LatLon(self.getAirportById(2).airportData().lat, self.getAirportById(2).airportData().lng);
         var dist = p1.distanceTo(p2);
 
         var distanceToReturn = dist;
@@ -370,10 +471,8 @@ MapIt.ViewModel = function(options) {
         var distanceToReturnTrimmed =  parseFloat(distanceToReturn).toFixed(2);
         return distanceToReturnTrimmed;
       },
-
       deferEvaluation: true
     }, this);
   };
-  /***************************************************************************************/
 
 };

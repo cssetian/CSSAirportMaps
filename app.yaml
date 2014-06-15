@@ -1,4 +1,4 @@
-application: cssetian-api-project
+application: map-it-clean
 version: 1
 runtime: python27
 api_version: 1
