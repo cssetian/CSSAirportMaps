@@ -23,14 +23,10 @@
         <tbody>
           <tr>
             <th class="input-label first-input-column">Departure Airport:</th>
-            <td><!-- value: departureAirport().airportSearchTerm,-->
-              <!--event: { 
-                                      focus: function() {departureSearchActive(true);},
-                                      blur: function() {departureSearchActive(false);}
-                                    }-->
+            <td>
               <div id="departure-airport-selector-container">
                 <input  id="departure-airport-selector"
-                        class="typeahead second-input-column required"
+                        class="typeahead second-input-column"
                         name="departureAirports"
                         type="text"
                         autocomplete="off"
@@ -40,14 +36,14 @@
                                     airportId: 1,
                                     valueUpdate: ['input'] "/>
               </div>
-            </td>  <!-- data-list input to go with local json or pidgits data -->
+            </td>
           </tr>
           <tr>
             <th class="input-label first-input-column">Arrival Airport:</th>
-            <td><!-- value: arrivalAirport().airportSearchTerm, -->
+            <td>
               <div id="arrival-airport-selector-container">
                 <input  id="arrival-airport-selector"
-                        class="typeahead second-input-column required"
+                        class="typeahead second-input-column"
                         autocomplete="off"
                         type="text" 
                         placeholder="Type to search for an arrival airport..." 
@@ -56,7 +52,7 @@
                                     airportId: 2,
                                     valueUpdate: ['input']" />
               </div>
-            </td> <!-- data-list input to go with local json or pidgits data -->
+            </td>
           </tr>
         </tbody>
       </table>
@@ -227,10 +223,6 @@
 
   </div>
 
-  <div class="span4">
-      <small>Errors</small>
-      <pre id="printError" style="background:pink;" title="errors"></pre>
-  </div>
 </body>
 <footer class="footer">
 <div>Authored By: Chris Setian</div>

@@ -37,7 +37,7 @@ MapIt.App = (function($, _, ko) {
     console.log('MapIt.Init: Adding default, non-located marker to map! Location at: <' +  viewModel.airportCollection()[0].airportMarker().position + '>');
     
     console.log('MapIt.Init: Panning and zooming to default, non-located coordinates');
-    viewModel.positionAndZoomToMarker(_initialDefaultAirport.airportMarker());
+    viewModel.positionAndZoomToAirport(_initialDefaultAirport);
     viewModel.initialAirport(_initialDefaultAirport);
 
     ko.applyBindings(viewModel);

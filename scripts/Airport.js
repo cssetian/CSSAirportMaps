@@ -4,10 +4,11 @@ MapIt.Airport = function(map, options) {
 
   self.id = options.id;
   self.name = options.name;
-  self.airportSearchTerm = ko.observable();
+
+  // DO I WANT TO MAINTAIN THESE STATE VARIABLES ON THE ACTUAL AIRPORTS?
   self.isSelected = ko.observable(false);
-  self.bloodhoundSearchResultSet = ko.observable(null);
-  self.selectedSearchResultObj = ko.observable(options.airportData);
+  self.isSearchActive = ko.observable(false);
+  
   self.airportData = ko.observable(options.airportData);
   self.airportCoords = ko.computed({
     read: function() {
@@ -22,42 +23,7 @@ MapIt.Airport = function(map, options) {
     owner: self
   });
 
-  self.airportSearchTerm.subscribe(function(newSearchTerm) {
-    console.log('Airport.<' + self.name + '>.airportSearchTerm: Current search term: <' + newSearchTerm + '>');
-    self.isSelected(false);
-    return false; //newSearchTerm;
-  });
-
-  self.isSelected.subscribe(function(newIsSelected){
-    if(newIsSelected) {
-      self.selectedSearchResultObj(self.bloodhoundSearchResultSet()[0]);
-      self.airportSearchTerm(self.selectedSearchResultObj().name);
-      self.airportCoords(new google.maps.LatLng(parseFloat(self.airportData().lat, 10), parseFloat(self.airportData().lng, 10)));
-      self.airportMarker(new google.maps.Marker({ position: self.airportCoords(), title: self.name + ': ' + self.airportData().name}));
-    } else {
-      //self.bloodhoundSearchResultSet(null);
-      self.selectedSearchResultObj(null);
-      self.airportCoords(null);
-      self.airportMarker(null);
-    }
-  });
-
-  function onOpened($e) {
-    console.log('opened');
-  }
-
-  function onClosed($e) {
-
-  }
-
-  function onAutocompleted($e, s, datum) {
-      //Only fires whenever you search for an item and hit tab or enter to autocomplete to the first suggested result
-    console.log('AUTOCOMPLETED DATA - AUTOCOMPLETED RESULT SHOULD UPDATE AUTOMATICALLY');
-    console.log(datum);
-    //self.selectedResult(datum);
-    //typeAheadEl.typeahead('val', datum.name);
-  }
-
+  // THESE EVENT HANDLERS ARE NOT CURRENTLY IN USE - CURRENTLY DEFINED ON THE VIEWMODEL - NOT SURE IF THEY SHOULD BE HERE OR THERE - THESE DON'T WORK THOUGH WITH CURRENT CODE
   // https://github.com/twitter/typeahead.js/issues/300
   self.onSelectedAndAutocompleted = function(obj, datum, name) {
     //Fires when you select one of the options in the autocomplete either with the mouse or using the arrow keys and tab/enter
