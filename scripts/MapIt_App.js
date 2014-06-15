@@ -34,7 +34,7 @@ MapIt.App = (function($, _, ko) {
 
     var _initialDefaultAirport = new MapIt.Airport(viewModel.map(), {name: 'Initial Airport: Start Here', id: 0, airportData: {name: 'Initial Airport: Start here Data', lat: 34.5, lng: 75.5}});
     viewModel.addAirport(_initialDefaultAirport);
-    console.log('MapIt.Init: Adding default, non-located marker to map! Location at: <' +  viewModel.airportCollection()[0].airportMarker().position + '>');
+    console.log('MapIt.Init: Adding default, non-located marker to map! Location at: <' +  viewModel.getAirportById(0).airportMarker().position + '>');
     
     console.log('MapIt.Init: Panning and zooming to default, non-located coordinates');
     viewModel.positionAndZoomToAirport(_initialDefaultAirport);

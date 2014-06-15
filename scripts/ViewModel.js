@@ -62,7 +62,7 @@ MapIt.ViewModel = function(options) {
 
   self.departureSearchInput = ko.observable('');
   self.arrivalSearchInput = ko.observable('');
-  
+
   self.departureSearchEngine = ko.observable(new MapIt.SearchEngine());
   self.arrivalSearchEngine = ko.observable(new MapIt.SearchEngine());
 
@@ -167,7 +167,7 @@ MapIt.ViewModel = function(options) {
 
     if(typeof airportToRemoveArray !== 'undefined' && airportToRemoveArray !== null && airportToRemoveArray.length > 0) {
       airportToRemove = airportToRemoveArray[0];
-      airportToRemove.airportMarker().setMap(null);
+      self.removeMarkerFromMap(airportToRemove);
       self.airportCollection.remove(airportToRemove);
       console.log('ViewModel.removeAirportById: Airport <' + idToRemove + '> removed! Size of airportCollection is now <' 
                       + self.airportCollection().length + '>. Removed airport copied below --v');
@@ -198,7 +198,7 @@ MapIt.ViewModel = function(options) {
 
   self.removeMarkerFromMap = function(airportModel) {
     console.log('ViewModel.removeMarkerFromMap: Removing airport the map!');
-    self.airportCollection()[airportModel.id].marker.setMap(null);
+    airportModel.airportMarker().setMap(null);
   };
 
   self.fitBounds = function() {
