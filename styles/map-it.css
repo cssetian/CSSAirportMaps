@@ -93,19 +93,26 @@ input::-webkit-calendar-picker-indicator {
 .typeahead-airport-name {
   font-size: 12px;
   font-weight: bold;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .typeahead-airport-state {
   font-size: 10px;
   padding-left: 5px;
-
+  padding-right: 5px;
 }
 
 .typeahead-airport-country {
   font-size: 11px;
+  padding-left: 5px;
+  padding-right: 5px;
   
 }
-
+.typeahead-dropdown-title {
+  padding-left: 5px;
+  padding-right: 5px;
+}
 .twitter-typeahead{
      width: 97%;
 }

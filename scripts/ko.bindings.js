@@ -44,7 +44,8 @@
         $e.typeahead({
             hint: false, // default = true
             highlight: true, // default = false
-            minLength: 1 // default = 1
+            minLength: 1, // default = 1
+            limit: 2,
           }, {
             // `ttAdapter` wraps the suggestion engine in an adapter that
             // is compatible with the typeahead jQuery plugin

@@ -11,15 +11,15 @@ MapIt.Config = (function() {
         '<div>',
         '<span class=\'typeahead-airport-name\'>{{name}} - ({{code}})</span>',
         '</div>',
-        '<div> {{#isnotnull city}}',
+        '<div>{{#isnotnull city}}',
         '<span class=\'typeahead-airport-state\'>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
         '{{else}}{{#isnotnull state}}',
         '<span class=\'typeahead-airport-state\'>{{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
         '{{else}}',
-        'å<span class=\'typeahead-airport-country\'>{{country}}</span>',
+        '<span class=\'typeahead-airport-country\'>{{country}}</span>',
         '{{/isnotnull}}{{/isnotnull}}</div>'
       ].join('\n')),
-      header: '<h3>Select An Airport</h3>'
+      header: '<h3 class=\'typeahead-dropdown-title\'>Select An Airport</h3>'
     };
   };
 
@@ -31,7 +31,7 @@ MapIt.Config = (function() {
         //return arr.concat(Bloodhound.tokenizers.whitespace(d.name), Bloodhound.tokenizers.whitespace(d.city), Bloodhound.tokenizers.whitespace(d.country), Bloodhound.tokenizers.whitespace(d.code));
       },
       queryTokenizer: Bloodhound.tokenizers.whitespace,
-      limit: 20,
+      limit: 40,
       log_successful_searches: true,
       log_failed_searches: true,
       remote: {
