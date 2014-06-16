@@ -12,6 +12,7 @@ Bootstrap was used for general out of the box theming and knockout.js was used f
 
 Requirements To Run This App
 -----------------------------
+* This app can in theory be run without a web-server, but has been developed using one to allow for google app engine deployment, so I cannot guarrantee bug-free functionality when running from the local filesystem, but I suspect it will work the same as the requests I make from the client are a part of the respective client API's that I implemented and not straight AJAX requests to a different domain.
 * This link provides a comprehensive guide for getting started with Google App Engine. It has a full setup guide for those who prefer to get their direction straight from the source.
 ** https://developers.google.com/appengine/training/intro/gettingstarted#install
 * Download and install the App Engine SDK for Python and App Engine Launcher at this link, following the instructions provided:
