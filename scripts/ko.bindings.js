@@ -42,7 +42,7 @@
 
 
         $e.typeahead({
-            hint: false, // default = true
+            hint: true, // default = true
             highlight: true, // default = false
             minLength: 1, // default = 1
             limit: 2,

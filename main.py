@@ -56,9 +56,9 @@ class AirportSearchHandler(webapp2.RequestHandler):
       logging.info('----------------------------')
       #search_query = kwargs.get('search_query')
 
-      test = 'https://maps.googleapis.com/maps/api/place/search/json?types="cafe|bakery"&location=37.787930,-122.4074990&radius=5000&sensor=false&key=AIzaSyDC0_jxucNVmD3mA40DOUB8463jhdQ0yPE'
+      test = 'https://maps.googleapis.com/maps/api/place/search/json?types="cafe|bakery"&location=37.787930,-122.4074990&radius=5000&sensor=false&key='
       #airportSearchBaseUrl = 'https://maps.googleapis.com/maps/api/place/search/json?sensor=false&rankby=prominence&keyword=airport&types=airport'
-      #googlePlacesAPIKey = '&key=' + 'AIzaSyDC0_jxucNVmD3mA40DOUB8463jhdQ0yPE'
+      #googlePlacesAPIKey = '&key='
       #queryKey = '&name='
       #fullSearchUrl = airportSearchBaseUrl + googlePlacesAPIKey + queryKey + search_query
       cssairportmapsAPIKey = '';
@@ -109,7 +109,6 @@ class AirportSearchHandler(webapp2.RequestHandler):
       #self.response.out.write(output)
 
 app = webapp2.WSGIApplication([
-    #webapp2.Route('/airportsearch<search_query:((\?)([^/\?\.])+)*>', handler=AirportSearchHandler),
     webapp2.Route('/airportsearch', handler=AirportSearchHandler),
     ('/debug', DebugHandler),
     ('/', MainHandler)

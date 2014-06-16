@@ -26,9 +26,9 @@ MapIt.Config = (function() {
   var _bloodhound_options = function(options) {
     return {
       datumTokenizer: function (d) {
-        return Bloodhound.tokenizers.whitespace(d.name);
+        //return Bloodhound.tokenizers.whitespace(d.name);
         // When it's working, try tokenizing multiple fields of the objects
-        //return arr.concat(Bloodhound.tokenizers.whitespace(d.name), Bloodhound.tokenizers.whitespace(d.city), Bloodhound.tokenizers.whitespace(d.country), Bloodhound.tokenizers.whitespace(d.code));
+        return arr.concat(Bloodhound.tokenizers.whitespace(d.name), Bloodhound.tokenizers.whitespace(d.city), Bloodhound.tokenizers.whitespace(d.country), Bloodhound.tokenizers.whitespace(d.code), Bloodhound.tokenizers.whitespace(d.state));
       },
       queryTokenizer: Bloodhound.tokenizers.whitespace,
       limit: 40,
