@@ -82,27 +82,59 @@
               <!-- /ko -->
             </td>
           </tr>
-          <!--
+          
           <tr>
             <td>Airport Code:</td>
-            <td><span data-bind="text: departureAirport().selectedSearchResultObj()"></span></td>
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().code" class="hidden-600"></span></td>
+            <td>
+              <!-- ko if: isDepartureSelected -->
+                <span data-bind="text: getAirportById(1).airportData().code"></span>
+              <!-- /ko -->
+            </td>
+            <td class="hidden-700">
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().code" class="hidden-600"></span>
+              <!-- /ko -->
+            </td>
           </tr>
           <tr>
             <td>City:</td>
-            <td><span data-bind="text: departureAirport().selectedSearchResultObj()"></span></td>
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().city" class="hidden-600"></span></td>
+            <td>
+              <!-- ko if: isDepartureSelected -->
+                <span data-bind="text: getAirportById(1).airportData().city"></span>
+              <!-- /ko -->
+            </td>
+            <td class="hidden-700">
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().city" class="hidden-600"></span>
+              <!-- /ko -->
+            </td>
           </tr>
           <tr>
             <td>State:</td>
-            <td><span data-bind="text: departureAirport().selectedSearchResultObj()"></span></td>
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().state" class="hidden-600"></span></td>
+            <td>
+              <!-- ko if: isDepartureSelected -->
+                <span data-bind="text: getAirportById(1).airportData().state"></span>
+              <!-- /ko -->
+            </td>
+            <td class="hidden-700">
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().state" class="hidden-600"></span>
+              <!-- /ko -->
+            </td>
           </tr>
           <tr>
             <td>Country:</td>
-            <td><span data-bind="text: departureAirport().selectedSearchResultObj()"></span></td>
-            <td class="hidden-700"><span data-bind="text: arrivalAirport().selectedSearchResultObj().country" class="hidden-600"></span></td>
-          </tr>-->
+            <td>
+              <!-- ko if: isDepartureSelected -->
+                <span data-bind="text: getAirportById(1).airportData().country"></span>
+              <!-- /ko -->
+            </td>
+            <td class="hidden-700">
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().country" class="hidden-600"></span>
+              <!-- /ko -->
+            </td>
+          </tr>
           <tr>
             <td>Latitude:</td>
             <td>
@@ -147,23 +179,39 @@
                 <span data-bind="text: getAirportById(2).airportData().name"></span>
               <!-- /ko -->
             </td>
-          </tr><!--
+          </tr>
           <tr>
             <td>Airport Code:</td>
-            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj()"></span></td>
+            <td>
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().code" class="hidden-600"></span>
+              <!-- /ko -->
+            </td>
           </tr>
           <tr>
             <td>City:</td>
-            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj()"></span></td>
+            <td>
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().city" class="hidden-600"></span>
+              <!-- /ko -->
+            </td>
           </tr>
           <tr>
             <td>State:</td>
-            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj()"></span></td>
+            <td>
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().state" class="hidden-600"></span>
+              <!-- /ko -->
+            </td>
           </tr>
           <tr>
             <td>Country:</td>
-            <td><span data-bind="text: arrivalAirport().selectedSearchResultObj()"></span></td>
-          </tr>-->
+            <td>
+              <!-- ko if: isArrivalSelected -->
+                <span data-bind="text: getAirportById(2).airportData().country" class="hidden-600"></span>
+              <!-- /ko -->
+            </td>
+          </tr>
           <tr>
             <td>Latitude:</td>
             <td>
@@ -234,12 +282,6 @@
 </footer>
 
 <div visibility="hidden">
-  <datalist autocomplete="off" id="departure-airports-list">
-  </datalist>
-
-  <datalist autocomplete="off" id="arrival-airports-list">
-  </datalist>
-
   <script type="text/javascript" src="scripts/lib/jquery-2.1.0.js"></script>
   <script type="text/javascript" src="scripts/lib/underscore-1.6.0.js"></script>
   <script type="text/javascript" src="scripts/lib/knockout-3.1.0.js"></script>
@@ -247,18 +289,15 @@
   <script type="text/javascript" src="scripts/lib/knockout-bootstrap.min.js"></script>
   <script type="text/javascript" src="scripts/lib/bootstrap.js"></script>
   <script type="text/javascript" src="scripts/lib/typeahead.bundle.js"></script>
-  <!--<script type="text/javascript" src="scripts/lib/knockout.bindings.typeahead.js"></script>-->
   <script type="text/javascript" src="scripts/lib/handlebars-v1.3.0.js"></script>
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
   <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markermanager/src/markermanager.js"></script>
   <script type="text/javascript" src="scripts/lib/latlong.js"></script>
   <script type="text/javascript" src="scripts/MapIt_App.js"></script>
   <script type="text/javascript" src="scripts/Config.js"></script>
-  <script type="text/javascript" src="content/airports.js"></script>
   <script type="text/javascript" src="scripts/SearchEngine.js"></script>
   <script type="text/javascript" src="scripts/ViewModel.js"></script>
   <script type="text/javascript" src="scripts/Airport.js"></script>
-  <script type="text/javascript" src="content/dummy-google-places.json"></script>
   <script type="text/javascript" src="scripts/ko.bindings.js"></script>
 </div>
 
@@ -279,8 +318,7 @@
           Urls: {
             allAirportsUrl_XML: "http://airports.pidgets.com/v1/airports",
             allAirportsUrl_JSON: "http://airports.pidgets.com/v1/airports?format=json"
-          },
-          airportsJSON: airportsJSON
+          }
         });
 
     });

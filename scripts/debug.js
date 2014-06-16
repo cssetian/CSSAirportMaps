@@ -1,3 +1,6 @@
+///
+/// This isn't really anything, was just random page I was messing around with and copying/pasting snippets to test stuff out.
+///
 var ExampleViewModel = function () {
     var self = this;
 
