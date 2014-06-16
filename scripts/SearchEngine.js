@@ -1,32 +1,38 @@
-MapIt.SearchEngine = function() {
+(function(){
+MapIt.SearchEngine = function(options) {
   // Initialize the Bloodhound search engine
   console.log('SearchEngine.body: Initializing Bloodhound engine');
   var self = this;
 
   // Hard-code the options for now, only need 1 kind of search engine
-  var bloodhoundOptions = {
-    datumTokenizer: function (d) {
-      return Bloodhound.tokenizers.whitespace(d.name);
-      // When it's working, try tokenizing multiple fields of the objects
-      //return arr.concat(Bloodhound.tokenizers.whitespace(d.name), Bloodhound.tokenizers.whitespace(d.city), Bloodhound.tokenizers.whitespace(d.country), Bloodhound.tokenizers.whitespace(d.code));
-    },
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    limit: 20,
-    log_successful_searches: true,
-    log_failed_searches: true,
-    remote: {
-      url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name=%QUERY',
-      filter: self.remoteFilter
-    }
+  /*
+  var suggestionTemplates = {
+      empty: [
+        '<div class="empty-message">',
+        'Unable to find any Airports that match the search.',
+        '</div>'
+      ].join('\n'),
+      suggestion: Handlebars.compile([
+        '<div>',
+        '<span class=\'typeahead-airport-name\'>{{name}} - ({{code}})</span>',
+        '</div>',
+        '<div> {{#isnotnull city}}',
+        '<span class=\'typeahead-airport-state\'>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
+        '{{else}}{{#isnotnull state}}',
+        '<span class=\'typeahead-airport-state\'>{{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
+        '{{else}}',
+        'å<span class=\'typeahead-airport-country\'>{{country}}</span>',
+        '{{/isnotnull}}{{/isnotnull}}</div>'
+      ].join('\n')),
+      header: '<h3>Select An Airport</h3>'
   };
 
-
-  self.search = new Bloodhound(bloodhoundOptions);
+  self.search = new Bloodhound(MapIt.Config.bloodhound_options());
 
   var searchPromise = self.search.initialize();
   searchPromise.done(function() { console.log('success!'); })
                .fail(function() { console.log('err!'); });
-
+*/
 
   self.mapSearchResults = function(bloodhoundSearchResultObj) {
 
@@ -54,7 +60,8 @@ MapIt.SearchEngine = function() {
         adminId1: airportSearchResultItem.adminId1,
         geoNameId: airportSearchResultItem.geonameId,
         timeZone: airportSearchResultItem.timezone,
-        code: _filteredIATACode
+        code: _filteredIATACode,
+        id: options.id
       };
     });
 
@@ -65,8 +72,8 @@ MapIt.SearchEngine = function() {
     return mappedOutput;
   };
 
-  //
-  self.remoteFilter = function(bloodhoundSearchResultObj) {
+  
+  self.filterAndMapSearchResults = function(bloodhoundSearchResultObj) {
     console.log('************************* COMPLETED BLOODHOUND AIRPORT SEARCH EXECUTION ****************************');
     console.log('SearchEngine.remoteFilter: (Bloodhound Callback) Found ' + bloodhoundSearchResultObj.length + ' airport(s)! (Obj copied below) ---v');
     console.log(bloodhoundSearchResultObj);
@@ -80,4 +87,9 @@ MapIt.SearchEngine = function() {
   };
 
 
+return {  remoteFilter: self.filterAndMapSearchResults,
+          search: self.search,
+          mapSearchResults: self.mapSearchResults
+        };
 };
+})();

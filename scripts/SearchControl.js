@@ -1,4 +1,0 @@
-MapIt.SearchControl = function(options) {
-
-
-};

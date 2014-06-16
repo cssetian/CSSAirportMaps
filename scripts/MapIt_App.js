@@ -24,7 +24,7 @@ MapIt.App = (function($, _, ko) {
     viewModel.initialize();
 
     // If geolocation is available in this browser, set the initial marker to that person's location
-    // Otherwise, set location to Manhattan
+    // Otherwise, set location to a default airport
     if ('geolocation' in navigator) {
       console.log('MapItApp.init: Found Geolocation!');
       navigator.geolocation.getCurrentPosition(_geoLocationCallback);

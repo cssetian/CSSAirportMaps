@@ -3,7 +3,7 @@
   // Typeahead handler
   ko.bindingHandlers.typeahead = {
     init: function (element, valueAccessor, allBindingsAccessor, bindingContext) {
-
+/*
       // Initialize the Bloodhound search engine
       console.log('SearchEngine.body: Initializing Bloodhound engine');
       var mapSearchResults = function(bloodhoundSearchResultObj) {
@@ -28,7 +28,8 @@
             name: airportSearchResultItem.toponymName,
             lat: airportSearchResultItem.lat,
             lng: airportSearchResultItem.lng,
-            city: airportSearchResultItem.adminName1,
+            city: airportSearchResultItem.adminName2,
+            state: airportSearchResultItem.adminName1,
             country: airportSearchResultItem.countryName,
             countryCode: airportSearchResultItem.countryCode,
             adminId1: airportSearchResultItem.adminId1,
@@ -46,7 +47,7 @@
         return mappedOutput;
       };
 
-      var remoteFilter = function(bloodhoundSearchResultObj) {
+      var filterAndMapSearchResults = function(bloodhoundSearchResultObj) {
         console.log('************************* COMPLETED BLOODHOUND AIRPORT SEARCH EXECUTION ****************************');
         console.log('SearchEngine.remoteFilter: (Bloodhound Callback) Found ' + bloodhoundSearchResultObj.length + ' airport(s)! (Obj copied below) ---v');
         console.log(bloodhoundSearchResultObj);
@@ -57,8 +58,9 @@
         console.log('SearchEngine.remoteFilter: (Bloodhound Callback) Mapped Output (Obj copied below) --v');
         console.log(mappedSearchResults);
         return mappedSearchResults;
-      };
+      };*/
 
+      /*
         // Hard-code the options for now, only need 1 kind of search engine
         self.bloodhoundOptions = {
           datumTokenizer: function (d) {
@@ -75,11 +77,11 @@
             filter: remoteFilter
           }
         };
-      var search = new Bloodhound(bloodhoundOptions);
+        */
+       
+       console.log('Search Options: ');
+       console.log(MapIt.Config.bloodhound_options());
 
-      var searchPromise = search.initialize();
-      searchPromise.done(function() { console.log('success!'); })
-                   .fail(function() { console.log('err!'); });
 
         // HTML element that the binding was applied to, so DOM operations can be performed
         var $e = $(element);
@@ -102,28 +104,23 @@
         console.log('bindingContext');
         console.log(bindingContext);
 
+        var search_options = MapIt.Config.bloodhound_options();
+        search_options.remote.filter = options.remoteFilter;
+
+        console.log('search options');
+        console.log(search_options);
+        var search = new Bloodhound(search_options);//MapIt.Config.bloodhound_options());
+
+        var searchPromise = search.initialize();
+        searchPromise.done(function() { console.log('success!'); })
+                     .fail(function() { console.log('err!'); });
+
 
         $e.typeahead({
-            updater: function(item) {
-              console.log('ViewModel.departureTypeahead.Updater: Updater method for typeahead! Just returning item --v');
-              console.log(item);
-              options.searchInputVal(item);
-              return item;
-            },
-            highlighter: function (item) {
-              console.log('ViewModel.departureTypeahead.Highlighter: Highlighting via regex and returning item.');
-              var regex = new RegExp( '(' + this.query + ')', 'gi' );
-              return item.replace( regex, '<stronger>$1</stronger>' );
-            },
-            response: function( event, ui ) {
-              console.log('ViewModel.departureTypeahead.Response: Response method for typeahead! Returning true and logging event and ui --v');
-              console.log(event);
-              console.log(ui);
-              return true;
-            }}, {
-            hint: true,
-            highlight: true,
-            //minLength: 2,
+            hint: false, // default = true
+            highlight: true, // default = false
+            minLength: 1 // default = 1
+          }, {
             // `ttAdapter` wraps the suggestion engine in an adapter that
             // is compatible with the typeahead jQuery plugin
             source: search.ttAdapter(),//options.source,
@@ -138,5 +135,15 @@
         console.log('ko.bindings.init: Typeahead initialization complete!');
       }
   };
+
+  Handlebars.registerHelper('isnotnull', function(value, options) {
+    var exists = (typeof value !== 'undefined' && value !== null && value.length > 0 && value !== '');
+
+    if( exists ) {
+        return options.fn(this);
+    } else {
+        return options.inverse(this);
+    }
+  });
 
 })();

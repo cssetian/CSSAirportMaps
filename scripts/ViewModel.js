@@ -5,52 +5,24 @@ MapIt.ViewModel = function(options) {
 
   self.initialize = function() {
     self.departureSearchOptions = {
-      source: self.departureSearchEngine().search.ttAdapter(),
+      //source: MapIt.SearchEngine.search,//self.departureSearchEngine().search.ttAdapter(),
       name: 'departureAirports',
-      templates: {
-          empty: [
-            '<div class="empty-message">',
-            'unable to find any Airports that match the search term',
-            '</div>'
-          ].join('\n'),
-          suggestion: Handlebars.compile([
-            '<div>',
-            '<span class=\'typeahead-airport-name\'>{{name}} - ({{code}})</span>',
-            '</div>',
-            '<div>',
-            '<span class=\'typeahead-airport-state\'>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
-            '</div>'
-          ].join('\n')),
-          header: '<h3>Select An Airport</h3>'
-      },
+      templates: MapIt.Config.typeahead_templates(),
       onOpened: self.onOpened,
       onSelected: self.onSelected,
       onAutoCompleted: self.onAutoCompleted,
-      searchInputVal: self.departureSearchInput
+      searchInputVal: self.departureSearchInput,
+      remoteFilter: self.departureSearchEngine().remoteFilter
     };
     self.arrivalSearchOptions = {
-      source: self.arrivalSearchEngine().search.ttAdapter(),
+      //source: MapIt.SearchEngine.search,//self.arrivalSearchEngine().search.ttAdapter(),
       name: 'arrivalAirports',
-      templates: {
-          empty: [
-            '<div class="empty-message">',
-            'unable to find any Airports that match the search term',
-            '</div>'
-          ].join('\n'),
-          suggestion: Handlebars.compile([
-            '<div>',
-            '<span class=\'typeahead-airport-name\'>{{name}} - ({{code}})</span>',
-            '</div>',
-            '<div>',
-            '<span class=\'typeahead-airport-state\'>{{city}}, {{state}}</span> - <span class=\'typeahead-airport-country\'>{{country}}</span>',
-            '</div>'
-          ].join('\n')),
-          header: '<h3>Select An Airport</h3>'
-      },
+      templates: MapIt.Config.typeahead_templates(),
       onOpened: self.onOpened,
       onSelected: self.onSelected,
       onAutoCompleted: self.onAutoCompleted,
-      searchInputVal: self.arrivalSearchInput
+      searchInputVal: self.arrivalSearchInput,
+      remoteFilter: self.arrivalSearchEngine().remoteFilter
     };
 
   };
@@ -63,8 +35,8 @@ MapIt.ViewModel = function(options) {
   self.departureSearchInput = ko.observable('');
   self.arrivalSearchInput = ko.observable('');
 
-  self.departureSearchEngine = ko.observable(new MapIt.SearchEngine());
-  self.arrivalSearchEngine = ko.observable(new MapIt.SearchEngine());
+  self.departureSearchEngine = ko.observable(new MapIt.SearchEngine({id: 1}));
+  self.arrivalSearchEngine = ko.observable(new MapIt.SearchEngine({id: 2}));
 
   self.departureSearchActive = ko.observable(false);
   self.arrivalSearchActive = ko.observable(false);
