@@ -10,7 +10,7 @@ The app is hosted using a Google App Engine python webapp2 server. This used to 
 
 Bootstrap was used for general out of the box theming and knockout.js was used for data-binding. Also includes underscore.js for various utility functions, and handlebars.js for template rendering on the autocomplete. A library was also included to make the distance calculation form 2 latlng coordinates. This was freely available and hosted online at www.movable-type.co.uk.
 
-Requirements to run this app-
+Requirements To Run This App
 -----------------------------
 * This link provides a comprehensive guide for getting started with Google App Engine. It has a full setup guide for those who prefer to get their direction straight from the source.
 ** https://developers.google.com/appengine/training/intro/gettingstarted#install
@@ -25,7 +25,7 @@ Requirements to run this app-
 * If you want to see it hosted on my GAE account, you can find the app at cssairportmaps.appspot.com
 
 
-Future enhancements I haven't had time for yet-
+Future Enhancements I Haven't Had Time For Yet
 -----------------------------------------------
 * Make the tab/enter responses when searching feel more intuitive
 * Handle partial strings in the remote search
