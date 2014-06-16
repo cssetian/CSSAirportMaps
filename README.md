@@ -1,5 +1,3 @@
-map-it
-
 Mapping Maps
 ------------
 A simple app that searches for airports given a string input, retrieves data about a selected airport, and plots geo-arcs on a google map connecting two selected airports. Airport search results are fetched automatically using Typeahead.js and its Bloodhound remote search engine. GeoPlanet is used as a data source, as their web service allows for string queries to search for a particular type of place, which I have filtered to airports. 
