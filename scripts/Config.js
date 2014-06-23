@@ -35,7 +35,8 @@ MapIt.Config = (function() {
       log_successful_searches: true,
       log_failed_searches: true,
       remote: {
-        url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name=%QUERY',
+        //url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name=%QUERY',
+        url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name_startsWith=%QUERY',
         filter: ''
       }
     };
@@ -49,10 +50,21 @@ MapIt.Config = (function() {
     return {};
   };
 
+  var _handlebars_register_helpers = function() {
+    Handlebars.registerHelper('isnotnull', function(value, options) {
+      var exists = (typeof value !== 'undefined' && value !== null && value.length > 0 && value !== '');
+      if( exists ) {
+          return options.fn(this);
+      } else {
+          return options.inverse(this);
+      }
+    });
+  };
 
   return  { bloodhound_options: _bloodhound_options,
             typeahead_templates: _typeahead_templates,
             typeahead_departure_options: _typeahead_departure_options,
-            typeahead_arrival_options: _typeahead_arrival_options
+            typeahead_arrival_options: _typeahead_arrival_options,
+            handlebars_register_helpers: _handlebars_register_helpers
           };
 })();

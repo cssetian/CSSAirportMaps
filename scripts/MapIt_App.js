@@ -16,6 +16,7 @@ MapIt.App = (function($, _, ko) {
   var _init = function (options) {
 
     console.log('MapIt.Init: Initializing search engine.');
+    MapIt.Config.handlebars_register_helpers();
     _searchEngine = new MapIt.SearchEngine(options);
     options.searchEngine = _searchEngine;
 
