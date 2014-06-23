@@ -19,7 +19,7 @@ MapIt.Config = (function() {
         '<span class=\'typeahead-airport-country\'>{{country}}</span>',
         '{{/isnotnull}}{{/isnotnull}}</div>'
       ].join('\n')),
-      header: '<h3 class=\'typeahead-dropdown-title\'>Select An Airport</h3>'
+      header: Handlebars.compile('{{#if isEmpty}}{{else}}<h3 class=\'typeahead-dropdown-title\'>Select An Airport</h3>{{/if}}')
     };
   };
 

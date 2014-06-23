@@ -4,8 +4,8 @@
   ko.bindingHandlers.typeahead = {
     init: function (element, valueAccessor, allBindingsAccessor, bindingContext) {
        
-       console.log('ko.bindings.init: Search Options: ');
-       console.log(MapIt.Config.bloodhound_options());
+        console.log('ko.bindings.init: Search Options: ');
+        console.log(MapIt.Config.bloodhound_options());
 
 
         // HTML element that the binding was applied to, so DOM operations can be performed
@@ -43,7 +43,12 @@
 
         $e.typeahead({
             hint: true, // default = true
-            highlight: true, // default = false
+            highlight: true,
+            /*
+            highlighter: function(item) {
+                return '<div class="typeahead-suggestion-match">' + item + '</div>';
+            }, */ // default = false
+            //autoselect: true,
             minLength: 1, // default = 1
             limit: 2,
           }, {
