@@ -210,6 +210,13 @@ MapIt.ViewModel = function(options) {
 
   self.onOpened = function(obj, datum, name) {
     console.log('opened typeahead');
+    if(datum.id === 1) {
+      obj.typeahead("setQuery",self.departureSearchInput()).focus();
+    } else if(datum.id === 2) {
+      obj.typeahead("setQuery",self.arrivalSearchInput()).focus();
+    } else {
+      console.log('what is going on??');
+    }
   };
   
   self.onSelected = function(obj, datum, name) {

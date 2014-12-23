@@ -67,14 +67,5 @@
       }
   };
 
-  Handlebars.registerHelper('isnotnull', function(value, options) {
-    var exists = (typeof value !== 'undefined' && value !== null && value.length > 0 && value !== '');
-
-    if( exists ) {
-        return options.fn(this);
-    } else {
-        return options.inverse(this);
-    }
-  });
 
 })();
