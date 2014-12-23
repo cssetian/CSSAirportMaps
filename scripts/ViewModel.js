@@ -1,13 +1,13 @@
 
-MapIt.ViewModel = function(options) {
+CSSAirportMaps.ViewModel = function(options) {
   var self = this;
   self.initialAirport = ko.observable();
 
   self.initialize = function() {
     self.departureSearchOptions = {
-      //source: MapIt.SearchEngine.search,//self.departureSearchEngine().search.ttAdapter(),
+      //source: CSSAirportMaps.SearchEngine.search,//self.departureSearchEngine().search.ttAdapter(),
       name: 'departureAirports',
-      templates: MapIt.Config.typeahead_templates(),
+      templates: CSSAirportMaps.Config.typeahead_templates(),
       onOpened: self.onOpened,
       onSelected: self.onSelected,
       onAutoCompleted: self.onAutoCompleted,
@@ -15,9 +15,9 @@ MapIt.ViewModel = function(options) {
       remoteFilter: self.departureSearchEngine().remoteFilter
     };
     self.arrivalSearchOptions = {
-      //source: MapIt.SearchEngine.search,//self.arrivalSearchEngine().search.ttAdapter(),
+      //source: CSSAirportMaps.SearchEngine.search,//self.arrivalSearchEngine().search.ttAdapter(),
       name: 'arrivalAirports',
-      templates: MapIt.Config.typeahead_templates(),
+      templates: CSSAirportMaps.Config.typeahead_templates(),
       onOpened: self.onOpened,
       onSelected: self.onSelected,
       onAutoCompleted: self.onAutoCompleted,
@@ -35,8 +35,8 @@ MapIt.ViewModel = function(options) {
   self.departureSearchInput = ko.observable('');
   self.arrivalSearchInput = ko.observable('');
 
-  self.departureSearchEngine = ko.observable(new MapIt.SearchEngine({id: 1}));
-  self.arrivalSearchEngine = ko.observable(new MapIt.SearchEngine({id: 2}));
+  self.departureSearchEngine = ko.observable(new CSSAirportMaps.SearchEngine({id: 1}));
+  self.arrivalSearchEngine = ko.observable(new CSSAirportMaps.SearchEngine({id: 2}));
 
   self.departureSearchActive = ko.observable(false);
   self.arrivalSearchActive = ko.observable(false);
@@ -226,7 +226,7 @@ MapIt.ViewModel = function(options) {
 
     self.removeAirportById(0);
 
-    var newAirport = new MapIt.Airport(self.map(), {name: datum.name, id: datum.id, airportData: datum});
+    var newAirport = new CSSAirportMaps.Airport(self.map(), {name: datum.name, id: datum.id, airportData: datum});
     self.addAirport(newAirport);
     if(datum.id === 1) {
       self.isDepartureSelected(true);
@@ -267,7 +267,7 @@ MapIt.ViewModel = function(options) {
 
     self.removeAirportById(0);
 
-    var newAirport = new MapIt.Airport(self.map(), {name: datum.name, id: datum.id, airportData: datum});
+    var newAirport = new CSSAirportMaps.Airport(self.map(), {name: datum.name, id: datum.id, airportData: datum});
     self.addAirport(newAirport);
     if(datum.id === 1) {
       self.isDepartureSelected(true);

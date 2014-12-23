@@ -1,5 +1,5 @@
-MapIt.Airport = function(map, options) {
-  console.log('MapIt.Airport: Initializing Airport ViewModel for ' + options.name);
+CSSAirportMaps.Airport = function(map, options) {
+  console.log('CSSAirportMaps.Airport: Initializing Airport ViewModel for ' + options.name);
   var self = this;
 
   self.id = options.id;

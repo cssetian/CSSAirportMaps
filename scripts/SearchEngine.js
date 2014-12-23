@@ -1,5 +1,5 @@
 (function(){
-  MapIt.SearchEngine = function(options) {
+  CSSAirportMaps.SearchEngine = function(options) {
     // Initialize the Bloodhound search engine
     console.log('SearchEngine.body: Initializing Bloodhound engine');
     var self = this;

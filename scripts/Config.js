@@ -1,4 +1,4 @@
-MapIt.Config = (function() {
+CSSAirportMaps.Config = (function() {
 
   var _typeahead_templates = function() {
     return {
