@@ -10,17 +10,16 @@ var CSSAirportMaps = CSSAirportMaps || {};
 CSSAirportMaps.App = (function($, _, ko) {
 
   var viewModel;
-  var _searchEngine;
+  var searchEngine;
   var _initialMarker;
 
   var _init = function (options) {
+    console.log('Initializing CSSAirportMaps!');
 
-    console.log('CSSAirportMaps.Init: Initializing search engine.');
-    CSSAirportMaps.Config.handlebars_register_helpers();
-    _searchEngine = new CSSAirportMaps.SearchEngine(options);
-    options.searchEngine = _searchEngine;
+    CSSAirportMaps.Config.registerHandlebarHelpers();
+    searchEngine = new CSSAirportMaps.SearchEngine(options);
+    options.searchEngine = searchEngine;
 
-    console.log('CSSAirportMaps.Init: Initializing view model.');
     viewModel = new CSSAirportMaps.ViewModel(options);
     viewModel.initialize();
 

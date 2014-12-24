@@ -7,7 +7,7 @@ CSSAirportMaps.ViewModel = function(options) {
     self.departureSearchOptions = {
       //source: CSSAirportMaps.SearchEngine.search,//self.departureSearchEngine().search.ttAdapter(),
       name: 'departureAirports',
-      templates: CSSAirportMaps.Config.typeahead_templates(),
+      templates: CSSAirportMaps.Config.typeaheadTemplates,
       onOpened: self.onOpened,
       onSelected: self.onSelected,
       onAutoCompleted: self.onAutoCompleted,
@@ -17,7 +17,7 @@ CSSAirportMaps.ViewModel = function(options) {
     self.arrivalSearchOptions = {
       //source: CSSAirportMaps.SearchEngine.search,//self.arrivalSearchEngine().search.ttAdapter(),
       name: 'arrivalAirports',
-      templates: CSSAirportMaps.Config.typeahead_templates(),
+      templates: CSSAirportMaps.Config.typeaheadTemplates,
       onOpened: self.onOpened,
       onSelected: self.onSelected,
       onAutoCompleted: self.onAutoCompleted,
@@ -210,6 +210,9 @@ CSSAirportMaps.ViewModel = function(options) {
 
   self.onOpened = function(obj, datum, name) {
     console.log('opened typeahead');
+    if(!datum) {
+      return;
+    }
     if(datum.id === 1) {
       obj.typeahead("setQuery",self.departureSearchInput()).focus();
     } else if(datum.id === 2) {

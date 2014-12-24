@@ -5,7 +5,7 @@
     init: function (element, valueAccessor, allBindingsAccessor, bindingContext) {
        
         console.log('ko.bindings.init: Search Options: ');
-        console.log(CSSAirportMaps.Config.bloodhound_options());
+        console.log(CSSAirportMaps.Config.bloodhoundOptions);
 
 
         // HTML element that the binding was applied to, so DOM operations can be performed
@@ -29,7 +29,7 @@
         console.log('ko.bindings.init: bindingContext');
         console.log(bindingContext);
 
-        var search_options = CSSAirportMaps.Config.bloodhound_options();
+        var search_options = CSSAirportMaps.Config.bloodhoundOptions;
         search_options.remote.filter = options.remoteFilter;
 
         console.log('search options');
