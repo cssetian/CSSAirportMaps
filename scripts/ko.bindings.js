@@ -15,11 +15,12 @@ ko.bindingHandlers.typeahead = {
 
     var searchOptions = CSSAirportMaps.Config.bloodhoundOptions;
     searchOptions.remote.filter = options.remoteFilter;
-    
+
     var bloodhoundSearchEngine = new Bloodhound(searchOptions);
-    var searchPromise = bloodhoundSearchEngine.initialize();
-    searchPromise.done(function() { console.log('success!'); })
-                 .fail(function() { console.log('err!'); });
+    var searchPromise = bloodhoundSearchEngine
+                  .initialize()
+                  .done(function() { console.log('BloodhoundSearchEngine Initialization Success!'); })
+                  .fail(function() { console.log('BloodhoundSearchEngine Initialization Error!'); });
 
     // Log all of the relevant typehaead bindings initialization data
     console.log('ko.bindingHandlers (' + valueAccessor().name + '): $el: ', $el);
