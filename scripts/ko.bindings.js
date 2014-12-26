@@ -1,7 +1,7 @@
 // Typeahead handler
 ko.bindingHandlers.typeahead = {
   init: function (element, valueAccessor, allBindingsAccessor, bindingContext) {
-    console.log('ko.bindingHandlers: Initializing search options!');
+    console.log('ko.bindingHandlers (' + valueAccessor().name + '): Initializing search options!');
 
     // HTML element that the binding was applied to, so DOM operations can be performed
     var $el = $(element);
@@ -21,11 +21,11 @@ ko.bindingHandlers.typeahead = {
                  .fail(function() { console.log('err!'); });
 
     // Log all of the relevant typehaead bindings initialization data
-    console.log('ko.bindingHandlers: $el: ', $el);
-    console.log('ko.bindingHandlers: ko.unwrap(valueAccessor()): ', ko.unwrap(valueAccessor()));
-    console.log('ko.bindingHandlers: allBindingsAccessor(): ', allBindingsAccessor());
-    console.log('ko.bindingHandlers: bindingContext: ', bindingContext);
-    console.log('ko.bindingHandlers: Search Options: ', searchOptions);
+    console.log('ko.bindingHandlers (' + valueAccessor().name + '): $el: ', $el);
+    console.log('ko.bindingHandlers (' + valueAccessor().name + '): ko.unwrap(valueAccessor()): ', ko.unwrap(valueAccessor()));
+    console.log('ko.bindingHandlers (' + valueAccessor().name + '): allBindingsAccessor(): ', allBindingsAccessor());
+    console.log('ko.bindingHandlers (' + valueAccessor().name + '): bindingContext: ', bindingContext);
+    console.log('ko.bindingHandlers (' + valueAccessor().name + '): Search Options: ', searchOptions);
 
     $el.typeahead({
       hint: true, // default = true
@@ -42,6 +42,6 @@ ko.bindingHandlers.typeahead = {
       .on('typeahead:selected', options.onSelected)
       .on('typeahead:autocompleted', options.onAutoCompleted);
 
-    console.log('ko.bindingHandlers: Initialization of search options complete!');
+    console.log('ko.bindingHandlers (' + valueAccessor().name + '): Initialization of search options complete!');
   }
 };
