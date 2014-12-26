@@ -1,13 +1,10 @@
 // Typeahead handler
 ko.bindingHandlers.typeahead = {
   init: function (element, valueAccessor, allBindingsAccessor, bindingContext) {
-   
-    console.log('ko.bindings.init: Search Options: ');
-    console.log(CSSAirportMaps.Config.bloodhoundOptions);
-
+    console.log('ko.bindingHandlers: Initializing search options!');
 
     // HTML element that the binding was applied to, so DOM operations can be performed
-    var $e = $(element);
+    var $el = $(element);
 
     // A JavaScript object that you can use to access all the model values bound to this DOM element with the data-bind attribute
     var searchInput = allBindingsAccessor().value;
@@ -16,51 +13,35 @@ ko.bindingHandlers.typeahead = {
     // unwrap: This function will extract the observable value if an observable was bound to the value, otherwise will just return the value
     var options = ko.unwrap(valueAccessor());
 
-    console.log('ko.bindings.init: Initializing typeahead custom binding!');
-    console.log('ko.bindings.init: element: ');
-    console.log($e);
-    console.log('ko.bindings.init: valueAccessor() unwrapped');
-    console.log(valueAccessor());
-    console.log(ko.unwrap(valueAccessor()));
-    console.log('ko.bindings.init: allBindingsAccessor');
-    console.log(allBindingsAccessor());
-    console.log('ko.bindings.init: bindingContext');
-    console.log(bindingContext);
-
-    var search_options = CSSAirportMaps.Config.bloodhoundOptions;
-    search_options.remote.filter = options.remoteFilter;
-
-    console.log('search options');
-    console.log(search_options);
-    var search = new Bloodhound(search_options);//CSSAirportMaps.Config.bloodhound_options());
-
+    var searchOptions = CSSAirportMaps.Config.bloodhoundOptions;
+    searchOptions.remote.filter = options.remoteFilter;
+    var search = new Bloodhound(searchOptions);
     var searchPromise = search.initialize();
     searchPromise.done(function() { console.log('success!'); })
                  .fail(function() { console.log('err!'); });
 
+    // Log all of the relevant typehaead bindings initialization data
+    console.log('ko.bindingHandlers: $el: ', $el);
+    console.log('ko.bindingHandlers: ko.unwrap(valueAccessor()): ', ko.unwrap(valueAccessor()));
+    console.log('ko.bindingHandlers: allBindingsAccessor(): ', allBindingsAccessor());
+    console.log('ko.bindingHandlers: bindingContext: ', bindingContext);
+    console.log('ko.bindingHandlers: Search Options: ', searchOptions);
 
-    $e.typeahead({
+    $el.typeahead({
       hint: true, // default = true
       highlight: true,
-      /*
-      highlighter: function(item) {
-          return '<div class="typeahead-suggestion-match">' + item + '</div>';
-      }, */ // default = false
-      //autoselect: true,
       minLength: 1, // default = 1
       limit: 2,
     }, {
-      // `ttAdapter` wraps the suggestion engine in an adapter that
-      // is compatible with the typeahead jQuery plugin
-      source: search.ttAdapter(),//options.source,
+      source: search.ttAdapter(), // `ttAdapter` wraps the suggestion engine in an adapter that is compatible with the typeahead jQuery plugin
       name: options.name,
       displayKey: 'value',
-      engine: Handlebars,
-      templates: options.templates
-    }).on('typeahead:opened', options.onOpened)
+      engine: Handlebars, // Specifies the template-rendering engine
+      templates: options.templates  // Provides the Handlebars templates to typeahead for the autocomplete heading, suggestion and empty situations
+    }).on('typeahead:opened', options.onOpened) // Register events for opening, selecting, and autocompleting search options
       .on('typeahead:selected', options.onSelected)
       .on('typeahead:autocompleted', options.onAutoCompleted);
 
-    console.log('ko.bindings.init: Typeahead initialization complete!');
+    console.log('ko.bindingHandlers: Initialization of search options complete!');
   }
 };
