@@ -86,36 +86,18 @@ CSSAirportMaps.ViewModel = function(options) {
     }
   });
 
+  // Update state variables when user begins departure airport search
   self.departureSearchInput.subscribe(function(newDepartureSearchInput) {
-    console.log('ViewModel.departureSearchInput.subscribe: I am subscribed to departureSearchInput right now.');
-    console.log('ViewModel.departureSearchInput.subscribe: The new value of departureSearchInput is: <' + newDepartureSearchInput + '>');
-    
+    console.log('ViewModel value update (departureSearchInput): (' + newDepartureSearchInput + ')');
     self.departureSearchActive(true);
     self.isDepartureSelected(false);
   });
 
-
+  // Update state variables when user begins departure airport search
   self.arrivalSearchInput.subscribe(function(newArrivalSearchInput) {
-    console.log('ViewModel.departureSearchInput.subscribe: I am subscribed to departureSearchInput right now.');
-    console.log('ViewModel.departureSearchInput.subscribe: The new value of departureSearchInput is: <' + newArrivalSearchInput + '>');
-    
+    console.log('ViewModel value update (arrivalSearchInput): (' + newArrivalSearchInput + ')');
     self.arrivalSearchActive(true);
     self.isArrivalSelected(false);
-  });
-
-  // BUILDS THE SEARCHABLE WORDS AND TOKENS FOR BLOODHOUND TO USE
-  self.SearchText = ko.computed({
-    read: function () {
-      var searchableTerms = [];
-      ko.utils.arrayForEach(self.departureAirport().airportSearchResults(), function (item) {
-        searchableTerms.push(item.name);
-      });
-      console.log('SearchableTerms:');
-      console.log(searchableTerms);
-      return searchableTerms;
-    },
-    owner: self,
-    deferEvaluation: true
   });
 
   /************ MAP-RENDERING AND STATE-MAINTAINING HELPER FUNCTIONS *************/

@@ -1,5 +1,8 @@
 CSSAirportMaps.Config = {};
 
+// These templates are rendered when the typeahead autocomplete results are empty, 
+//    provide a collection of results, and when typeahead is rendering 
+//    the static autocomplete header, respectively.
 CSSAirportMaps.Config.typeaheadTemplates = {
   empty: [
     '<div class="empty-message">',
