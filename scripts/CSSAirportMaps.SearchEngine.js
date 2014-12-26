@@ -44,15 +44,9 @@ CSSAirportMaps.SearchEngine = function(options) {
 
   
   self.remoteFilter = function(bloodhoundSearchResultObj) {
-    console.log('************************* COMPLETED BLOODHOUND AIRPORT SEARCH EXECUTION ****************************');
-    console.log('SearchEngine.remoteFilter: (Bloodhound Callback) Found ' + bloodhoundSearchResultObj.length + ' airport(s)! (Obj copied below) ---v');
-    console.log(bloodhoundSearchResultObj);
-
-    console.log('SearchEngine.remoteFilter: Mapping results!');
+    console.log('SearchEngine.remoteFilter: Completed Bloodhound Search! Found ' + bloodhoundSearchResultObj.totalResultsCount + ' airport(s)!', bloodhoundSearchResultObj);
     var mappedSearchResults = self.mapSearchResults(bloodhoundSearchResultObj);
-
-    console.log('SearchEngine.remoteFilter: (Bloodhound Callback) Mapped Output (Obj copied below) --v');
-    console.log(mappedSearchResults);
+    console.log('SearchEngine.remoteFilter: Mapped Results: ', mappedSearchResults);
     return mappedSearchResults;
   };
 

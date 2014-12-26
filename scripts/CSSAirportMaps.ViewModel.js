@@ -103,12 +103,9 @@ CSSAirportMaps.ViewModel = function(options) {
   /************ MAP-RENDERING AND STATE-MAINTAINING HELPER FUNCTIONS *************/
 
   self.addAirport = function(newAirport) {
-    console.log('ViewModel.addAirportToMap: Adding airport to the airprotCollection with an id of ' + newAirport.id + '! Copying airport below --v');
-    console.log(newAirport);
-    
+    console.log('ViewModel.addAirport: Adding airport ' + newAirport.name + ': ', newAirport);
     self.airportCollection.push(newAirport);
-    
-    console.log('ViewModel.addAirportToMap: Added airport to collection with id of <' + newAirport.id + '>! New collection size: <' + self.airportCollection().length + '>');
+    console.log('ViewModel.addAirport: Added airport with id of ' + newAirport.id + '. New collection size: ' + self.airportCollection().length + '.');
     };
 
   self.removeAirportById = function(idToRemove) {
@@ -205,9 +202,7 @@ CSSAirportMaps.ViewModel = function(options) {
   };
   
   self.onSelected = function(obj, datum, name) {
-    console.log('ViewModel.onSelected: Typeahead ' + datum.name + ' was autocompleted!');
-    console.log('ViewModel.onSelected: Data Results: --v');
-    console.log(datum);
+    console.log('ViewModel.onSelected: Selected ' + datum.name + ': ', datum);
 
     self.removeAirportById(0);
 
@@ -234,21 +229,10 @@ CSSAirportMaps.ViewModel = function(options) {
     } else {
       console.log('ViewModel.onAutoCompleted: This should never get to this block of code, there will always be either 1, 2, or 0 mapMarkers on the map.');
     }
-
-    //console.log('ViewModel.onSelected: Stringifying, obj, then datum, then name: --v');
-    //console.log(JSON.stringify(obj)); // object
-    // outputs, e.g., {"type":"typeahead:selected","timeStamp":1371822938628,"jQuery19105037956037711017":true,"isTrigger":true,"namespace":"","namespace_re":null,"target":{"jQuery19105037956037711017":46},"delegateTarget":{"jQuery19105037956037711017":46},"currentTarget":
-    //console.log(JSON.stringify(datum)); // contains datum value, tokens and custom fields
-    // outputs, e.g., {"redirect_url":"http://localhost/test/topic/test_topic","image_url":"http://localhost/test/upload/images/t_FWnYhhqd.jpg","description":"A test description","value":"A test value","tokens":["A","test","value"]}
-    // in this case I created custom fields called 'redirect_url', 'image_url', 'description'   
-    //console.log(JSON.stringify(name)); // contains dataset name
-    // outputs, e.g., "my_dataset"
   };
 
   self.onAutoCompleted = function(obj, datum, name) {
-    console.log('ViewModel.onAutoCompleted: Typeahead ' + datum.name + ' was autocompleted!');
-    console.log('ViewModel.onAutoCompleted: Data Results: --v');
-    console.log(datum);
+    console.log('ViewModel.onAutoCompleted: (' + datumn.name + '): ', datum);
 
     self.removeAirportById(0);
 
@@ -275,25 +259,14 @@ CSSAirportMaps.ViewModel = function(options) {
     } else {
       console.log('ViewModel.onAutoCompleted: Shouldn\'t really have gotten here...');
     }
-
-    //console.log('ViewModel.onAutoCompleted: Stringifying, obj, then datum, then name: --v');
-    //console.log(JSON.stringify(obj)); // object
-    // outputs, e.g., {"type":"typeahead:selected","timeStamp":1371822938628,"jQuery19105037956037711017":true,"isTrigger":true,"namespace":"","namespace_re":null,"target":{"jQuery19105037956037711017":46},"delegateTarget":{"jQuery19105037956037711017":46},"currentTarget":
-    //console.log(JSON.stringify(datum)); // contains datum value, tokens and custom fields
-    // outputs, e.g., {"redirect_url":"http://localhost/test/topic/test_topic","image_url":"http://localhost/test/upload/images/t_FWnYhhqd.jpg","description":"A test description","value":"A test value","tokens":["A","test","value"]}
-    // in this case I created custom fields called 'redirect_url', 'image_url', 'description'   
-    //console.log(JSON.stringify(name)); // contains dataset name
-    // outputs, e.g., "my_dataset"
   };
 
   self.distBtwnAirports = function(unit) {
     return ko.computed({
       read: function() {
-        //console.log('ViewModel.distBtwnAirports: Calculating the distance between airport 1: ' 
-        // + self.departureAirport().selectedSearchResultObj().name + ' and airport 2: ' 
-        // + self.arrivalAirport().selectedSearchResultObj().name);
+        console.log('ViewModel.distBtwnAirports: Calculating distance between airports!');
+
         if(!self.isDepartureSelected() || !self.isArrivalSelected()) {
-          //console.log('ViewModel.distBtwnAirports: Error calculating distance: Make sure departure airport, arrival airport, and units are specified!');
           return '';
         }
 
@@ -314,8 +287,9 @@ CSSAirportMaps.ViewModel = function(options) {
         
         // This is getting repeated multiple times because whenever departureAirport or arrivalAirport are updated/touched at all, this recomputes
         // That incldues the tests in the HTML where it checks to see if they exist before displaying the computed distances
-        //console.log('ViewModel.distBtwnAirports: Distance between ' + self.departureAirport().selectedSearchResultObj().name + ' and ' + self.arrivalAirport().selectedSearchResultObj().name + ' is approximately: ' + distanceToReturnTrimmed + ' ' + unit);
         var distanceToReturnTrimmed =  parseFloat(distanceToReturn).toFixed(2);
+        console.log('ViewModel.distBtwnAirports: Calculated distance between airports: ' , distanceToReturnTrimmed);
+
         return distanceToReturnTrimmed;
       },
       deferEvaluation: true
