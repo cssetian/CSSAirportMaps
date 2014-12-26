@@ -15,8 +15,9 @@ ko.bindingHandlers.typeahead = {
 
     var searchOptions = CSSAirportMaps.Config.bloodhoundOptions;
     searchOptions.remote.filter = options.remoteFilter;
-    var search = new Bloodhound(searchOptions);
-    var searchPromise = search.initialize();
+    
+    var bloodhoundSearchEngine = new Bloodhound(searchOptions);
+    var searchPromise = bloodhoundSearchEngine.initialize();
     searchPromise.done(function() { console.log('success!'); })
                  .fail(function() { console.log('err!'); });
 
@@ -33,7 +34,7 @@ ko.bindingHandlers.typeahead = {
       minLength: 1, // default = 1
       limit: 2,
     }, {
-      source: search.ttAdapter(), // `ttAdapter` wraps the suggestion engine in an adapter that is compatible with the typeahead jQuery plugin
+      source: bloodhoundSearchEngine.ttAdapter(), // `ttAdapter` wraps the suggestion engine in an adapter that is compatible with the typeahead jQuery plugin
       name: options.name,
       displayKey: 'value',
       engine: Handlebars, // Specifies the template-rendering engine

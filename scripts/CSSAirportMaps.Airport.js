@@ -52,7 +52,8 @@ CSSAirportMaps.Airport = function(map, options) {
       var e = $.Event('keydown');
       e.keyCode = e.which = 9; // 9 == tab
       
-      if (event.which === 13) {  // if user is pressing enter key
+      // if user is pressing enter key
+      if (event.which === 13) {
         typeAheadEl.trigger(e); // trigger "tab" key - which works as "enter" for typeahead
       }
       typeAheadEl.typeahead('close');  // Closes the typeahead when tab or enter selects an item
