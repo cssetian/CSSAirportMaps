@@ -32,12 +32,14 @@ CSSAirportMaps.Config.bloodhoundOptions = {
   log_successful_searches: true,
   log_failed_searches: true,
   remote: {
+    // This Geonames remote API provides a free queryable library for searching for airports based on textual input
     //url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name=%QUERY',
     url: 'http://api.geonames.org/searchJSON?style=full&lang=en&maxRows=20&featureClass=S&featureCode=AIRP&username=cssetian&orderby=relevance&name_startsWith=%QUERY',
     filter: ''
   }
 };
 
+// Helper for rendering handlebar templates
 CSSAirportMaps.Config.registerHandlebarHelpers = function() {
   Handlebars.registerHelper('isnotnull', function(value, options) {
     var exists = (typeof value !== 'undefined' && value !== null && value.length > 0 && value !== '');
