@@ -185,7 +185,7 @@ CSSAirportMaps.ViewModel = function(options) {
     self.flightPath().setMap(null);
   };
 
-  /****** TYPEAHEAD EVENT HANDLERS ******/
+  /************* TYPEAHEAD EVENT HANDLERS *************/
 
   self.onOpened = function(obj, datum, name) {
     console.log('opened typeahead');
