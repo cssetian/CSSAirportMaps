@@ -47,3 +47,40 @@ ko.bindingHandlers.typeahead = {
     console.log('ko.bindingHandlers (' + valueAccessor().name + '): Initialization of search options complete!');
   }
 };
+
+ko.bindingHandlers.distBtwnAirports = {
+  update:  function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    'use strict';
+    var self = viewModel;
+    var unit = valueAccessor();
+
+    if(self.isDepartureSelected() && self.isArrivalSelected()) {
+      console.log('ViewModel.distBtwnAirports: Calculating distance between airports!');
+
+      var p1 = new LatLon(self.getAirportById(1).airportData().lat, self.getAirportById(1).airportData().lng);
+      var p2 = new LatLon(self.getAirportById(2).airportData().lat, self.getAirportById(2).airportData().lng);
+      var dist = p1.distanceTo(p2);
+      var distanceToReturn;
+
+      if(unit === 'M') {
+        distanceToReturn = dist * 0.621371; // 0.621371 Miles per 1 Kilometer
+      } else if (unit === 'NM') {
+        distanceToReturn = dist * 0.539957; // 0.539957 Nautical Miles per 1 Kilometer
+      } else if (unit === 'Km') {
+        distanceToReturn = dist;
+      } else {
+        distanceToReturn = -1;
+        console.log('ViewModel.distBtwnAirports: No unit of length specified.');
+      }
+      
+      // This is getting repeated multiple times because whenever departureAirport or arrivalAirport are updated/touched at all, this recomputes
+      // That incldues the tests in the HTML where it checks to see if they exist before displaying the computed distances
+      var distanceToReturnTrimmed =  parseFloat(distanceToReturn).toFixed(2);
+      console.log('ViewModel.distBtwnAirports: Calculated distance between airports: ' , distanceToReturnTrimmed);
+
+      $(element).text(distanceToReturnTrimmed);
+    } else {
+      console.log('ViewModel.distBtwnAirports: Must select 2 airports to calculate distance!');
+    }
+  }
+};

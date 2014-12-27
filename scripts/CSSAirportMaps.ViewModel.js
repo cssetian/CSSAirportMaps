@@ -4,27 +4,33 @@ CSSAirportMaps.ViewModel = function(options) {
   self.initialAirport = ko.observable();
 
   self.initialize = function() {
+
     self.departureSearchOptions = {
-      //source: CSSAirportMaps.SearchEngine.search,//self.departureSearchEngine().search.ttAdapter(),
+      id: 1,
       name: 'departureAirports',
       templates: CSSAirportMaps.Config.typeaheadTemplates,
       onOpened: self.onOpened,
       onSelected: self.onSelected,
       onAutoCompleted: self.onAutoCompleted,
-      searchInputVal: self.departureSearchInput,
-      remoteFilter: self.departureSearchEngine().remoteFilter
+      searchInputVal: self.departureSearchInput
     };
     self.arrivalSearchOptions = {
-      //source: CSSAirportMaps.SearchEngine.search,//self.arrivalSearchEngine().search.ttAdapter(),
+      id: 2,
       name: 'arrivalAirports',
       templates: CSSAirportMaps.Config.typeaheadTemplates,
       onOpened: self.onOpened,
       onSelected: self.onSelected,
       onAutoCompleted: self.onAutoCompleted,
-      searchInputVal: self.arrivalSearchInput,
-      remoteFilter: self.arrivalSearchEngine().remoteFilter
+      searchInputVal: self.arrivalSearchInput
     };
 
+    // Initialize each search engine with its specific name and id
+    self.departureSearchEngine(new CSSAirportMaps.SearchEngine({id: self.departureSearchOptions.id, name: self.departureSearchOptions.name }));
+    self.arrivalSearchEngine(new CSSAirportMaps.SearchEngine({id: self.arrivalSearchOptions.id, name: self.arrivalSearchOptions.name }));
+
+    // Add the filter to the search options after initializing the search engines
+    self.departureSearchOptions.remoteFilter = self.departureSearchEngine().remoteFilter;
+    self.arrivalSearchOptions.remoteFilter = self.arrivalSearchEngine().remoteFilter;
   };
 
   self.map = ko.observable(new google.maps.Map(document.getElementById('map-canvas'), {}));
@@ -35,8 +41,8 @@ CSSAirportMaps.ViewModel = function(options) {
   self.departureSearchInput = ko.observable('');
   self.arrivalSearchInput = ko.observable('');
 
-  self.departureSearchEngine = ko.observable(new CSSAirportMaps.SearchEngine({id: 1}));
-  self.arrivalSearchEngine = ko.observable(new CSSAirportMaps.SearchEngine({id: 2}));
+  self.departureSearchEngine = ko.observable();
+  self.arrivalSearchEngine = ko.observable();
 
   self.departureSearchActive = ko.observable(false);
   self.arrivalSearchActive = ko.observable(false);
@@ -259,41 +265,6 @@ CSSAirportMaps.ViewModel = function(options) {
     } else {
       console.log('ViewModel.onAutoCompleted: Shouldn\'t really have gotten here...');
     }
-  };
-
-  self.distBtwnAirports = function(unit) {
-    return ko.computed({
-      read: function() {
-        console.log('ViewModel.distBtwnAirports: Calculating distance between airports!');
-
-        if(!self.isDepartureSelected() || !self.isArrivalSelected()) {
-          return '';
-        }
-
-        var p1 = new LatLon(self.getAirportById(1).airportData().lat, self.getAirportById(1).airportData().lng);
-        var p2 = new LatLon(self.getAirportById(2).airportData().lat, self.getAirportById(2).airportData().lng);
-        var dist = p1.distanceTo(p2);
-
-        var distanceToReturn = dist;
-        if(unit === 'M') {
-          distanceToReturn = dist * 0.621371;
-        } else if (unit === 'NM') {
-          distanceToReturn = dist * 0.539957;
-        } else if (unit === 'Km') {
-          distanceToReturn = dist;
-        } else {
-          console.log('ViewModel.distBtwnAirports: No unit of length supplied, providing distance in Kilometers.');
-        }
-        
-        // This is getting repeated multiple times because whenever departureAirport or arrivalAirport are updated/touched at all, this recomputes
-        // That incldues the tests in the HTML where it checks to see if they exist before displaying the computed distances
-        var distanceToReturnTrimmed =  parseFloat(distanceToReturn).toFixed(2);
-        console.log('ViewModel.distBtwnAirports: Calculated distance between airports: ' , distanceToReturnTrimmed);
-
-        return distanceToReturnTrimmed;
-      },
-      deferEvaluation: true
-    }, this);
   };
 
 };

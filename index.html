@@ -241,25 +241,19 @@
         <tr>
           <td>Kilometers:</td>
           <td>
-            <!-- ko if: isDepartureSelected && isArrivalSelected -->
-            <span data-bind="text: distBtwnAirports('Km')"></span>
-            <!-- /ko -->
+            <span data-bind="distBtwnAirports: 'Km'"></span>
           </td>
         </tr>
         <tr>
           <td>Miles:</td>
           <td>
-            <!-- ko if: isDepartureSelected && isArrivalSelected -->
-            <div data-bind="text: distBtwnAirports('M')"></div>
-            <!-- /ko -->
+            <div data-bind="distBtwnAirports: 'M'"></div>
           </td>
         </tr>
         <tr>
           <td>Nautical Miles:</td>
           <td>
-            <!-- ko if:  isDepartureSelected && isArrivalSelected -->
-            <div data-bind="text: distBtwnAirports('NM')"></div>
-            <!-- /ko -->
+            <div data-bind="distBtwnAirports: 'NM'"></div>
           </td>
         </tr>
       </table>

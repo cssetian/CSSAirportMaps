@@ -1,7 +1,9 @@
 CSSAirportMaps.SearchEngine = function(options) {
   // Initialize the Bloodhound search engine
-  console.log('SearchEngine.body: Initializing Bloodhound engine');
   var self = this;
+  self.id = options.id;
+  self.name = options.name;
+  console.log('SearchEngine.body: Initializing Bloodhound engine for ' + self.name);
 
   self.mapSearchResults = function(bloodhoundSearchResultObj) {
 
