@@ -1,10 +1,5 @@
-/*
+// App class for CSSAirportMaps Site. Initializes the site, sets up the viewmodel, and applies the  knockout bindings
 
-  Statements that begin with the token function are 
-    always considered to be function declarations. 
-  Including () creates a function expression instead
-
- */
 var CSSAirportMaps = CSSAirportMaps || {};
 
 CSSAirportMaps.App = (function($, _, ko) {
@@ -29,7 +24,7 @@ CSSAirportMaps.App = (function($, _, ko) {
       console.log('CSSAirportMapsApp.init: Geolocation not available!');
     }
 
-    var _initialDefaultAirport = new CSSAirportMaps.Airport(viewModel.map(), {name: 'Initial Airport: Start Here', id: 0, airportData: {name: 'Initial Airport: Start here Data', lat: 34.5, lng: 75.5}});
+    var _initialDefaultAirport = new CSSAirportMaps.Airport(viewModel.map(), {name: 'Newark Airport (HardCoded)', id: 0, airportData: {name: 'Initial Airport: Start here Data', lat: 34.5, lng: 75.5}});
     viewModel.addAirport(_initialDefaultAirport);
     console.log('CSSAirportMaps.Init: Adding default, non-located marker to map! Location at: <' +  viewModel.getAirportById(0).airportMarker().position + '>');
     
