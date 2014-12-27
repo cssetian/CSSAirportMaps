@@ -4,10 +4,10 @@ CSSAirportMaps.SearchEngine = function(options) {
   var self = this;
   self.id = options.id;
   self.name = options.name;
-  console.log('SearchEngine.body: Initializing Bloodhound engine for ' + self.name);
+  console.log('SearchEngine: Initializing Bloodhound engine for ' + self.name);
 
   self.mapSearchResults = function(bloodhoundSearchResultObj) {
-    console.log('SearchEngine.body: Mapping Search Results');
+    console.log('SearchEngine.mapSearchResults: Mapping Search Results');
 
     // Map the properties of the returned geoplanet data to the viewmodel properties
     var mappedOutputPreFiltering = $.map(bloodhoundSearchResultObj.geonames, function (airportSearchResultItem) {

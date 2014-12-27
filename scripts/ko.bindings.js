@@ -78,7 +78,7 @@ ko.bindingHandlers.distBtwnAirports = {
       // This is getting repeated multiple times because whenever departureAirport or arrivalAirport are updated/touched at all, this recomputes
       // That incldues the tests in the HTML where it checks to see if they exist before displaying the computed distances
       var distanceToReturnTrimmed =  parseFloat(distanceToReturn).toFixed(2);
-      console.log('ViewModel.distBtwnAirports: Calculated distance between airports: ' , distanceToReturnTrimmed);
+      console.log('ViewModel.distBtwnAirports: Calculated distance between airports: ' + distanceToReturnTrimmed + ' ' + unit);
 
       $(element).text(distanceToReturnTrimmed);
     } else {
