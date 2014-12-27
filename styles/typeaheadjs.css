@@ -1,3 +1,4 @@
+/* Styles for the dropdown autocomplete typeahead seawrch bar */
 .tt-dropdown-menu {
   position: absolute;
   top: 100%;
@@ -35,3 +36,81 @@
   outline: 0;
   background-color: #428bca;
 }
+
+
+/* Specific Styling for typeahead dropdown templates */
+.typeahead-airport-name {
+  font-size: 12px;
+  font-weight: bold;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.typeahead-airport-state {
+  font-size: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.typeahead-airport-country {
+  font-size: 11px;
+  padding-left: 5px;
+  padding-right: 5px;
+  
+}
+.typeahead-dropdown-title {
+  padding-left: 5px;
+  padding-right: 5px;
+  font-size: large;
+  border-bottom: double;
+}
+.twitter-typeahead{
+     width: 97%;
+}
+.tt-dropdown-menu{
+  width: 102%;
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
+.tt-cursor{ color:#f1b218; }
+
+.tt-suggestion:not(:last-child) {
+  border-bottom: dotted;
+  border-width: 1px;
+  padding-top: 5px;
+}
+
+.typeahead-suggestion-match {
+  color: red;
+}
+.tt-hint {
+    color: #999;
+}
+
+.tt-dropdown-menu {
+  width: 300px;
+  margin-top: 12px;
+  padding: 8px 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+/* This is a bright blue background for suggestions
+.tt-suggestion {
+    padding: 3px 20px;
+    font-size: 18px;
+    line-height: 24px;
+}
+.tt-suggestion.tt-cursor { 
+    color: #fff;
+    background-color: #0097cf;
+
+}
+.tt-suggestion p {
+    margin: 0;
+}
+*/
