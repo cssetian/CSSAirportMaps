@@ -64,6 +64,5 @@ class AirportSearchHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     webapp2.Route('/airportsearch', handler=AirportSearchHandler),
-    ('/debug', DebugHandler),
     ('/', MainHandler)
 ], debug=True)

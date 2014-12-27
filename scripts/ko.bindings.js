@@ -84,6 +84,7 @@ ko.bindingHandlers.distBtwnAirports = {
       $(element).text(distanceToReturnTrimmed);
     } else {
       console.log('ViewModel.distBtwnAirports: Must select 2 airports to calculate distance!');
+      $(element).text('');
     }
   }
 };
