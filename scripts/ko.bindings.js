@@ -59,6 +59,7 @@ ko.bindingHandlers.distBtwnAirports = {
     if(self.isDepartureSelected() && self.isArrivalSelected()) {
       console.log('ViewModel.distBtwnAirports: Calculating distance between airports!');
 
+      // Create 2 coordinates using the 2 airports to calculate the distance with
       var p1 = new LatLon(self.getAirportById(1).airportData().lat, self.getAirportById(1).airportData().lng);
       var p2 = new LatLon(self.getAirportById(2).airportData().lat, self.getAirportById(2).airportData().lng);
       var dist = p1.distanceTo(p2);

@@ -6,6 +6,7 @@ CSSAirportMaps.SearchEngine = function(options) {
   self.name = options.name;
   console.log('SearchEngine: Initializing Bloodhound engine for ' + self.name);
 
+  // Map bloodhound search results to airport JSON objects that can be fed into the autocomplete
   self.mapSearchResults = function(bloodhoundSearchResultObj) {
     console.log('SearchEngine.mapSearchResults: Mapping Search Results');
 
@@ -43,10 +44,10 @@ CSSAirportMaps.SearchEngine = function(options) {
     var mappedOutput = _.filter(mappedOutputPreFiltering, function(item) {
       return (typeof item.code !== 'undefined' && item.code !== null && item.code !== '');
     });
+
     return mappedOutput;
   };
 
-  
   self.remoteFilter = function(bloodhoundSearchResultObj) {
     console.log('SearchEngine.remoteFilter: Completed Bloodhound Search! Found ' + bloodhoundSearchResultObj.totalResultsCount + ' airport(s)!', bloodhoundSearchResultObj);
     var mappedSearchResults = self.mapSearchResults(bloodhoundSearchResultObj);

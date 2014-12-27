@@ -4,8 +4,8 @@ CSSAirportMaps.ViewModel = function(options) {
   var self = this;
   self.initialAirport = ko.observable();
 
+  // ViewModel requires some specific initialization logic after its member variables have been defined
   self.initialize = function() {
-
     // Define the specific unique data for each of the two search engines
     self.departureSearchOptions = {
       id: 1,
@@ -40,18 +40,23 @@ CSSAirportMaps.ViewModel = function(options) {
   self.bounds = ko.observable(new google.maps.LatLngBounds(null)); // Define a map boundary object so it can be extended when airports are defined
   self.flightPath = ko.observable(new google.maps.Polyline());  // Defines a google maps polyline to be added / removed when both airports are selected
 
+  // Search Engine textual inputs
   self.departureSearchInput = ko.observable('');
   self.arrivalSearchInput = ko.observable('');
 
+  // Search Engine observable viewModel variables
   self.departureSearchEngine = ko.observable();
   self.arrivalSearchEngine = ko.observable();
 
+  // State observable variables
   self.departureSearchActive = ko.observable(false);
   self.arrivalSearchActive = ko.observable(false);
 
   self.isDepartureSelected = ko.observable(false);
   self.isArrivalSelected = ko.observable(false);
 
+  // Subscribe to the departure/arrival searches being initiated, and if it's active, 
+  //    then set state variables and update positioning of map if an existing airport was removed
   self.departureSearchActive.subscribe(function(newVal) {
     console.log('ViewModel.departureSearchActive: ' + newVal);
     if(newVal === true) {
@@ -109,7 +114,6 @@ CSSAirportMaps.ViewModel = function(options) {
   });
 
   /************ MAP-RENDERING AND STATE-MAINTAINING HELPER FUNCTIONS *************/
-
   self.addAirport = function(newAirport) {
     console.log('ViewModel.addAirport: Adding airport ' + newAirport.name + ': ', newAirport);
     self.airportCollection.push(newAirport);
