@@ -14,10 +14,6 @@ from google.appengine.ext.webapp import util
 def handleError(e):
   logging.info('Need to handle the error!')
 
-class DebugHandler(webapp2.RequestHandler):
-    def get(self):
-        self.response.out.write(template.render('debug.html', {}))
-
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.out.write(template.render('index.html', {}))
