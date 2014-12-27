@@ -11,10 +11,10 @@ ko.bindingHandlers.typeahead = {
 
     // valueAccessor: A JavaScript function that you can call to get the current model property that is involved in this binding.
     // unwrap: This function will extract the observable value if an observable was bound to the value, otherwise will just return the value
-    var options = ko.unwrap(valueAccessor());
+    var typeaheadOptions = ko.unwrap(valueAccessor());
 
     var searchOptions = CSSAirportMaps.Config.bloodhoundOptions;
-    searchOptions.remote.filter = options.remoteFilter;
+    searchOptions.remote.filter = typeaheadOptions.remoteFilter;
 
     var bloodhoundSearchEngine = new Bloodhound(searchOptions);
     var searchPromise = bloodhoundSearchEngine
@@ -36,13 +36,13 @@ ko.bindingHandlers.typeahead = {
       limit: 2,
     }, {
       source: bloodhoundSearchEngine.ttAdapter(), // `ttAdapter` wraps the suggestion engine in an adapter that is compatible with the typeahead jQuery plugin
-      name: options.name,
+      name: typeaheadOptions.name,
       displayKey: 'value',
       engine: Handlebars, // Specifies the template-rendering engine
-      templates: options.templates  // Provides the Handlebars templates to typeahead for the autocomplete heading, suggestion and empty situations
-    }).on('typeahead:opened', options.onOpened) // Register events for opening, selecting, and autocompleting search options
-      .on('typeahead:selected', options.onSelected)
-      .on('typeahead:autocompleted', options.onAutoCompleted);
+      templates: typeaheadOptions.templates  // Provides the Handlebars templates to typeahead for the autocomplete heading, suggestion and empty situations
+    }).on('typeahead:opened', typeaheadOptions.onOpened) // Register events for opening, selecting, and autocompleting search options
+      .on('typeahead:selected', typeaheadOptions.onSelected)
+      .on('typeahead:autocompleted', typeaheadOptions.onAutoCompleted);
 
     console.log('ko.bindingHandlers (' + valueAccessor().name + '): Initialization of search options complete!');
   }
