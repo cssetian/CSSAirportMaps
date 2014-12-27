@@ -10,7 +10,8 @@ ko.bindingHandlers.typeahead = {
     var searchInput = allBindingsAccessor().value;
 
     // valueAccessor: A JavaScript function that you can call to get the current model property that is involved in this binding.
-    // unwrap: This function will extract the observable value if an observable was bound to the value, otherwise will just return the value
+    //                valueAccessor in each knockout binding equals the departureSearchOptions/arrivalSearchOptions defined in the viewModel.
+    // unwrap: This function will extract the observable value if an observable was bound to the value, otherwise will just return the value.
     var typeaheadOptions = ko.unwrap(valueAccessor());
 
     var searchOptions = CSSAirportMaps.Config.bloodhoundOptions;
@@ -33,7 +34,8 @@ ko.bindingHandlers.typeahead = {
       hint: true, // default = true
       highlight: true,
       minLength: 1, // default = 1
-      limit: 2,
+      autoselect: true
+      //limit: 2,
     }, {
       source: bloodhoundSearchEngine.ttAdapter(), // `ttAdapter` wraps the suggestion engine in an adapter that is compatible with the typeahead jQuery plugin
       name: typeaheadOptions.name,

@@ -116,7 +116,7 @@ CSSAirportMaps.ViewModel = function(options) {
     };
 
   self.removeAirportById = function(idToRemove) {
-    console.log('ViewModel.removeAirportById: Removing airport from collection with id of <' + idToRemove + '>. Current collection size: <' + self.airportCollection().length + '>');
+    console.log('ViewModel.removeAirportById: Removing airport ' + idToRemove + ' from collection. Current collection size: ' + self.airportCollection().length);
 
     var airportToRemove;
     var airportToRemoveArray = _.filter(self.airportCollection(), function(airport) {
@@ -127,19 +127,15 @@ CSSAirportMaps.ViewModel = function(options) {
       airportToRemove = airportToRemoveArray[0];
       self.removeMarkerFromMap(airportToRemove);
       self.airportCollection.remove(airportToRemove);
-      console.log('ViewModel.removeAirportById: Airport <' + idToRemove + '> removed! Size of airportCollection is now <' 
-                      + self.airportCollection().length + '>. Removed airport copied below --v');
-      console.log(airportToRemove);
+      console.log('ViewModel.removeAirportByid: Removing airport ' + idToRemove + '. Airport collection size is now ' + self.airportCollection().length);
     } else {
-      console.log('ViewModel.removeAirportById: No airport was found to remove with id of <' 
-                      + idToRemove + '>, copying data array below that was returned in removal search --v');
-      console.log(airportToRemoveArray);
+      console.log('ViewModel.removeAirportByid: Could not find airport with id' + idToRemove + '! Some kind of error happened.');
     }
+
     return airportToRemove;
   };
 
   self.getAirportById = function(idToRetrieve) {
-    console.log('ViewModel.getAirportById: Retrieving airport with id: <' + idToRetrieve + '>');
 
     var airportToReturn;
     var airportToReturnArray = _.filter(self.airportCollection(), function(airport) {
@@ -149,7 +145,7 @@ CSSAirportMaps.ViewModel = function(options) {
     if(typeof airportToReturnArray !== 'undefined' && airportToReturnArray !== null && airportToReturnArray.length > 0) {
       airportToReturn = airportToReturnArray[0];
     } else {
-      console.log('ViewModel.getAirportById: No airport was found with an id of <' + idToRetrieve + '>');
+      console.log('ViewModel.getAirportById: No airport was found with an id of ' + idToRetrieve);
     }
     return airportToReturn;
   };
@@ -172,7 +168,7 @@ CSSAirportMaps.ViewModel = function(options) {
   };
 
   self.positionAndZoomToAirport = function(airport) {
-    console.log('ViewModel.positionAndZoomToAirport: Moving map to the coordinates: <' + airport.airportMarker().position + '>');
+    console.log('ViewModel.positionAndZoomToAirport: Moving map to the coordinates: ' + airport.airportMarker().position);
     self.map().setZoom(10);
     self.map().setCenter(airport.airportMarker().position);
   };
@@ -228,6 +224,10 @@ CSSAirportMaps.ViewModel = function(options) {
 
       self.positionAndZoomToAirport(newAirport);
     } else if (self.airportCollection().length == 2) {
+      if(self.airportCollection()[0].name === self.airportCollection()[1].name) {
+        return;
+      }
+
       self.removeFlightPathFromMap();
 
       self.fitBounds();
@@ -239,7 +239,7 @@ CSSAirportMaps.ViewModel = function(options) {
   };
 
   self.onAutoCompleted = function(obj, datum, name) {
-    console.log('ViewModel.onAutoCompleted: (' + datumn.name + '): ', datum);
+    console.log('ViewModel.onAutoCompleted: (' + datum.name + '): ', datum);
 
     self.removeAirportById(0);
 

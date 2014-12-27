@@ -5,7 +5,6 @@ CSSAirportMaps.Airport = function(map, options) {
   self.id = options.id;
   self.name = options.name;
 
-  // DO I WANT TO MAINTAIN THESE STATE VARIABLES ON THE ACTUAL AIRPORTS?
   self.isSelected = ko.observable(false);
   self.isSearchActive = ko.observable(false);
   
