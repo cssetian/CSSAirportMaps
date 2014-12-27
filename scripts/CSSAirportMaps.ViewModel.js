@@ -1,5 +1,6 @@
 
 CSSAirportMaps.ViewModel = function(options) {
+  'use strict';
   var self = this;
   self.initialAirport = ko.observable();
 

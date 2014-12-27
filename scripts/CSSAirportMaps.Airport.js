@@ -1,4 +1,5 @@
 CSSAirportMaps.Airport = function(map, options) {
+  'use strict';
   console.log('CSSAirportMaps.Airport: Initializing Airport ViewModel for ' + options.name);
   var self = this;
 

@@ -1,4 +1,5 @@
 CSSAirportMaps.SearchEngine = function(options) {
+  'use strict';
   // Initialize the Bloodhound search engine
   var self = this;
   self.id = options.id;
