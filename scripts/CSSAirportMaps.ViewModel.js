@@ -5,6 +5,7 @@ CSSAirportMaps.ViewModel = function(options) {
 
   self.initialize = function() {
 
+    // Define the specific unique data for each of the two search engines
     self.departureSearchOptions = {
       id: 1,
       name: 'departureAirports',
@@ -33,10 +34,10 @@ CSSAirportMaps.ViewModel = function(options) {
     self.arrivalSearchOptions.remoteFilter = self.arrivalSearchEngine().remoteFilter;
   };
 
-  self.map = ko.observable(new google.maps.Map(document.getElementById('map-canvas'), {}));
-  self.airportCollection = ko.observableArray([]);
-  self.bounds = ko.observable(new google.maps.LatLngBounds(null));
-  self.flightPath = ko.observable(new google.maps.Polyline());
+  self.map = ko.observable(new google.maps.Map(options.domEls.map.get(0), {})); // Define the map object on the map element provided
+  self.airportCollection = ko.observableArray([]);  // Stores the airport objects for initial, departure, and arrival airports
+  self.bounds = ko.observable(new google.maps.LatLngBounds(null)); // Define a map boundary object so it can be extended when airports are defined
+  self.flightPath = ko.observable(new google.maps.Polyline());  // Defines a google maps polyline to be added / removed when both airports are selected
 
   self.departureSearchInput = ko.observable('');
   self.arrivalSearchInput = ko.observable('');

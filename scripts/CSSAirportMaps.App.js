@@ -9,11 +9,14 @@ CSSAirportMaps.App = (function($, _, ko) {
   var _init = function (options) {
     console.log('App.Init: Initializing CSSAirportMaps!');
 
+    // Register handlebar helpers to render templates
     CSSAirportMaps.Config.registerHandlebarHelpers();
 
+    // Instantiate and initialize the viewmodel
     viewModel = new CSSAirportMaps.ViewModel(options);
     viewModel.initialize();
-
+    
+    // Initial display location hard-coded to newark international airport
     var initialAirportDisplayData = {
       value: 'Newark International Airport',
       name: 'Newark International Airport',
@@ -33,14 +36,17 @@ CSSAirportMaps.App = (function($, _, ko) {
       airportData: initialAirportDisplayData
     };
 
+    // Create the initial airport to be displayed when no other airports are selected
     var initialAirport = new CSSAirportMaps.Airport(viewModel.map(), initialAirportParams);
     viewModel.addAirport(initialAirport);
     console.log('App.Init: Adding default, hard-coded initial airport (' + initialAirport.name + ') to map at: ' +  initialAirport.airportCoords());
     
+    // Pan and zoom to hard coded initial airport and set the initial airport viewModel property
     console.log('App.Init: Panning and zooming to default, non-located coordinates');
     viewModel.positionAndZoomToAirport(initialAirport);
     viewModel.initialAirport(initialAirport);
 
+    // Apply bindings and fade in main app element
     ko.applyBindings(viewModel);
     options.domEls.appContainer.fadeIn(500).removeClass('hidden');
   };
