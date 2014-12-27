@@ -7,12 +7,10 @@
   padding-left: 5px;
   padding-right: 5px;
 }
-
 .hidden { display: none; }
 
 .tt-dataset-departureAirports { cursor: default; }
 .tt-dataset-arrivalAirports { cursor: default; }
-
 
 h2 { margin-top: 5px; }
 
@@ -30,11 +28,9 @@ th { text-align: left; }
     /* note that x is hidden now */
     overflow-x:hidden;
     overflow-y:scroll;
-} 
-/*.ui-autocomplete { height: 200px; overflow-y: scroll; overflow-x: hidden;}*/
+}
 
 .input-append,.input-prepend{ font-size: 16px; }
-
 .input-table th, .input-table td { border-top: none !important; }
 
 table {
@@ -45,11 +41,9 @@ table {
 }
 
 .first-input-column { min-width: 150px; }
-
 .second-input-column { min-width: 300px; }
 
 .first-column { min-width: 150px; }
-
 .second-column, .third-column { min-width: 200px; }
 
 @media (max-width: 700px) {
@@ -126,27 +120,6 @@ input::-webkit-calendar-picker-indicator { display: none; }
   padding-top: 5px;
 }
 
-
-
-
-/*
-.tt-query,
-.tt-hint {
-    width: 396px;
-    height: 30px;
-    padding: 8px 12px;
-    font-size: 24px;
-    line-height: 30px;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    outline: none;
-}
-
-.tt-query {
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-}
-*/
-
 .typeahead-suggestion-match {
   color: red;
 }
@@ -166,7 +139,6 @@ input::-webkit-calendar-picker-indicator { display: none; }
 }
 
 /* This is a bright blue background for suggestions
-
 .tt-suggestion {
     padding: 3px 20px;
     font-size: 18px;
@@ -179,5 +151,5 @@ input::-webkit-calendar-picker-indicator { display: none; }
 }
 .tt-suggestion p {
     margin: 0;
-}*/
-
+}
+*/

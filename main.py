@@ -1,26 +1,9 @@
-#!/usr/bin/env python
-#
-# Copyright 2007 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
 import webapp2
 import json as simplejson
 from webapp2_extras import json as webapp_json
 import logging
 import urllib
 import urllib2
-# import requests
 
 # ndb is the new version of db
 # from google.appengine.ext import db
@@ -40,6 +23,7 @@ class MainHandler(webapp2.RequestHandler):
         self.response.out.write(template.render('index.html', {}))
 
 # This class is no longer needed now that I'm using GeoPlanet for data instead of the google maps api
+#       But is also a good example of a places API attempt at searching for Airport data
 class AirportSearchHandler(webapp2.RequestHandler):
     def get(self, *args, **kwargs):
       #url = self;
@@ -54,7 +38,6 @@ class AirportSearchHandler(webapp2.RequestHandler):
       logging.info('----------------------------')
       logging.info(kwargs)
       logging.info('----------------------------')
-      #search_query = kwargs.get('search_query')
 
       test = 'https://maps.googleapis.com/maps/api/place/search/json?types="cafe|bakery"&location=37.787930,-122.4074990&radius=5000&sensor=false&key='
       #airportSearchBaseUrl = 'https://maps.googleapis.com/maps/api/place/search/json?sensor=false&rankby=prominence&keyword=airport&types=airport'
