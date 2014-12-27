@@ -1,8 +1,5 @@
 import webapp2
-import json as simplejson
-from webapp2_extras import json as webapp_json
 import logging
-import urllib
 import urllib2
 
 # ndb is the new version of db
