@@ -36,10 +36,12 @@ class AirportSearchHandler(webapp2.RequestHandler):
       logging.info('----------------------------')
 
       test = 'https://maps.googleapis.com/maps/api/place/search/json?types="cafe|bakery"&location=37.787930,-122.4074990&radius=5000&sensor=false&key='
+     
       #airportSearchBaseUrl = 'https://maps.googleapis.com/maps/api/place/search/json?sensor=false&rankby=prominence&keyword=airport&types=airport'
       #googlePlacesAPIKey = '&key='
       #queryKey = '&name='
       #fullSearchUrl = airportSearchBaseUrl + googlePlacesAPIKey + queryKey + search_query
+      
       cssairportmapsAPIKey = '';
       apiprojectAPIKey = '';
       APIKeyPrefix = '&key='
@@ -60,32 +62,8 @@ class AirportSearchHandler(webapp2.RequestHandler):
       except urllib2.URLError, e:
         logging.info('Error searching for airports!')
         handleError(e)
-      #searchInput = self.request.get('searchInput')
-      #logging.info('Search Input Sent: ' + searchInput)
-      #url_base = 'http://airports.pidgets.com/v1/airports?format=json&name='
-      #url_suffix = '?format=json&callback=alert'
-      #url = url_base + searchInput #+ url_suffix
-      #logging.info('Searching for airports! Url Below')
-      #logging.info(url)
 
-      #yql_base_url = 'http://query.yahooapis.com/v1/public/yql'
-      #yql = 'select * from geo.airports where location=\'' + searchInput + '\'and search_text=\'dance\''
-      #yql_encoded = urllib.urlencode(yql)
-      #yql_query_url = yql_base_url + "?q=" + yql_encoded
-
-
-      #request = urllib2.Request(url)
-      #results = urllib2.urlopen(url)
-      #logging.info('Request URLOpened Data Below') 
-      #logging.info(type(results))
-      #logging.info(results)
-      #logging.info('Got the request! Request Full URL: ' + request.get_full_url())
-      #output = results.read()
-      #logging.info('Request Read Data Below') 
-      #logging.info(type(output))
-      #logging.info(output)
       logging.info('This app should never get here!')
-      #self.response.out.write(output)
 
 app = webapp2.WSGIApplication([
     webapp2.Route('/airportsearch', handler=AirportSearchHandler),
